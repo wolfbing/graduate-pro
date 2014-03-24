@@ -1,3 +1,4 @@
+
 #
 # 为什么这样写无效？ ##
 #TrafficSimulation/
@@ -20,4 +21,19 @@ TrafficSimulation/TrafficSimulation/*.vcxproj.user
 TrafficSimulation/TrafficSimulation/*.qrc
 TrafficSimulation/TrafficSimulation/*.db
 
+
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
 
