@@ -1,4 +1,6 @@
 #include "trafficsimulation.h"
+#include "nodegraphicsscene.h"
+#include <QGraphicsView>
 
 TrafficSimulation::TrafficSimulation(QWidget *parent)
 	: QMainWindow(parent)

@@ -245,3 +245,45 @@ QHash<ConnWithCoorPair,int>* DbAdapter::loadNormConnWithBusNum()
 	return result;
 
 }
+
+QList<QPointF>* DbAdapter::loadNodes()
+{
+	QList<QPointF>* pointList = mDb->loadNodes();
+	norm(pointList);
+	return pointList;
+}
+
+void DbAdapter::norm( QList<QPointF>* pointList ) const
+{
+	QListIterator<QPointF> ite(*pointList);
+	QPointF tmpPoint;
+	if(!ite.hasNext())
+		return;
+	tmpPoint = ite.next();
+	qreal left=tmpPoint.x(), right = tmpPoint.x(),
+		top = tmpPoint.y(), bottom = tmpPoint.y();
+	while (ite.hasNext())
+	{
+		tmpPoint = ite.next();
+		if(tmpPoint.x()<left)
+			left = tmpPoint.x();
+		if(tmpPoint.x()>right)
+			right = tmpPoint.x();
+		if(tmpPoint.y()<bottom)
+			bottom = tmpPoint.y();
+		if(tmpPoint.y()>top)
+			top = tmpPoint.y();
+	}
+
+	QPointF center = QPointF((left+right)/2.0, (top+bottom)/2.0);
+	qreal width = qAbs(right - left);
+	qreal height = qAbs(top - bottom);
+	qreal maxLen = width>height ? width : height;
+	QMutableListIterator<QPointF> mIte(*pointList);
+	while (mIte.hasNext())
+	{
+		tmpPoint = mIte.next();
+		mIte.setValue(QPointF((tmpPoint.x()-center.x())/maxLen,
+			(tmpPoint.y()-center.y())/maxLen));
+	}
+}

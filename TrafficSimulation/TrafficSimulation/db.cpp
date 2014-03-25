@@ -1024,6 +1024,20 @@ QHash<int,int>* DB::loadNodeIdToId()
 	return hash;
 }
 
+QList<QPointF>* DB::loadNodes()
+{
+	QList<QPointF>* pointList = new QList<QPointF>;
+	QSqlQuery query(mDb);
+
+	// 载入坐标
+	QString sql = "select coor_x, coor_y from "+DB::sNodeTableName;
+	query.exec(sql);
+	while(query.next()){
+		pointList->append(QPointF(query.value(0).toInt(), query.value(1).toInt()));
+	}
+	return pointList;
+}
+
 
 
 

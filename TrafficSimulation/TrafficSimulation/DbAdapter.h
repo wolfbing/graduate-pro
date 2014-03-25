@@ -15,11 +15,13 @@ public:
 	QList<QPair<Node,Node> >* loadNormConns();
 	QList<ConnWithCoorLevel>* loadNormConnWithLevel();
 	QHash<ConnWithCoorPair,int>* loadNormConnWithBusNum();
+	QList<QPointF>* loadNodes();
 
 private:
 	void normConns(QList<QPair<Node,Node> > *);
 	void normConns(QList<ConnWithCoorLevel>* );
 	void normConns(QHash<ConnWithCoorPair,int>*);
+	void norm(QList<QPointF>*) const;
 
 private:
 	DB* mDb;
