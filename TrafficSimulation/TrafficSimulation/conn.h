@@ -2,6 +2,7 @@
 #define CONN_H
 
 #include <QtCore>
+#include "Normal.h"
 
 struct ConnWithCoorLevel
 {
@@ -33,13 +34,18 @@ inline uint qHash(const ConnWithNoPair & p, uint seed = 0){
 QDataStream& operator<<(QDataStream& out, const ConnWithNoPair& conn);
 QDataStream& operator>>(QDataStream& in, const ConnWithNoPair& conn);
 
-struct ConnWithCoorPair
+struct ConnWithCoorPair : public Normal
 {
 	QPair<QPointF,QPointF> mCoorPair;
 
 	ConnWithCoorPair(){};
 	ConnWithCoorPair(QPointF p1,QPointF p2);
+	ConnWithCoorPair(const ConnWithCoorPair & conn);
+	ConnWithCoorPair & operator=(const ConnWithCoorPair & conn);
 	bool operator==(const ConnWithCoorPair &) const;
+
+	Rect border() const;
+	void norm(qreal, QPointF c);
 };
 
 inline uint qHash(const ConnWithCoorPair & p, uint seed=0 ){

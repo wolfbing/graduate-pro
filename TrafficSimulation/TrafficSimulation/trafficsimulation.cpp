@@ -59,7 +59,7 @@ void TrafficSimulation::changeGraphics( int comIndex,int listIndex )
 		return ;
 	mCurrentComIndex = comIndex;
 	mCurrentListIndex = listIndex;
-	switch (comIndex)
+	/*switch (comIndex)
 	{
 	case 0:
 		{
@@ -93,7 +93,7 @@ void TrafficSimulation::changeGraphics( int comIndex,int listIndex )
 		}
 	default:
 		break;
-	}
+	}*/
 	mNoGraphics = false;
 	update();
 }

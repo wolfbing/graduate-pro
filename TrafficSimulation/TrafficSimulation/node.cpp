@@ -8,9 +8,33 @@ NodeWithCoorNo::NodeWithCoorNo( QPointF p, int no)
 	mNo = no;
 }
 
-bool NodeWithCoorNo::operator==( const NodeWithCoorNo node ) const
+NodeWithCoorNo::NodeWithCoorNo( const NodeWithCoorNo & node )
+{
+	mCoor = node.mCoor;
+	mNo = node.mNo;
+}
+
+bool NodeWithCoorNo::operator==( const NodeWithCoorNo & node ) const
 {
 	return (this->mCoor==node.mCoor) && (this->mNo==node.mNo);
+}
+
+NodeWithCoorNo & NodeWithCoorNo::operator=( const NodeWithCoorNo & node )
+{
+	mCoor = node.mCoor;
+	mNo = node.mNo;
+	return *this;
+}
+
+
+Rect NodeWithCoorNo::border() const
+{
+	return Rect(mCoor.x(), mCoor.y(), 0, 0);
+}
+
+void NodeWithCoorNo::norm( qreal factor, QPointF c )
+{
+	mCoor = (mCoor-c)/factor;
 }
 
 

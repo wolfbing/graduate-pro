@@ -1,13 +1,17 @@
 #include "nodegraphicsscene.h"
 #include <QtWidgets>
+#include <QGraphicsScene>
+#include <QGraphicsEllipseItem>
 
 NodeGraphicsScene::NodeGraphicsScene(QObject *parent)
-	: QGraphicsScene(parent)
-	, mRatio(0.9)
-	, mOffset(QPointF(0,0))
-{
-	mPointList = mDbAdapter.loadNodes();
+	: GraphicsScene(parent)
 	
+{
+	mPointList = mDbAdapter.loadNormNodesWithNo();
+	mConnList = mDbAdapter.loadNormConns();
+	mItemList = QList<QGraphicsItem*>();
+	//mConnItemList = QList<QGraphicsItem*>();
+	updateItems();
 }
 
 NodeGraphicsScene::~NodeGraphicsScene()
@@ -18,67 +22,52 @@ NodeGraphicsScene::~NodeGraphicsScene()
 void NodeGraphicsScene::updateItems()
 {
 	clear();
-	QListIterator<QPointF> ite(*mPointList);
+	QListIterator<NodeWithCoorNo> nodeIte(*mPointList);
 	QPointF normPoint;
 	QPointF scenePoint;
-	while (ite.hasNext())
+	mItemList.clear();
+	while (nodeIte.hasNext())
 	{
-		normPoint = ite.next();
+		normPoint = nodeIte.next().mCoor;
 		scenePoint = normCoorToSceneCoor(normPoint);
-		addItem(new QGraphicsEllipseItem(scenePoint.x()-3, scenePoint.y()-3, 6, 6));
+		QGraphicsItem* item = new QGraphicsEllipseItem(scenePoint.x()-3, scenePoint.y()-3, 6, 6);
+		item->setData(1, normPoint.x());
+		item->setData(2, normPoint.y());
+		item->setData(3, scenePoint.x());
+		item->setData(4, scenePoint.y());
+		addItem(item);
+		mItemList.append(item);
+	}
+	QListIterator<ConnWithCoorPair> connIte(*mConnList);
+	while (connIte.hasNext())
+	{
+		ConnWithCoorPair conn = connIte.next();
+		QPointF normFP = conn.mCoorPair.first;
+		QPointF normSP = conn.mCoorPair.second;
+		QPointF sceneFP = normCoorToSceneCoor(normFP);
+		QPointF sceneSP = normCoorToSceneCoor(normSP);
+		QGraphicsLineItem* item = new QGraphicsLineItem(QLineF(sceneFP, sceneSP));
+		addItem(item);
+		mItemList.append(item);
 	}
 
 }
 
-void NodeGraphicsScene::zoom( int step, QPointF hoverPos )
+void NodeGraphicsScene::moveItems()
 {
-	if(mRatio==0.9 && step<=0)
-		return;
-	QPointF normPoint = sceneCoorToNormCoor(hoverPos);
-	qreal minLen = shorterSceneRectSide();
-	mRatio += 0.1 * step;
-	if(mRatio<0.9)
-		mRatio = 0.9;
-	QPointF newScenePoint = 
-		QPointF( normPoint.x() * minLen * mRatio, - normPoint.y()*minLen*mRatio);
-	QPointF tmp = (hoverPos - newScenePoint)/(minLen*mRatio);
-	mOffset = QPointF(tmp.x(), -tmp.y());
-	updateItems();
+	QListIterator<QGraphicsItem*> ite(mItemList);
+	QGraphicsItem* item;
+	QPointF newScenePos, scenePos, delta;
+	while(ite.hasNext())
+	{
+		item = ite.next();
+		newScenePos = normCoorToSceneCoor(QPointF(item->data(1).toReal(),item->data(2).toReal()));
+		scenePos = QPointF(item->data(3).toReal(), item->data(4).toReal());
+		item->setData(3, newScenePos.x());
+		item->setData(4, newScenePos.y());
+		delta = newScenePos - scenePos;
+		item->moveBy(delta.x(), delta.y());
+
+	}
 }
 
-void NodeGraphicsScene::changeSceneRect( int w, int h )
-{
-	setSceneRect(-w/2.0, -h/2.0, w, h);
-	updateItems();
-}
-
-QPointF NodeGraphicsScene::normCoorToSceneCoor( QPointF point )
-{
-	qreal minLen = shorterSceneRectSide();
-	qreal x = (point.x()+mOffset.x()) * minLen * mRatio;
-	qreal y = -(point.y()+mOffset.y()) * minLen * mRatio;
-	return QPointF(x, y);
-}
-
-void NodeGraphicsScene::move( QPointF offset )
-{ 
-	qreal minLen = shorterSceneRectSide();
-	QPointF normOffset(offset.x()/(minLen*mRatio), -offset.y()/(minLen*mRatio));
-	mOffset += normOffset;
-	updateItems();
-}
-
-qreal NodeGraphicsScene::shorterSceneRectSide()
-{
-	QRectF rect = sceneRect(); 
-	qreal minLen = qreal (rect.width()>rect.height() ? rect.height():rect.width());
-	return minLen;
-}
-
-QPointF NodeGraphicsScene::sceneCoorToNormCoor( QPointF point )
-{
-	qreal minLen = shorterSceneRectSide();
-	qreal x = point.x()/(minLen*mRatio)-mOffset.x();
-	qreal y = -point.y()/(minLen*mRatio)-mOffset.y();
-	return QPointF(x, y);
-}

@@ -3,6 +3,7 @@
 #include "db.h"
 #include "node.h"
 #include "conn.h"
+#include "rect.h"
 
 typedef NodeWithCoorNo Node;
 
@@ -12,16 +13,21 @@ public:
 	DbAdapter(void);
 	~DbAdapter(void);
 
-	QList<QPair<Node,Node> >* loadNormConns();
+	//QList<QPair<Node,Node> >* loadNormConns();
 	QList<ConnWithCoorLevel>* loadNormConnWithLevel();
 	QHash<ConnWithCoorPair,int>* loadNormConnWithBusNum();
-	QList<QPointF>* loadNodes();
+	QList<NodeWithCoorNo>* loadNormNodesWithNo();
+	QList<ConnWithCoorPair>* loadNormConns();
 
 private:
+	template <class T>
+	Rect boundingRect(QList<T>) const;
 	void normConns(QList<QPair<Node,Node> > *);
 	void normConns(QList<ConnWithCoorLevel>* );
 	void normConns(QHash<ConnWithCoorPair,int>*);
-	void norm(QList<QPointF>*) const;
+
+	template <class T>
+	void norm(QList<T>*) const;
 
 private:
 	DB* mDb;
@@ -29,4 +35,6 @@ private:
 
 
 };
+
+
 

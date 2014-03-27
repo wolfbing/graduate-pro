@@ -1024,18 +1024,51 @@ QHash<int,int>* DB::loadNodeIdToId()
 	return hash;
 }
 
-QList<QPointF>* DB::loadNodes()
+QList<Node>* DB::loadNodes()
 {
-	QList<QPointF>* pointList = new QList<QPointF>;
+	QList<Node>* nodeList = new QList<Node>;
 	QSqlQuery query(mDb);
 
 	// 载入坐标
-	QString sql = "select coor_x, coor_y from "+DB::sNodeTableName;
+	QString sql = "select node_id, coor_x, coor_y from "+DB::sNodeTableName;
 	query.exec(sql);
 	while(query.next()){
-		pointList->append(QPointF(query.value(0).toInt(), query.value(1).toInt()));
+		nodeList->append(Node(
+			QPointF( query.value(1).toInt(), query.value(2).toInt() ), 
+			query.value(0).toInt() )  );
 	}
-	return pointList;
+	return nodeList;
+}
+
+QList<ConnWithCoorPair>* DB::loadConns()
+{
+	QList<ConnWithCoorPair>* secList = new QList<ConnWithCoorPair>;
+	QList<QPair<int,int> > nodePairVec;
+	QSqlQuery query(mDb);
+	QString sql = "select start_node,end_node from "+DB::sConnTableName;
+	if(!query.exec(sql))
+	{
+		QSqlError err = query.lastError();
+		QString errText = err.text();
+		throw new SqlQueryException(errText);
+	}
+	while(query.next()){
+		nodePairVec.append(QPair<int,int>(query.value(0).toInt(),
+			query.value(1).toInt()));
+
+	}
+	QString sql2 = "select id,coor_x,coor_y from "+DB::sNodeTableName;
+	query.exec(sql2);
+	QHash<int, QPointF> points;
+	while(query.next()){
+		points.insert(query.value(0).toInt(),
+			QPointF(query.value(1).toDouble(),	query.value(2).toDouble() )  );
+	}
+	for(int i=0; i<nodePairVec.size(); ++i){
+		secList->append(ConnWithCoorPair(points.value(nodePairVec.at(i).first),
+			points.value(nodePairVec.at(i).second) )  );
+	}
+	return secList;
 }
 
 

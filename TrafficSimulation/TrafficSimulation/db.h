@@ -33,7 +33,8 @@ public:
 	QHash<int,QPointF>* loadNodeByNodeId();
 	QVector<ConnWithNoPair>* loadConnByNo();
 	QHash<int,int>* loadNodeIdToId();
-	QList<QPointF>* loadNodes();
+	QList<Node>* loadNodes();
+	QList<ConnWithCoorPair>* loadConns();
 
 
 signals:

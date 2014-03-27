@@ -3,9 +3,6 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_trafficsimulation.h"
-#include "nodegraphicswidget.h"
-#include "roadlevelgraphicswidget.h"
-#include "busnumgraphicswidget.h"
 #include "selectgraphicswidget.h"
 
 /*
@@ -44,9 +41,6 @@ private:
 	// 选择交通图的对话框
 	SelectGraphicsWidget* mSelectGraphicsDialog;
 	// 各种图
-	NodeGraphicsWidget* mNodeWidget;
-	RoadLevelGraphicsWidget* mRoadLevelWidget;
-	BusNumGraphicsWidget* mBusNumWidget;
 };
 
 #endif // TRAFFICSIMULATION_H
