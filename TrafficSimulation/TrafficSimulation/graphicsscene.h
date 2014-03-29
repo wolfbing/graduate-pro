@@ -17,6 +17,10 @@ public slots:
 	void zoom(int step, QPointF hoverPos);
 	void move(QPointF offset);
 
+signals:
+	void sendMsgToStatus(QString);
+	void clearMsgFromStatus();
+
 protected:
 	virtual void updateItems()=0;
 	virtual void moveItems(){};
@@ -24,12 +28,18 @@ protected:
 	QPointF sceneCoorToNormCoor(QPointF);
 	qreal shorterSceneRectSide(); // 返回sceneRect中较短的边
 
+	virtual void checkNoTextVisible() = 0;
+	
+	void drawBackground(QPainter *painter, const QRectF &rect);
+
 protected:
 	DbAdapter mDbAdapter;
 
 private:
 	qreal mRatio;
 	QPointF mOffset;
+
+	QColor mBackColor;
 
 };
 

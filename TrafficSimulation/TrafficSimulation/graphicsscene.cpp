@@ -1,9 +1,11 @@
 #include "graphicsscene.h"
+#include <QPainter>
 
 GraphicsScene::GraphicsScene(QObject *parent)
 	: QGraphicsScene(parent)
 	, mRatio(0.9)
 	, mOffset(QPointF(0,0))
+	, mBackColor(QColor(242,239,232))
 {
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	
@@ -30,12 +32,14 @@ void GraphicsScene::zoom( int step, QPointF hoverPos )
 	mOffset = QPointF(tmp.x(), -tmp.y());
 	updateItems();
 	//moveItems();
+	checkNoTextVisible();
 }
 
 void GraphicsScene::changeSceneRect( int w, int h )
 {
 	setSceneRect(-w/2.0, -h/2.0, w, h);
 	updateItems();
+	checkNoTextVisible();
 	//moveItems();
 }
 
@@ -70,3 +74,10 @@ QPointF GraphicsScene::sceneCoorToNormCoor( QPointF point )
 	qreal y = -point.y()/(minLen*mRatio)-mOffset.y();
 	return QPointF(x, y);
 }
+
+void GraphicsScene::drawBackground( QPainter *painter, const QRectF &rect )
+{
+	painter->fillRect(rect, mBackColor);
+}
+
+

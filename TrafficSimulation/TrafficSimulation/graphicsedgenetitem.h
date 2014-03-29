@@ -19,10 +19,22 @@ public:
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */);
 	QPainterPath shape() const;
+	 
+	// …Ë÷√ªÊÕº Ù–‘
+	GraphicsEdgetNetItem & setWidth(qreal width);
+	GraphicsEdgetNetItem & setBorderColor(QColor borderColor);
+	GraphicsEdgetNetItem & setInnerColor(QColor innerColor);
+	GraphicsEdgetNetItem & setHaveBorder(bool haveBorder);
 
+private:
+	void init();
 
 private:
 	QList<Edge> mEdges;
+	qreal mEdgeWidth;
+	QColor mBorderColor;
+	QColor mInnerColor;
+	bool mHaveBorder;
 	
 };
 

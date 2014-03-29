@@ -122,15 +122,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_nodegraphicsscene.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="nodegraphicsview.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_nodegraphicsview.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_nodegraphicsview.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="Normal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -179,6 +170,24 @@
     <ClCompile Include="GeneratedFiles\Release\moc_winofgraphicsview.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="graphicsview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_graphicsview.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_graphicsview.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="graphicsnodenotextitem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_graphicsnodeitem.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_graphicsnodeitem.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="trafficsimulation.ui">
@@ -208,9 +217,6 @@
     <CustomBuild Include="nodegraphicsscene.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="nodegraphicsview.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="selectgraphicswidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -229,6 +235,15 @@
     <CustomBuild Include="winofgraphicsview.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="graphicsview.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="graphicsnodenotextitem.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="graphicsnodeitem.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_trafficsimulation.h">
@@ -244,9 +259,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphicsedgenetitem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="graphicsnodeitem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="node.h">

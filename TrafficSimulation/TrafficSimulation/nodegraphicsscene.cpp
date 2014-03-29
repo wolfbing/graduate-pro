@@ -2,6 +2,7 @@
 #include <QtWidgets>
 #include <QGraphicsScene>
 #include <QGraphicsEllipseItem>
+#include "graphicsnodenotextitem.h"
 
 NodeGraphicsScene::NodeGraphicsScene(QObject *parent)
 	: GraphicsScene(parent)
@@ -13,14 +14,19 @@ NodeGraphicsScene::NodeGraphicsScene(QObject *parent)
 	mNodes = QList<GraphicsNodeItem*>();
 	NodeWithCoorNo node;
 	GraphicsNodeItem* nodeItem;
+	GraphicsNodeNoTextItem* nodeNoTextItem;
 	while (ite.hasNext())
 	{
 		node = ite.next();
-		nodeItem = new GraphicsNodeItem(node.mCoor);
+		nodeItem = new GraphicsNodeItem(node.mCoor, node.mNo);
+		nodeNoTextItem = new GraphicsNodeNoTextItem(nodeItem);
+		connect(nodeItem, SIGNAL(sendNodeInfoToStatus(QString)), this, SIGNAL(sendMsgToStatus(QString)) );
+		connect(nodeItem, SIGNAL(clearNodeInfoFromStatus()), this, SIGNAL(clearMsgFromStatus() ) );
 		nodeItem->setNo(node.mNo);
 		mNodes << nodeItem;
 		hash.insert(nodeItem->no(), nodeItem);
 		addItem(nodeItem);
+		addItem(nodeNoTextItem);
 	}
 	QListIterator<ConnWithNoPair> connIte(*connList);
 	ConnWithNoPair tmpConn;
@@ -32,6 +38,7 @@ NodeGraphicsScene::NodeGraphicsScene(QObject *parent)
 
 	}
 	addItem(mEdgeNet);
+	mEdgeNum = connList->size();
 
 	delete nodeList;
 	delete connList;
@@ -56,5 +63,27 @@ void NodeGraphicsScene::updateItems()
 		item->setPos(newPos);
 	}
 	mEdgeNet->advance();
+}
+
+void NodeGraphicsScene::checkNoTextVisible()
+{
+	QListIterator<GraphicsNodeItem*> ite(mNodes);
+	GraphicsNodeItem * item;
+	while (ite.hasNext())
+	{
+		item = ite.next();
+		item->checkNoItemVisible();
+	}
+
+}
+
+int NodeGraphicsScene::nodeNum() const
+{
+	return mNodes.size();
+}
+
+int NodeGraphicsScene::edgeNum() const
+{
+	return mEdgeNum;
 }
 
