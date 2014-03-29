@@ -22,7 +22,7 @@
 #include "sqlqueryexception.h"
 
 
-const QString DB::sDbType = "QSQLITE"; // ä½¿ç”¨Sqlite3æ•°æ®åº“
+const QString DB::sDbType = "QSQLITE"; // Ê¹ÓÃSqlite3Êı¾İ¿â
 const QString DB::sDbName = "F:/GitHub/TrafficSimulation/TrafficSimulation/road.db";
 // Table names
 const QString DB::sNodeTableName = "road_node";
@@ -143,8 +143,8 @@ DB::~DB()
         delete mFileDir;
 }
 
-// å°†ä¼šæœç´¢ç›®å½•ä¸‹çš„æ•°æ®æ–‡ä»¶ç„¶åè½¬å­˜åˆ°æ•°æ®åº“
-// è¿”å›æœç´¢åˆ°çš„æ•°æ®æ–‡ä»¶ååˆ—è¡¨
+// ½«»áËÑË÷Ä¿Â¼ÏÂµÄÊı¾İÎÄ¼şÈ»ºó×ª´æµ½Êı¾İ¿â
+// ·µ»ØËÑË÷µ½µÄÊı¾İÎÄ¼şÃûÁĞ±í
 QStringList DB::createTablesAndFetchData()
 {
     QSqlQuery query = QSqlQuery(mDb);
@@ -153,8 +153,8 @@ QStringList DB::createTablesAndFetchData()
     if(!dir.exists())
         throw new PathNotExistsException;
     mDb.transaction();
-    // è½¬å­˜æ–‡ä»¶æ—¶æ³¨æ„: åŸå§‹æ•°æ®æ–‡ä»¶ä¹‹é—´æœ‰ä¾èµ–å…³ç³»,
-    // åœ¨ä¸è¿›è¡Œæ•°æ®åº“åˆ›å»ºçš„æ—¶å€™, è¿™æ—¶æ‰€æ“ä½œçš„æ–‡ä»¶åº”è¯¥æ˜¯å¯¹ä¸Šé¢çš„æ–‡ä»¶æœ‰æ‰€ä¾èµ–çš„
+    // ×ª´æÎÄ¼şÊ±×¢Òâ: Ô­Ê¼Êı¾İÎÄ¼şÖ®¼äÓĞÒÀÀµ¹ØÏµ,
+    // ÔÚ²»½øĞĞÊı¾İ¿â´´½¨µÄÊ±ºò, ÕâÊ±Ëù²Ù×÷µÄÎÄ¼şÓ¦¸ÃÊÇ¶ÔÉÏÃæµÄÎÄ¼şÓĞËùÒÀÀµµÄ
     try{
         clearTables();
         if(dir.exists(DB::sCoorFileName)){
@@ -335,7 +335,7 @@ void DB::fetchDataFromSectionFile(QSqlQuery &query)
                     "(start_node, end_node, sec_len, motor_driveway_width,"+
                     "non_motor_driveway_width, driveway_isolation, road_level) "+
                     "values ("+
-                    "(select id from "+DB::sNodeTableName+" where node_id=?),"+ //å¤–é”®, ä¸‹åŒ
+                    "(select id from "+DB::sNodeTableName+" where node_id=?),"+ //Íâ¼ü, ÏÂÍ¬
                     "(select id from "+DB::sNodeTableName+" where node_id=?),"+
                     "?,?,?,?,?)";
             query.prepare(sql);
@@ -345,7 +345,7 @@ void DB::fetchDataFromSectionFile(QSqlQuery &query)
             while(!in.atEnd() && num<NUM_ONCE){
                 in>>startNode>>endNode>>secLen>>motorDrivewayWidth
                     >>nonMotorDriveWayWidth>>isolateType>>roadLevel;
-                if(startNode!=0 && endNode!=0){ // ç›®çš„ä¸€æ˜¯æ•°æ®å”¯ä¸€æ€§, äºŒæ˜¯è¿‡æ»¤0æ•°æ®
+                if(startNode!=0 && endNode!=0){ // Ä¿µÄÒ»ÊÇÊı¾İÎ¨Ò»ĞÔ, ¶şÊÇ¹ıÂË0Êı¾İ
                     startNodes.append(startNode);
                     endNodes.append(endNode);
                     secLens.append(secLen);
@@ -390,8 +390,8 @@ void DB::fetchDataFromCoorFile(QSqlQuery &query)
         while(!in.atEnd()){
             int node_id;
             double coor_x, coor_y;
-            int num = 0; // sqlite3è¦æ±‚ä¸èƒ½ä¸€æ¬¡æ‰§è¡Œå¤§äº500æ¬¡çš„æ“ä½œ,
-                         // è¿™é‡Œé™åˆ¶åœ¨æ¯æ¬¡æ’å…¥500ä¸ªæ•°æ®,(ä¸€ä¸ªä¸€ä¸ªæ’å…¥å¤ªæ…¢äº†ï¼ï¼)
+            int num = 0; // sqlite3ÒªÇó²»ÄÜÒ»´ÎÖ´ĞĞ´óÓÚ500´ÎµÄ²Ù×÷,
+                         // ÕâÀïÏŞÖÆÔÚÃ¿´Î²åÈë500¸öÊı¾İ,(Ò»¸öÒ»¸ö²åÈëÌ«ÂıÁË£¡£¡)
             int const INSERT_NUM = 500;
             QString sql = "insert into "+DB::sNodeTableName+
                     " (node_id, coor_x, coor_y) values (?,?,?)";
@@ -401,7 +401,7 @@ void DB::fetchDataFromCoorFile(QSqlQuery &query)
             QVariantList coor_ys;
             while(!in.atEnd() && num<INSERT_NUM){
                 in>>node_id>>coor_x>>coor_y;
-                if(node_id!=0){ // è¿‡æ»¤æ‰ç©ºè¡Œäº§ç”Ÿçš„0æ•°æ®
+                if(node_id!=0){ // ¹ıÂËµô¿ÕĞĞ²úÉúµÄ0Êı¾İ
                     node_ids<<node_id;
                     coor_xs<<coor_x;
                     coor_ys<<coor_y;
@@ -415,7 +415,7 @@ void DB::fetchDataFromCoorFile(QSqlQuery &query)
             if(!query.execBatch()){
                 QSqlError err = query.lastError();
                 mDb.rollback();
-                throw new SqlQueryException("å¤„ç†æ–‡ä»¶"+DB::sCoorFileName+"æ—¶å‡ºé”™,"+
+                throw new SqlQueryException("´¦ÀíÎÄ¼ş"+DB::sCoorFileName+"Ê±³ö´í,"+
                                             "sqlerror:"+err.text());
             }
             mDb.commit();
@@ -441,7 +441,7 @@ void DB::fetchDataFromTrafficNode2OriNodeFile(QSqlQuery &query)
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sTrafficNode2OriNodeFileName));
     if(file->open(QIODevice::ReadOnly)){
         QTextStream in(file);
-        int tmp; in>>tmp; // ç¬¬ä¸€è¡Œæ•°æ®ä¸éœ€è¦
+        int tmp; in>>tmp; // µÚÒ»ĞĞÊı¾İ²»ĞèÒª
         int trafficId, nodeId;
         int NUM_ONCE = 200;
         QString sql = "insert into "+DB::sTrafficAreaTableName+" (traffic_area_id, node_id) "+
@@ -542,12 +542,12 @@ void DB::fetchDataFromRestrictTurnFile(QSqlQuery &query)
                 "(select id from "+DB::sNodeTableName+" where node_id=?)"+
                 ");";
         int NUM_ONCE = 100;
-        in>>tmp; // ç•¥å»ç¬¬ä¸€è¡Œæ•°æ®
+        in>>tmp; // ÂÔÈ¥µÚÒ»ĞĞÊı¾İ
         while(!in.atEnd()){
             int num = 0;
             QVariantList currNodes, fromNodes, toNodes;
             while(!in.atEnd() && num<NUM_ONCE){
-                in>>currNode>>tmp>>tmp>>fromNode>>tmp>>toNode; // æœ‰å‡ ä¸ªæ²¡ç”¨çš„æ•°æ®
+                in>>currNode>>tmp>>tmp>>fromNode>>tmp>>toNode; // ÓĞ¼¸¸öÃ»ÓÃµÄÊı¾İ
                 if(currNode!=0){
                     currNodes.append(currNode);
                     fromNodes.append(fromNode);
@@ -637,7 +637,7 @@ void DB::insertForbidAndRestrict(QSqlQuery & query, QString tbName, QString file
                 " and end_node=(select id from "+DB::sNodeTableName+" where node_id=?)),"+
                 "?,?,?,?,?,?);";
         QString tmp;
-        in>>tmp>>tmp>>tmp>>tmp>>tmp>>tmp>>tmp>>tmp; // ç•¥è¿‡ç¬¬ä¸€è¡Œçš„æ²¡ç”¨æ•°æ®
+        in>>tmp>>tmp>>tmp>>tmp>>tmp>>tmp>>tmp>>tmp; // ÂÔ¹ıµÚÒ»ĞĞµÄÃ»ÓÃÊı¾İ
         while(!in.atEnd()){
             QVariantList startNodes, endNodes;
             QVariantList bikes, cars, motors, taxis, trucks, buses;
@@ -705,7 +705,7 @@ void DB::fetchDataFromBusStopFile(QSqlQuery &query)
     if(file->open(QIODevice::ReadOnly)){
         QTextStream in(file);
         QString tmp;
-        in>>tmp; // ç•¥è¿‡ç¬¬ä¸€è¡Œçš„æ²¡ç”¨æ•°æ®
+        in>>tmp; // ÂÔ¹ıµÚÒ»ĞĞµÄÃ»ÓÃÊı¾İ
         QString sql = "insert into "+DB::sBusTableName+
                 " (route_id, node_num, nodes) values (?,?,?);";
         int NUM_ONCE = 500;
@@ -758,7 +758,7 @@ void DB::fetchDataFromBusNumFile(QSqlQuery &query)
     if(file->open(QIODevice::ReadOnly)){
         QTextStream in(file);
         int tmp;
-        in>>tmp; // ç•¥è¿‡ç¬¬ä¸€è¡Œæ²¡ç”¨çš„æ•°æ®
+        in>>tmp; // ÂÔ¹ıµÚÒ»ĞĞÃ»ÓÃµÄÊı¾İ
         QString sql = "update "+DB::sBusTableName +
                 " set vehicle=?,equivalent=? "+
                 " where route_id=?;";
@@ -916,7 +916,7 @@ QList<ConnWithCoorLevel>* DB::loadConnWithLevel()
 	QList<ConnWithCoorLevel >* connList = new QList<ConnWithCoorLevel>;
 	QSqlQuery query(mDb);
 
-	// è½½å…¥åæ ‡
+	// ÔØÈë×ø±ê
 	QString sql2 = "select id,coor_x,coor_y from "+DB::sNodeTableName;
 	query.exec(sql2);
 	QHash<int, QPointF> points;
@@ -924,7 +924,7 @@ QList<ConnWithCoorLevel>* DB::loadConnWithLevel()
 		points.insert(query.value(0).toInt(),
 			QPointF(query.value(1).toDouble(),	query.value(2).toDouble()));
 	}
-	// è½½å…¥é“è·¯
+	// ÔØÈëµÀÂ·
 	QString sql = "select start_node,end_node,road_level from "+DB::sConnTableName;
 	if(!query.exec(sql))
 	{
@@ -961,7 +961,7 @@ QHash<int,QPointF>* DB::loadNodeById()
 {
 	QSqlQuery query(mDb);
 
-	// è½½å…¥åæ ‡
+	// ÔØÈë×ø±ê
 	QString sql2 = "select id,coor_x,coor_y from "+DB::sNodeTableName;
 	query.exec(sql2);
 	QHash<int, QPointF>* points = new QHash<int, QPointF>;
@@ -999,7 +999,7 @@ QHash<int,QPointF>* DB::loadNodeByNodeId()
 {
 	QSqlQuery query(mDb);
 
-	// è½½å…¥åæ ‡
+	// ÔØÈë×ø±ê
 	QString sql2 = "select node_id,coor_x,coor_y from "+DB::sNodeTableName;
 	query.exec(sql2);
 	QHash<int, QPointF>* points = new QHash<int, QPointF>;
@@ -1015,7 +1015,7 @@ QHash<int,int>* DB::loadNodeIdToId()
 	QHash<int,int>* hash = new QHash<int,int>;
 	QSqlQuery query(mDb);
 
-	// è½½å…¥åæ ‡
+	// ÔØÈë×ø±ê
 	QString sql = "select id, node_id from "+DB::sNodeTableName;
 	query.exec(sql);
 	while(query.next()){
@@ -1029,7 +1029,7 @@ QList<Node>* DB::loadNodes()
 	QList<Node>* nodeList = new QList<Node>;
 	QSqlQuery query(mDb);
 
-	// è½½å…¥åæ ‡
+	// ÔØÈë×ø±ê
 	QString sql = "select node_id, coor_x, coor_y from "+DB::sNodeTableName;
 	query.exec(sql);
 	while(query.next()){
@@ -1068,6 +1068,36 @@ QList<ConnWithCoorPair>* DB::loadConns()
 		secList->append(ConnWithCoorPair(points.value(nodePairVec.at(i).first),
 			points.value(nodePairVec.at(i).second) )  );
 	}
+	return secList;
+}
+
+QList<ConnWithNoPair>* DB::loadConnsWithNoPair()
+{
+	QList<ConnWithNoPair>* secList = new QList<ConnWithNoPair>;
+	QList<QPair<int,int> > nodePairVec;
+	QSqlQuery query(mDb);
+	QString sql = "select start_node,end_node from "+DB::sConnTableName;
+	if(!query.exec(sql))
+	{
+		QSqlError err = query.lastError();
+		QString errText = err.text();
+		throw new SqlQueryException(errText);
+	}
+	while(query.next()){
+		nodePairVec.append(QPair<int,int>(query.value(0).toInt(),
+			query.value(1).toInt()));
+
+	} // ÔØÈëÓÃid±íÊ¾µÄconn
+	QString sql2 = "select id,node_id from "+DB::sNodeTableName;
+	query.exec(sql2);
+	QHash<int, int> points;
+	while(query.next()){
+		points.insert(query.value(0).toInt(), query.value(1).toInt()  );
+	} // idºÍroad_idµÄ¶ÔÓ¦
+	for(int i=0; i<nodePairVec.size(); ++i){
+		secList->append(ConnWithNoPair(points.value(nodePairVec.at(i).first),
+			points.value(nodePairVec.at(i).second) )  );
+	} // Íê³Éroad_id¶ÔidµÄÌæ»»
 	return secList;
 }
 

@@ -18,6 +18,7 @@ public:
 	QHash<ConnWithCoorPair,int>* loadNormConnWithBusNum();
 	QList<NodeWithCoorNo>* loadNormNodesWithNo();
 	QList<ConnWithCoorPair>* loadNormConns();
+	QList<ConnWithNoPair>* loadConnsWithNoPair();
 
 private:
 	template <class T>

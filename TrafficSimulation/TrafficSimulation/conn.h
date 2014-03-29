@@ -52,6 +52,5 @@ inline uint qHash(const ConnWithCoorPair & p, uint seed=0 ){
 	return 0;
 }
 
-
 #endif // !CONN_H
 

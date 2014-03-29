@@ -33,8 +33,11 @@ public:
 	QHash<int,QPointF>* loadNodeByNodeId();
 	QVector<ConnWithNoPair>* loadConnByNo();
 	QHash<int,int>* loadNodeIdToId();
+
+	//  ------------------  new  --------------------
 	QList<Node>* loadNodes();
 	QList<ConnWithCoorPair>* loadConns();
+	QList<ConnWithNoPair>* loadConnsWithNoPair();
 
 
 signals:
@@ -42,7 +45,7 @@ signals:
 public slots:
 
 private:
-    // åˆ›å»ºå„ç§è¡¨çš„å‡½æ•°, å†…å®¹å…¶å®éƒ½åªæ˜¯ä¸€å¥è¯
+    // ´´½¨¸÷ÖÖ±íµÄº¯Êı, ÄÚÈİÆäÊµ¶¼Ö»ÊÇÒ»¾ä»°
     void createNodeTable(QSqlQuery & query);
     void createConnTable(QSqlQuery & query);
     void createTrafficAreaTable(QSqlQuery & query);
@@ -50,8 +53,8 @@ private:
     void createBusTable(QSqlQuery & query);
     void createForbidCoonTable(QSqlQuery & query);
     void createRestrictConnTable(QSqlQuery & query);
-    // ä»æ•°æ®æ–‡ä»¶ä¸­è·å–æ•°æ®ç„¶åå­˜åˆ°æ•°æ®åº“
-    void fetchDataFromConnFile(QSqlQuery & query); // è¿™ä¸ªè²Œä¼¼æ²¡ç”¨
+    // ´ÓÊı¾İÎÄ¼şÖĞ»ñÈ¡Êı¾İÈ»ºó´æµ½Êı¾İ¿â
+    void fetchDataFromConnFile(QSqlQuery & query); // Õâ¸öÃ²ËÆÃ»ÓÃ
     void fetchDataFromSectionFile(QSqlQuery & query);
     void fetchDataFromCoorFile(QSqlQuery & query);
     void fetchDataFromTrafficNode2OriNodeFile(QSqlQuery & query);
@@ -76,7 +79,7 @@ private:
     // -------   static  area  ----------
     static const QString sDbType;
     static const QString sDbName;
-    // æ•°æ®åº“è¡¨çš„åç§°
+    // Êı¾İ¿â±íµÄÃû³Æ
     static const QString sNodeTableName;
     static const QString sConnTableName;
     static const QString sTrafficAreaTableName;
@@ -84,7 +87,7 @@ private:
     static const QString sBusTableName;
     static const QString sForbiddenConnTableName;
     static const QString sRestrictConnTableName;
-    //æ•°æ®æ–‡ä»¶åç§°
+    //Êı¾İÎÄ¼şÃû³Æ
     static const QString sConnFileName;
     static const QString sSectionFileName;
     static const QString sCoorFileName;
@@ -98,7 +101,7 @@ private:
     static const QString sBusNumFileName;
     static const QString sNodeStatisticsFileName;
     static const QString sRoadStatisticsFileName;
-    // åˆ›å»ºè¡¨çš„sqlè¯­å¥
+    // ´´½¨±íµÄsqlÓï¾ä
     static const QString sSqlCreateNodeTable;
     static const QString sSqlCreateConnTable;
     static const QString sSqlCreateTrafficAreaTable;

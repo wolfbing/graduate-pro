@@ -5,6 +5,7 @@ GraphicsScene::GraphicsScene(QObject *parent)
 	, mRatio(0.9)
 	, mOffset(QPointF(0,0))
 {
+	setItemIndexMethod(QGraphicsScene::NoIndex);
 	
 }
 

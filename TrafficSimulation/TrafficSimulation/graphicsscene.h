@@ -19,7 +19,7 @@ public slots:
 
 protected:
 	virtual void updateItems()=0;
-	virtual void moveItems()=0;
+	virtual void moveItems(){};
 	QPointF normCoorToSceneCoor(QPointF);
 	QPointF sceneCoorToNormCoor(QPointF);
 	qreal shorterSceneRectSide(); // 返回sceneRect中较短的边

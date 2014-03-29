@@ -300,3 +300,10 @@ Rect DbAdapter::boundingRect( QList<T> tList ) const
 	// 这里又要进行坐标系的转换
 	return Rect(left,top, qAbs(right-left), qAbs(top-bottom));
 }
+
+QList<ConnWithNoPair>* DbAdapter::loadConnsWithNoPair()
+{
+	QList<ConnWithNoPair>* connList = mDb->loadConnsWithNoPair();
+	return connList;
+
+}

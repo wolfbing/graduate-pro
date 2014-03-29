@@ -19,16 +19,8 @@ void ConnWithCoorLevel::setLevel( int level )
 
 ConnWithNoPair::ConnWithNoPair( int n1,int n2 )
 {
-	if (n1 < n2)
-	{
-		node1 = n1;
-		node2 = n2;
-	}
-	else
-	{
-		node1 = n2;
-		node2 = n1;
-	}
+	node1 = n1;
+	node2 = n2;
 }
 
 ConnWithNoPair::ConnWithNoPair( const ConnWithNoPair & conn )

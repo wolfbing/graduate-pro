@@ -13,7 +13,7 @@ WinOfGraphicsView::WinOfGraphicsView(QWidget *parent)
 
 	NodeGraphicsScene* scene = new NodeGraphicsScene;
 	NodeGraphicsView* view = new NodeGraphicsView(scene);
-	view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+	
 	setCentralWidget(view);
 
 }

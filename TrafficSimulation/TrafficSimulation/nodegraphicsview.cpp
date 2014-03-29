@@ -2,20 +2,13 @@
 #include <QResizeEvent>
 #include <QWheelEvent>
 #include <QMouseEvent>
+#include <QGLWidget>
 
-NodeGraphicsView::NodeGraphicsView(QWidget *parent)
-	: QGraphicsView(parent)
-	, mIsPressed(false)
-{
-}
 
 NodeGraphicsView::NodeGraphicsView( NodeGraphicsScene* scene, QWidget* parent/*=0*/ )
 	: QGraphicsView(scene, parent)
 {
-	setRenderHint(QPainter::Antialiasing);
-	connect(this, SIGNAL(sizeChange(int, int)), scene, SLOT(changeSceneRect(int, int)));
-	connect(this, SIGNAL(zoom(int, QPointF)), scene, SLOT(zoom(int, QPointF)));
-	connect(this, SIGNAL(move(QPointF)), scene, SLOT(move(QPointF)));
+	init(scene);
 }
 
 NodeGraphicsView::~NodeGraphicsView()
@@ -38,11 +31,28 @@ void NodeGraphicsView::wheelEvent( QWheelEvent *event )
 	emit zoom(numSteps.y(), scenePos);
 }
 
+void NodeGraphicsView::init(NodeGraphicsScene* scene)
+{
+	mIsPressed = false;
+	setRenderHint(QPainter::Antialiasing, false);
+	connect(this, SIGNAL(sizeChange(int, int)), scene, SLOT(changeSceneRect(int, int)));
+	connect(this, SIGNAL(zoom(int, QPointF)), scene, SLOT(zoom(int, QPointF)));
+	connect(this, SIGNAL(move(QPointF)), scene, SLOT(move(QPointF)));
+	setOptimizationFlag(QGraphicsView::DontSavePainterState);
+	setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+	setCursor(Qt::CrossCursor);
+	setDragMode(QGraphicsView::ScrollHandDrag);
+	setCacheMode(CacheBackground);
+	setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+
+}
+
+
 void NodeGraphicsView::mousePressEvent( QMouseEvent *event )
 {
 	if(event->button() == Qt::LeftButton){
 		mIsPressed = true;
-		mPressPos = event->pos();
+		mPressScenePos = mapToScene(event->pos());
 	}
 		
 }
@@ -50,17 +60,18 @@ void NodeGraphicsView::mousePressEvent( QMouseEvent *event )
 void NodeGraphicsView::mouseReleaseEvent( QMouseEvent *event )
 {
 	if(event->button() == Qt::LeftButton)
+	{
 		mIsPressed = false;
+	}
 }
 
 void NodeGraphicsView::mouseMoveEvent( QMouseEvent *event )
 {
 	if (mIsPressed)
 	{
-		QPoint currentPos = event->pos();
-		QPointF pos1 = mapToScene(mPressPos);
-		QPointF pos2 = mapToScene(currentPos);
-		mPressPos = currentPos;
-		emit move(pos2 - pos1);
+		QPointF currentPos = mapToScene(event->pos());
+		QPointF delta = currentPos - mPressScenePos;
+		mPressScenePos = currentPos;
+		emit move(delta);
 	}
 }

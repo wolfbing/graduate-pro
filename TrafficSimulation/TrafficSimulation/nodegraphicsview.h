@@ -9,7 +9,6 @@ class NodeGraphicsView : public QGraphicsView
 	Q_OBJECT
 
 public:
-	NodeGraphicsView(QWidget *parent = 0);
 	NodeGraphicsView(NodeGraphicsScene* scene, QWidget* parent=0);
 	~NodeGraphicsView();
 
@@ -26,8 +25,12 @@ protected:
 	void mouseMoveEvent(QMouseEvent *event);
 
 private:
+	void init(NodeGraphicsScene* scene);
+
+private:
 	bool mIsPressed;
 	QPoint mPressPos;
+	QPointF mPressScenePos;
 	
 };
 

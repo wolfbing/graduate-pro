@@ -6,6 +6,8 @@
 #include "DbAdapter.h"
 #include <QGraphicsEllipseItem>
 #include "conn.h"
+#include "graphicsnodeitem.h"
+#include "graphicsedgenetitem.h"
 
 class NodeGraphicsScene : public GraphicsScene
 {
@@ -18,13 +20,12 @@ public:
 
 private:
 	void updateItems();
-	void moveItems();
 
 private:	
-	QList<NodeWithCoorNo>* mPointList;
-	QList<ConnWithCoorPair>* mConnList;
-	QList<QGraphicsItem*> mItemList;
-	//QList<QGraphicsItem*> mConnItemList;
+	DbAdapter mDbAdapter;
+	QList<GraphicsNodeItem*> mNodes;
+	GraphicsEdgetNetItem* mEdgeNet;
+	
 
 };
 
