@@ -1,4 +1,4 @@
-#include "trafficsimulation.h"
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets>
 #include <QGLWidget>
@@ -11,7 +11,6 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	// TrafficSimulation w;
 	WinOfGraphicsView w;
 
 	w.show();
