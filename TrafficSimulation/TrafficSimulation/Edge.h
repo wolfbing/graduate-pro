@@ -1,28 +1,38 @@
 #pragma once
 
 #include "node.h"
-#include "graphicsnodeitem.h"
-#include <QGraphicsItem>
-#include <QRect>
 
+/*
+用于存放与边有关的数据, 诟病与Node相同
+边是有向的
+*/
 class Edge
 {
 public:
 	Edge(){};
-	Edge(GraphicsNodeItem* sourceNode, GraphicsNodeItem* destNode);
-	Edge(const Edge &);
-	Edge & operator=(const Edge &);
-	bool operator==(const Edge &) const;
+	///////// 不使用有参数的构造函数, 因为根本无法确定每次哪些数据是必须的
+	Edge(const Edge & );
+	Edge& operator=(const Edge &);
+	bool operator==(const Edge &);
 	~Edge(void);
 
-	GraphicsNodeItem* sourceNode() const;
-	GraphicsNodeItem* destNode() const;
+	// get
+	Node * sourceNode() const;
+	Node * destNode() const;
+	uint roadLevel() const;
+	QRectF sceneBorder() const;
+	// set
+	Edge & setSourceNode(Node *);
+	Edge & setDestNode(Node *);
+	Edge & setRoadLevel(uint);
 
-	QRectF border(const QGraphicsItem*) const;
 
 private:
-	GraphicsNodeItem* mSourceNode;
-	GraphicsNodeItem* mDestNode;
+	// 边依赖于外部独立的节点
+	Node * mSourceNode;
+	Node * mDestNode;
+
+	uint mRoadLevel;
 
 
 };

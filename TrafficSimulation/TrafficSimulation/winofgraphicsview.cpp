@@ -1,9 +1,12 @@
 #include "winofgraphicsview.h"
 
 #include "nodegraphicsscene.h"
+#include "roadlevelgraphicsscene.h"
 #include "graphicsview.h"
 #include <QGraphicsView>
 #include <QGLWidget>
+#include <QPrinter>
+#include <QPrintDialog>
 
 
 WinOfGraphicsView::WinOfGraphicsView(QWidget *parent)
@@ -16,7 +19,8 @@ WinOfGraphicsView::WinOfGraphicsView(QWidget *parent)
 	initStatusBar();
 
 	NodeGraphicsScene* scene = new NodeGraphicsScene;
-	GraphicsView* view = new GraphicsView(scene);
+	//RoadLevelGraphicsScene* scene = new RoadLevelGraphicsScene;
+	mView = new GraphicsView(scene);
 	connect(scene, SIGNAL(sendMsgToStatus(QString)), this, SLOT(updateStatus(QString)) );
 	connect(scene, SIGNAL(clearMsgFromStatus()), this, SLOT(clearTmpMsgFromStatus())  );
 
@@ -25,9 +29,10 @@ WinOfGraphicsView::WinOfGraphicsView(QWidget *parent)
 
 	setWindowTitle(QStringLiteral("交通分析成果可视化") );
 	showMaximized();
-	setCentralWidget(view);
+	setCentralWidget(mView);
 
-	 
+	 initActions(); // warning: 放在 initToolBar之前
+	 initToolBar(); // warning: 放在mView的初始化之后
 
 }
 
@@ -60,5 +65,21 @@ void WinOfGraphicsView::updatePermanentStatus(QString str1, QString str2)
 	mStatusLabel1->setText(str1+"    ");
 	mStatusLabel2->setText(str2+"    ");
 }
+
+void WinOfGraphicsView::initActions()
+{
+	mPrintAction = new QAction("Print", this);
+	mPrintAction->setStatusTip("Print view");
+	connect(mPrintAction, SIGNAL(triggered()),mView, SLOT(print()) );
+
+}
+
+void WinOfGraphicsView::initToolBar()
+{
+	mToolBar = addToolBar("toolbar");
+	mToolBar->addAction(mPrintAction);
+}
+
+
 
 

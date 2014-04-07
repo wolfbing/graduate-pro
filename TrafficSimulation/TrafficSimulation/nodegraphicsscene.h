@@ -24,10 +24,12 @@ public:
 
 private:
 	void updateItems();
+	void doSomething();
 	void checkNoTextVisible();
 
 private:	
 	DbAdapter mDbAdapter;
+	QList<Node*> mNodeDataList;
 	QList<GraphicsNodeItem*> mNodes;
 	GraphicsEdgetNetItem* mEdgeNet;
 	int mEdgeNum;

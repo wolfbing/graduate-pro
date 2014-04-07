@@ -1,11 +1,13 @@
 #include "graphicsscene.h"
 #include <QPainter>
+#include <QGraphicsSceneMouseEvent>
 
 GraphicsScene::GraphicsScene(QObject *parent)
 	: QGraphicsScene(parent)
 	, mRatio(0.9)
 	, mOffset(QPointF(0,0))
 	, mBackColor(QColor(242,239,232))
+	, mLeftBtnPressed(false)
 {
 	setItemIndexMethod(QGraphicsScene::NoIndex);
 	
@@ -31,16 +33,14 @@ void GraphicsScene::zoom( int step, QPointF hoverPos )
 	QPointF tmp = (hoverPos - newScenePoint)/(minLen*mRatio);
 	mOffset = QPointF(tmp.x(), -tmp.y());
 	updateItems();
-	//moveItems();
-	checkNoTextVisible();
+	doSomething();
 }
 
 void GraphicsScene::changeSceneRect( int w, int h )
 {
 	setSceneRect(-w/2.0, -h/2.0, w, h);
 	updateItems();
-	checkNoTextVisible();
-	//moveItems();
+	doSomething();
 }
 
 QPointF GraphicsScene::normCoorToSceneCoor( QPointF point )
@@ -57,7 +57,6 @@ void GraphicsScene::move( QPointF offset )
 	QPointF normOffset(offset.x()/(minLen*mRatio), -offset.y()/(minLen*mRatio));
 	mOffset += normOffset;
 	updateItems();
-	//moveItems();
 }
 
 qreal GraphicsScene::shorterSceneRectSide()
@@ -79,5 +78,41 @@ void GraphicsScene::drawBackground( QPainter *painter, const QRectF &rect )
 {
 	painter->fillRect(rect, mBackColor);
 }
+
+
+void GraphicsScene::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
+{
+	QGraphicsScene::mouseMoveEvent(event);
+	if(event->isAccepted())
+		return ;
+
+	if (event->buttons() & Qt::LeftButton)
+	{
+		QPointF p1 = event->lastScenePos();
+		QPointF p2 = event->scenePos();
+		QPointF delta = p2 - p1;
+		move(delta);
+		event->accept();
+	}
+	
+}
+
+void GraphicsScene::mousePressEvent( QGraphicsSceneMouseEvent *event )
+{
+	QGraphicsScene::mousePressEvent(event);
+	if(event->isAccepted())
+		return ;
+	event->accept();
+}
+
+void GraphicsScene::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
+{
+	QGraphicsScene::mouseReleaseEvent(event);
+	if(event->isAccepted())
+		return ;
+	event->accept();
+}
+
+
 
 

@@ -3,9 +3,12 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QGLWidget>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QFileDialog>
 
 
-GraphicsView::GraphicsView( NodeGraphicsScene* scene, QWidget* parent/*=0*/ )
+GraphicsView::GraphicsView( GraphicsScene* scene, QWidget* parent/*=0*/ )
 	: QGraphicsView(scene, parent)
 {
 	init(scene);
@@ -31,15 +34,15 @@ void GraphicsView::wheelEvent( QWheelEvent *event )
 	emit zoom(numSteps.y(), scenePos);
 }
 
-void GraphicsView::init(NodeGraphicsScene* scene)
+void GraphicsView::init(GraphicsScene* scene)
 {
 	mIsPressed = false;
 	setRenderHint(QPainter::Antialiasing, false);
 	connect(this, SIGNAL(sizeChange(int, int)), scene, SLOT(changeSceneRect(int, int)));
 	connect(this, SIGNAL(zoom(int, QPointF)), scene, SLOT(zoom(int, QPointF)));
 	connect(this, SIGNAL(move(QPointF)), scene, SLOT(move(QPointF)));
-	setOptimizationFlag(QGraphicsView::DontSavePainterState);
-	setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+	//setOptimizationFlag(QGraphicsView::DontSavePainterState);
+	setViewportUpdateMode(FullViewportUpdate);
 	setCursor(Qt::OpenHandCursor);
 	setDragMode(QGraphicsView::ScrollHandDrag);
 	setCacheMode(CacheBackground);
@@ -47,35 +50,17 @@ void GraphicsView::init(NodeGraphicsScene* scene)
 
 }
 
-
-void GraphicsView::mousePressEvent( QMouseEvent *event )
+void GraphicsView::print()
 {
-	if(event->button() == Qt::LeftButton){
-		mIsPressed = true;
-		mPressScenePos = mapToScene(event->pos());
-		//setCursor(Qt::ClosedHandCursor);
+	QPrinter printer;
+	if (QPrintDialog(&printer).exec() == QDialog::Accepted) {
+		// printer自带的filedialog不能用, 原因未知, 所以手动加了一个
+		QString filename = QFileDialog::getSaveFileName(this,"filename",QString(),QString("pdf Files (*.pdf)"));
+		printer.setOutputFileName(filename);
+		QPainter painter(&printer);
+		painter.setRenderHint(QPainter::Antialiasing);
+		//开始打印
+		render(&painter);
 	}
-	QGraphicsView::mousePressEvent(event);
-}
-
-void GraphicsView::mouseReleaseEvent( QMouseEvent *event )
-{
-	if(event->button() == Qt::LeftButton)
-	{
-		mIsPressed = false;
-		//unsetCursor();
-	}
-	QGraphicsView::mouseReleaseEvent(event);
-}
-
-void GraphicsView::mouseMoveEvent( QMouseEvent *event )
-{
-	if (mIsPressed)
-	{
-		QPointF currentPos = mapToScene(event->pos());
-		QPointF delta = currentPos - mPressScenePos;
-		mPressScenePos = currentPos;
-		emit move(delta);
-	}
-	QGraphicsView::mouseMoveEvent(event);
+	
 }

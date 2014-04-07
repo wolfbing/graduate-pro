@@ -28,9 +28,12 @@ protected:
 	QPointF sceneCoorToNormCoor(QPointF);
 	qreal shorterSceneRectSide(); // 返回sceneRect中较短的边
 
-	virtual void checkNoTextVisible() = 0;
-	
+	virtual void doSomething()=0;
+	// 重载
 	void drawBackground(QPainter *painter, const QRectF &rect);
+	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+	void mousePressEvent(QGraphicsSceneMouseEvent *event);
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 protected:
 	DbAdapter mDbAdapter;
@@ -40,6 +43,8 @@ private:
 	QPointF mOffset;
 
 	QColor mBackColor;
+
+	bool mLeftBtnPressed;
 
 };
 

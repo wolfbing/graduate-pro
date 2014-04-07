@@ -16,7 +16,7 @@ class Legend : public QDialog
 {
     Q_OBJECT
 public:
-    explicit Legend(QList<LegendElement> elements, QWidget *parent);
+    explicit Legend(QList<LegendElement> elements, QWidget *parent=0);
     Legend* setElements(QList<LegendElement> elelist);
 	void draw();
 
@@ -24,14 +24,11 @@ signals:
 	void posChange(QString);
 
 public slots:
-	void updatePos();
 
 protected:
-	void moveEvent(QMoveEvent * );
 	void paintEvent(QPaintEvent *);
 
 private:
-	void initPos();
 
     QList<LegendElement> mElements;
 	bool mFirstShow;

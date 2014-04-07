@@ -2,26 +2,24 @@
 #define GRAPHICSNODEITEM_H
 
 #include <QGraphicsItem>
+#include "Communicate.h"
+#include "node.h"
 
-class GraphicsNodeItem : public QObject, public QGraphicsItem
+class GraphicsNodeItem :public Communicate, public QGraphicsItem
 {
 	Q_OBJECT
 
 public:
 	GraphicsNodeItem(QGraphicsItem *parent = 0);
-	GraphicsNodeItem(QPointF normPos, QGraphicsItem *parent=0);
-	GraphicsNodeItem(QPointF normPos, int no, QGraphicsItem *parent=0);
 	~GraphicsNodeItem();
 
-	void setNormPos(QPointF);
-	QPointF normPos() const;
-	void setNo(int);
-	int no() const;
 	// 重载
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */);
 	QRectF boundingRect() const;
 	QPainterPath shape() const;
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+	//set 
+	GraphicsNodeItem & setNodeData(Node *);
 	// 设置绘制属性
 	GraphicsNodeItem & setRadius(qreal radius);
 	GraphicsNodeItem & setHaveBorder(bool haveBorder);
@@ -29,16 +27,18 @@ public:
 	GraphicsNodeItem & setInnerColor(QColor innerColor);
 	// 检查最近节点, 并设为邻居
 	void checkNeighbour(GraphicsNodeItem*);
-	// 获取半径
+	// get
 	qreal radius() const;
+	QColor borderColor() const;
+	QColor innerColor() const;
+	Node * nodeData() const;
 	// 设置编号item
 	GraphicsNodeItem & setNoTextItem(QGraphicsItem*);
 
 	void checkNoItemVisible();
 
 signals:
-	void sendNodeInfoToStatus(QString);
-	void clearNodeInfoFromStatus();
+
 
 protected:
 	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
@@ -50,9 +50,9 @@ private:
 	
 
 private:
-	QPointF mNormPos;
-	int mNo;
-	qreal mRadius;
+	Node * mNodeData;
+	// 绘制属性
+	qreal mRadius; // 外围半径, 边框定死为1
 	QColor mBorderColor;
 	QColor mInnerColor;
 	bool mHaveBorder;

@@ -14,29 +14,23 @@ GraphicsEdgetNetItem::~GraphicsEdgetNetItem()
 
 }
 
-void GraphicsEdgetNetItem::addEdge(const Edge & edge )
-{
-	mEdges << edge;
-	edge.sourceNode()->checkNeighbour(edge.destNode() );
-	edge.destNode()->checkNeighbour(edge.sourceNode() );
-}
 
 QRectF GraphicsEdgetNetItem::boundingRect() const
 {
-	QListIterator<Edge> ite(mEdges);
+	QListIterator<Edge*> ite(mEdgeDataList);
 	qreal left, right, top, bottom;
 	if(!ite.hasNext())
 		return QRectF(0,0,0,0);
-	Edge edge = ite.next();
-	QRectF rect = edge.border(this);
+	Edge* edgeData = ite.next();
+	QRectF rect = edgeData->sceneBorder();
 	left = rect.left();
 	right = rect.right();
 	top = rect.top();
 	bottom = rect.bottom();
 	while (ite.hasNext())
 	{
-		edge = ite.next();
-		rect = edge.border(this);
+		edgeData = ite.next();
+		rect = edgeData->sceneBorder();
 		if(rect.left()<left)
 			left = rect.left();
 		if(rect.right()>right)
@@ -53,16 +47,13 @@ QRectF GraphicsEdgetNetItem::boundingRect() const
 void GraphicsEdgetNetItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */ )
 {
 	QPainterPath path;
-	QListIterator<Edge> ite(mEdges);
-	Edge edge;
-	GraphicsNodeItem *source, *dest;
+	QListIterator<Edge*> ite(mEdgeDataList);
+	Edge * edgeData;
 	while (ite.hasNext())
 	{
-		edge = ite.next();
-		source = edge.sourceNode();
-		dest = edge.destNode();
-		QPointF sourcePos = mapFromItem(source, QPointF(0,0) );
-		QPointF destPos = mapFromItem(dest, QPointF(0,0) );
+		edgeData = ite.next();
+		QPointF sourcePos = edgeData->sourceNode()->sceneCoor();
+		QPointF destPos = edgeData->destNode()->sceneCoor();
 		path.moveTo(sourcePos);
 		path.lineTo(destPos);
 	}
@@ -124,4 +115,24 @@ void GraphicsEdgetNetItem::init()
 	mBorderColor = QColor(203,168,87);
 	mInnerColor = QColor(253,206,102);
 	mEdgeWidth = 4.0;
+}
+
+qreal GraphicsEdgetNetItem::edgeWidth() const
+{
+	return mEdgeWidth;
+}
+
+QColor GraphicsEdgetNetItem::innerColor() const
+{
+	return mInnerColor;
+}
+
+QColor GraphicsEdgetNetItem::borderColor() const
+{
+	return mBorderColor;
+}
+
+void GraphicsEdgetNetItem::addEdgeData( Edge* edgeData )
+{
+	mEdgeDataList << edgeData;
 }

@@ -3,7 +3,9 @@
 
 #include <QObject>
 
-// 这个rect是正常坐标系下的, QRectF是屏幕坐标系下的, 有些地方不适合用
+/*
+这个rect是正常坐标系下的, QRectF是屏幕坐标系下的, 有些地方不适合用
+*/
 class Rect
 {
 

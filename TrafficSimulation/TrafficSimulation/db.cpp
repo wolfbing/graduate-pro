@@ -20,6 +20,9 @@
 #include "db.h"
 #include "pathnotexistsexception.h"
 #include "sqlqueryexception.h"
+#include "Edge.h"
+#include "structsfordb.h"
+#include "node.h"
 
 
 const QString DB::sDbType = "QSQLITE"; // 使用Sqlite3数据库
@@ -1024,16 +1027,16 @@ QHash<int,int>* DB::loadNodeIdToId()
 	return hash;
 }
 
-QList<Node>* DB::loadNodes()
+QList<Node*> DB::loadNodes()
 {
-	QList<Node>* nodeList = new QList<Node>;
+	QList<Node*> nodeList;
 	QSqlQuery query(mDb);
 
 	// 载入坐标
 	QString sql = "select node_id, coor_x, coor_y from "+DB::sNodeTableName;
 	query.exec(sql);
 	while(query.next()){
-		nodeList->append(Node(
+		nodeList.append(new Node(
 			QPointF( query.value(1).toInt(), query.value(2).toInt() ), 
 			query.value(0).toInt() )  );
 	}
@@ -1099,6 +1102,53 @@ QList<ConnWithNoPair>* DB::loadConnsWithNoPair()
 			points.value(nodePairVec.at(i).second) )  );
 	} // 完成road_id对id的替换
 	return secList;
+}
+
+QList<Edge>* DB::loadConnsWithNodeLevel()
+{
+	typedef TreeInt ConnData;// 三个数据依次对应 start_node,end_node,road_level
+	QList<Edge>* edgeList = new QList<Edge>; // 用于返回值的edge集合
+	QList<ConnData> connList; // 从数据库载入的边集
+	QSqlQuery query(mDb);
+	QString sql = "select start_node,end_node,road_level from "+DB::sConnTableName;
+	if(!query.exec(sql))
+	{
+		QSqlError err = query.lastError();
+		QString errText = err.text();
+		throw new SqlQueryException(errText);
+	}
+	while(query.next()){
+		connList.append(ConnData(query.value(0).toInt(),
+			query.value(1).toInt(), query.value(2).toInt() )  );
+
+	} // 载入conn
+
+	QHash<int,Node*> nodes = loadNodeIdCoorHash(); // id：node hash对照
+	
+	for(int i=0; i<connList.size(); ++i){
+		Edge edge;
+		edge.setSourceNode(nodes.value(connList.at(i).m1)  );
+		edge.setDestNode(nodes.value(connList.at(i).m2)  );
+		edge.setRoadLevel(static_cast<uint>(connList.at(i).m3) );
+		edgeList->append(edge);
+	} // 完成road_id对id的替换
+	return edgeList;
+}
+
+QHash<int,Node*> DB::loadNodeIdCoorHash()
+{
+	QHash<int,Node*> hash;
+	QSqlQuery query(mDb);
+	QString sql = "select id,node_id,coor_x,coor_y from "+DB::sNodeTableName;
+	query.exec(sql);
+	Node * node;
+	while(query.next()){
+		node = new Node;
+		node->setCoor( QPointF(query.value(2).toReal(), query.value(3).toReal() ) );
+		node->setNo(query.value(1).toInt());
+		hash.insert(query.value(0).toInt(), node );
+	} // id和坐标的对应
+	return hash;
 }
 
 

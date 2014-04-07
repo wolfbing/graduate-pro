@@ -11,7 +11,7 @@ public:
 	GraphicsEdgetNetItem(QGraphicsItem *parent = 0);
 	~GraphicsEdgetNetItem();
 
-	void addEdge(const Edge &);
+	void addEdgeData(Edge*);
 
 	void advance();
 
@@ -26,11 +26,16 @@ public:
 	GraphicsEdgetNetItem & setInnerColor(QColor innerColor);
 	GraphicsEdgetNetItem & setHaveBorder(bool haveBorder);
 
+	qreal edgeWidth() const ;
+	QColor innerColor() const;
+	QColor borderColor() const;
+
 private:
 	void init();
 
 private:
-	QList<Edge> mEdges;
+	QList<Edge*> mEdgeDataList;
+	// ªÊÕº Ù–‘
 	qreal mEdgeWidth;
 	QColor mBorderColor;
 	QColor mInnerColor;

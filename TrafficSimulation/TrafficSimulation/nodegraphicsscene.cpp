@@ -3,28 +3,31 @@
 #include <QGraphicsScene>
 #include <QGraphicsEllipseItem>
 #include "graphicsnodenotextitem.h"
+#include "legend.h"
+#include "legendelement.h"
+#include "legendproxy.h"
 
 NodeGraphicsScene::NodeGraphicsScene(QObject *parent)
 	: GraphicsScene(parent)
 {
-	QList<NodeWithCoorNo>* nodeList = mDbAdapter.loadNormNodesWithNo();
+	mNodeDataList = mDbAdapter.loadNormNodesWithNo();
 	QList<ConnWithNoPair>* connList = mDbAdapter.loadConnsWithNoPair();
-	QHash<int, GraphicsNodeItem*> hash;
-	QListIterator<NodeWithCoorNo> ite(*nodeList);
+	QHash<int, Node*> hash;
+	QListIterator<Node*> ite(mNodeDataList);
 	mNodes = QList<GraphicsNodeItem*>();
-	NodeWithCoorNo node;
+	Node * tmpNodeData;
 	GraphicsNodeItem* nodeItem;
 	GraphicsNodeNoTextItem* nodeNoTextItem;
 	while (ite.hasNext())
 	{
-		node = ite.next();
-		nodeItem = new GraphicsNodeItem(node.mCoor, node.mNo);
+		tmpNodeData = ite.next();
+		nodeItem = new GraphicsNodeItem;
+		nodeItem->setNodeData(tmpNodeData);
 		nodeNoTextItem = new GraphicsNodeNoTextItem(nodeItem);
-		connect(nodeItem, SIGNAL(sendNodeInfoToStatus(QString)), this, SIGNAL(sendMsgToStatus(QString)) );
-		connect(nodeItem, SIGNAL(clearNodeInfoFromStatus()), this, SIGNAL(clearMsgFromStatus() ) );
-		nodeItem->setNo(node.mNo);
+		connect(nodeItem, SIGNAL(sendTmpInfoToStatus(QString)), this, SIGNAL(sendMsgToStatus(QString)) );
+		connect(nodeItem, SIGNAL(clearTmpInfoFromStatus()), this, SIGNAL(clearMsgFromStatus() ) );
 		mNodes << nodeItem;
-		hash.insert(nodeItem->no(), nodeItem);
+		hash.insert(nodeItem->nodeData()->no(), tmpNodeData);
 		addItem(nodeItem);
 		addItem(nodeNoTextItem);
 	}
@@ -34,15 +37,28 @@ NodeGraphicsScene::NodeGraphicsScene(QObject *parent)
 	while (connIte.hasNext())
 	{
 		tmpConn = connIte.next();
-		mEdgeNet->addEdge(Edge(hash.value(tmpConn.node1), hash.value(tmpConn.node2)));
-
+		Edge * tmpEdgeData = new Edge;
+		tmpEdgeData->setSourceNode(hash.value(tmpConn.node1));
+		tmpEdgeData->setDestNode(hash.value(tmpConn.node2));
+		mEdgeNet->addEdgeData(tmpEdgeData);
 	}
 	addItem(mEdgeNet);
 	mEdgeNum = connList->size();
 
-	delete nodeList;
-	delete connList;
+	
+	// 添加图例
+	QList<LegendElement> legendList;
+	GraphicsNodeItem* tmpNode = mNodes.at(0);
+	legendList << LegendElement(QStringLiteral("节点"), LegendElement::THICK_DOT, tmpNode->radius(), 
+		tmpNode->innerColor(), tmpNode->borderColor() );
+	legendList << LegendElement(QStringLiteral("路段"), LegendElement::THICK_LINE, mEdgeNet->edgeWidth(),
+		mEdgeNet->innerColor(), mEdgeNet->borderColor() );
+	Legend * legend = new Legend(legendList);
+	LegendProxy* proxy = new LegendProxy(legend);
+	addItem(proxy);
+	
 
+	delete connList;
 
 }
 
@@ -59,7 +75,8 @@ void NodeGraphicsScene::updateItems()
 	while (ite.hasNext())
 	{
 		item = ite.next();
-		newPos = normCoorToSceneCoor(item->normPos());
+		newPos = normCoorToSceneCoor(item->nodeData()->coor());
+		item->nodeData()->setSceneCoor(newPos);
 		item->setPos(newPos);
 	}
 	mEdgeNet->advance();
@@ -85,5 +102,10 @@ int NodeGraphicsScene::nodeNum() const
 int NodeGraphicsScene::edgeNum() const
 {
 	return mEdgeNum;
+}
+
+void NodeGraphicsScene::doSomething()
+{
+	checkNoTextVisible();
 }
 

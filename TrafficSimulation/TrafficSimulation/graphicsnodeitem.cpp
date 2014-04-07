@@ -4,40 +4,18 @@
 #include <QStringListIterator>
 
 GraphicsNodeItem::GraphicsNodeItem(QGraphicsItem *parent)
-	: QGraphicsItem(parent)
+	: QGraphicsItem(parent), Communicate()
 {
 	init();
 }
 
-GraphicsNodeItem::GraphicsNodeItem( QPointF p , QGraphicsItem *parent/*=0*/ )
-	: QGraphicsItem(parent)
-	, mNormPos(p)
-{
-	init();
-}
 
-GraphicsNodeItem::GraphicsNodeItem( QPointF normPos, int no, QGraphicsItem *parent/*=0*/ )
-	: QGraphicsItem(parent)
-	, mNormPos(normPos)
-	, mNo(no)
-{
-	init();
-}
 
 GraphicsNodeItem::~GraphicsNodeItem()
 {
 
 }
 
-void GraphicsNodeItem::setNormPos( QPointF p )
-{
-	mNormPos = p;
-}
-
-QPointF GraphicsNodeItem::normPos() const
-{
-	return mNormPos;
-}
 
 void GraphicsNodeItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */ )
 {
@@ -72,10 +50,6 @@ void GraphicsNodeItem::init()
 	mNoTextItem = 0;
 }
 
-void GraphicsNodeItem::setNo( int no )
-{
-	mNo = no;
-}
 
 QRectF GraphicsNodeItem::boundingRect() const
 {
@@ -89,10 +63,6 @@ QPainterPath GraphicsNodeItem::shape() const
 	 return path;
  }
 
-int GraphicsNodeItem::no() const
-{
-	return mNo;
-}
 
 GraphicsNodeItem & GraphicsNodeItem::setRadius( qreal radius )
 {
@@ -123,11 +93,11 @@ void GraphicsNodeItem::checkNeighbour( GraphicsNodeItem* item )
 	if (!mNeignbour)
 	{
 		mNeignbour = item;
-		mNearestDistance = QLineF(mNormPos, item->mNormPos).length();
+		mNearestDistance = QLineF(mNodeData->coor(), item->mNodeData->coor()).length();
 	}
 	else
 	{
-		qreal len = QLineF(mNormPos, item->mNormPos).length();
+		qreal len = QLineF(mNodeData->coor(), item->mNodeData->coor()).length();
 		if (len<mNearestDistance)
 		{
 			mNeignbour = item;
@@ -181,14 +151,35 @@ GraphicsNodeItem & GraphicsNodeItem::setNoTextItem( QGraphicsItem* item )
 
 void GraphicsNodeItem::hoverEnterEvent( QGraphicsSceneHoverEvent *event )
 {
-	QString str = QString::number(mNo);
-	emit sendNodeInfoToStatus(QStringLiteral("节点编号：")+str);
+	QString str = QString::number(mNodeData->no());
+	emit sendTmpInfoToStatus(QStringLiteral("节点编号：")+str);
 }
 
 
 void GraphicsNodeItem::hoverLeaveEvent( QGraphicsSceneHoverEvent *event )
 {
-	emit clearNodeInfoFromStatus();
+	emit clearTmpInfoFromStatus();
+}
+
+QColor GraphicsNodeItem::borderColor() const
+{
+	return mBorderColor;
+}
+
+QColor GraphicsNodeItem::innerColor() const
+{
+	return mInnerColor;
+}
+
+GraphicsNodeItem & GraphicsNodeItem::setNodeData( Node * node )
+{
+	mNodeData = node;
+	return *this;
+}
+
+Node * GraphicsNodeItem::nodeData() const
+{
+	return mNodeData;
 }
 
 

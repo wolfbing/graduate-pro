@@ -9,8 +9,12 @@ class GraphicsView : public QGraphicsView
 	Q_OBJECT
 
 public:
-	GraphicsView(NodeGraphicsScene* scene, QWidget* parent=0);
+	GraphicsView(GraphicsScene* scene, QWidget* parent=0);
 	~GraphicsView();
+
+public slots:
+	void print();
+		
 
 signals:
 	void sizeChange(int w, int h);
@@ -20,12 +24,9 @@ signals:
 protected:
 	void resizeEvent(QResizeEvent *event);
 	void wheelEvent(QWheelEvent *event);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
 
 private:
-	void init(NodeGraphicsScene* scene);
+	void init(GraphicsScene* scene);
 
 private:
 	bool mIsPressed;

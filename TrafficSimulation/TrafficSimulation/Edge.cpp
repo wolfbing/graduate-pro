@@ -2,50 +2,73 @@
 
 
 
-Edge::Edge( GraphicsNodeItem* sourceNode, GraphicsNodeItem* destNode )
-{
-	mSourceNode = sourceNode;
-	mDestNode = destNode;
-}
-
-Edge::Edge( const Edge & edge )
-{
-	mSourceNode = edge.sourceNode();
-	mDestNode = edge.destNode();
-
-}
-
 
 Edge::~Edge(void)
 {
 }
 
-GraphicsNodeItem* Edge::sourceNode() const
+Edge::Edge( const Edge & edge)
+{
+	// 复制地址值而不是重新创造节点
+	// 因为节点是边的依赖, 是独立的, 边没能力构造, 也不应该构造
+	mDestNode = edge.mDestNode;
+	mSourceNode = edge.mSourceNode;
+	mRoadLevel = edge.mRoadLevel;
+}
+
+Edge& Edge::operator=( const Edge & edge )
+{
+	mDestNode = edge.mDestNode;
+	mSourceNode = edge.mSourceNode;
+	mRoadLevel = edge.mRoadLevel;
+	return *this;
+}
+
+bool Edge::operator==( const Edge & edge )
+{
+	return mDestNode==edge.mDestNode
+		&& mSourceNode==edge.mSourceNode
+		&& mRoadLevel==edge.mRoadLevel
+		;
+}
+
+Node * Edge::sourceNode() const
 {
 	return mSourceNode;
 }
 
-GraphicsNodeItem* Edge::destNode() const
+Node * Edge::destNode() const
 {
 	return mDestNode;
 }
 
-QRectF Edge::border(const QGraphicsItem* edge) const
+Edge & Edge::setSourceNode( Node * node)
 {
-	QPointF p1 = edge->mapFromItem(mSourceNode, QPointF(0,0) );
-	QPointF p2 = edge->mapFromItem(mDestNode, QPointF(0,0) );
-	QRectF rect(p1, p2);
-	return rect.normalized();
-}
-
-Edge & Edge::operator=( const Edge & edge )
-{
-	mSourceNode = edge.sourceNode();
-	mDestNode = edge.destNode();
+	mSourceNode = node;
 	return *this;
 }
 
-bool Edge::operator==( const Edge & edge ) const
+Edge & Edge::setDestNode( Node * node)
 {
-	return (mDestNode==edge.destNode() ) && (mSourceNode==edge.sourceNode() );
+	mDestNode = node;
+	return *this;
 }
+
+Edge & Edge::setRoadLevel( uint level )
+{
+	mRoadLevel = level;
+	return *this;
+}
+
+uint Edge::roadLevel() const
+{
+	return mRoadLevel;
+}
+
+QRectF Edge::sceneBorder() const
+{
+	QRectF rect(mSourceNode->coor(), mDestNode->coor());
+	return rect.normalized();
+}
+
+

@@ -12,7 +12,7 @@
 #include "node.h"
 #include "conn.h"
 
-typedef NodeWithCoorNo Node;
+class Edge;
 
 class DB : public QObject
 {
@@ -35,9 +35,13 @@ public:
 	QHash<int,int>* loadNodeIdToId();
 
 	//  ------------------  new  --------------------
-	QList<Node>* loadNodes();
+	QList<Node*> loadNodes();
 	QList<ConnWithCoorPair>* loadConns();
 	QList<ConnWithNoPair>* loadConnsWithNoPair();
+	QList<Edge>* loadConnsWithNodeLevel(); // 载入带有节点对(节点包含编号信息)、道路等级的conn
+
+private:
+	QHash<int,Node*> loadNodeIdCoorHash(); // 从sNodeTableName(节点表)中载入id:coor对照
 
 
 signals:

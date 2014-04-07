@@ -1,5 +1,6 @@
 ﻿#include "DbAdapter.h"
 #include <QtMath>
+#include "Edge.h"
 
 DbAdapter::DbAdapter(void)
 	: mDb(0)
@@ -27,7 +28,7 @@ void DbAdapter::normConns( QList<QPair<Node,Node> > *connList )
 {
 	if (connList->size() > 0)
 	{
-		QPointF tmpPoint = connList->at(0).first.mCoor;
+		QPointF tmpPoint = connList->at(0).first.coor();
 		qreal left = tmpPoint.rx();
 		qreal right = tmpPoint.rx();
 		qreal top = tmpPoint.ry();
@@ -36,8 +37,8 @@ void DbAdapter::normConns( QList<QPair<Node,Node> > *connList )
 		while (ite.hasNext())
 		{
 			QPair<Node,Node> conn = ite.next();
-			QPointF firstPoint = conn.first.mCoor;
-			QPointF secondPoint = conn.second.mCoor;
+			QPointF firstPoint = conn.first.coor();
+			QPointF secondPoint = conn.second.coor();
 			if (firstPoint.rx() < left)
 				left = firstPoint.rx();
 			if(firstPoint.rx() > right)
@@ -63,10 +64,10 @@ void DbAdapter::normConns( QList<QPair<Node,Node> > *connList )
 		while (ite.hasNext())
 		{
 			QPair<Node,Node>& conn = ite.next(); // conn是引用类型的
-			QPointF firstPoint = conn.first.mCoor;
-			QPointF secondPoint = conn.second.mCoor;
-			conn.first.mCoor = (firstPoint-center)/maxL;
-			conn.second.mCoor = (secondPoint-center)/maxL;
+			QPointF firstPoint = conn.first.coor();
+			QPointF secondPoint = conn.second.coor();
+			conn.first.setCoor((firstPoint-center)/maxL);
+			conn.second.setCoor((secondPoint-center)/maxL);
 		}
 	}
 }
@@ -246,10 +247,10 @@ QHash<ConnWithCoorPair,int>* DbAdapter::loadNormConnWithBusNum()
 
 }
 
-QList<NodeWithCoorNo>* DbAdapter::loadNormNodesWithNo()
+QList<Node*> DbAdapter::loadNormNodesWithNo()
 {
-	QList<NodeWithCoorNo>* pointList = mDb->loadNodes();
-	norm(pointList);
+	QList<Node*> pointList = mDb->loadNodes();
+	norm(&pointList);
 	return pointList;
 }
 
@@ -258,7 +259,7 @@ template <class T>
 void DbAdapter::norm( QList<T>* tList ) const
 {
 	
-	Rect rect = boundingRect(*tList);
+	Rect rect = boundingRect(tList);
 	QPointF center = rect.center();
 	qreal width = rect.width();
 	qreal height = rect.height();
@@ -272,10 +273,29 @@ void DbAdapter::norm( QList<T>* tList ) const
 	}
 }
 
+
 template <class T>
-Rect DbAdapter::boundingRect( QList<T> tList ) const
+void DbAdapter::norm( QList<T*>* tList ) const
 {
-	QListIterator<T> ite(tList);
+	Rect rect = boundingRect(tList);
+	QPointF center = rect.center();
+	qreal width = rect.width();
+	qreal height = rect.height();
+	qreal maxLen = width>height ? width : height;
+	QMutableListIterator<T*> mIte(*tList);
+	while (mIte.hasNext())
+	{
+		T* tmpT = mIte.next();
+		tmpT->norm(maxLen, center);
+		//mIte.setValue(tmpT);
+	}
+}
+
+
+template <class T>
+Rect DbAdapter::boundingRect(const QList<T> * tList ) const
+{
+	QListIterator<T> ite(*tList);
 	if(!ite.hasNext())
 		return Rect(0,0,0,0);
 	T tmpT;
@@ -301,9 +321,62 @@ Rect DbAdapter::boundingRect( QList<T> tList ) const
 	return Rect(left,top, qAbs(right-left), qAbs(top-bottom));
 }
 
+template <class T>
+Rect DbAdapter::boundingRect( const QList<T*> * tList) const
+{
+	QListIterator<T*> ite(*tList);
+	if(!ite.hasNext())
+		return Rect(0,0,0,0);
+	T* tmpT;
+	Rect rect;
+	tmpT = ite.next();
+	rect = tmpT->border();
+	qreal left=rect.left(), right = rect.right(),
+		top = rect.top(), bottom = rect.bottom();
+	while (ite.hasNext())
+	{
+		tmpT = ite.next();
+		rect = tmpT->border();
+		if(rect.left()<left)
+			left = rect.left();
+		if(rect.right()>right)
+			right = rect.right();
+		if(rect.bottom()<bottom)
+			bottom = rect.bottom();
+		if(rect.top()>top)
+			top = rect.top();
+	}
+	// 这里又要进行坐标系的转换
+	return Rect(left,top, qAbs(right-left), qAbs(top-bottom));
+}
+
+
+
 QList<ConnWithNoPair>* DbAdapter::loadConnsWithNoPair()
 {
 	QList<ConnWithNoPair>* connList = mDb->loadConnsWithNoPair();
 	return connList;
 
+}
+
+QList<Edge>* DbAdapter::loadEdgeWithCoorLevel()
+{
+	QList<Edge>* edgeList = mDb->loadConnsWithNodeLevel();
+	QList<Node*> nodeList;
+	QListIterator<Edge> ite(*edgeList);
+	Edge edge;
+	while (ite.hasNext())
+	{
+		edge = ite.next();
+		if (!nodeList.contains(edge.sourceNode()))
+		{
+			nodeList << edge.sourceNode();
+		}
+		if (!nodeList.contains(edge.destNode()))
+		{
+			nodeList << edge.destNode();
+		}
+	}
+	norm(&nodeList);
+	return edgeList;
 }
