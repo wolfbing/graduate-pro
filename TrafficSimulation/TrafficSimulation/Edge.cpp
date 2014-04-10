@@ -71,4 +71,130 @@ QRectF Edge::sceneBorder() const
 	return rect.normalized();
 }
 
+Edge & Edge::setLength( qreal len )
+{
+	mLength = len;
+	return *this;
+}
+
+Edge & Edge::setMotorWayWidth( qreal width )
+{
+	mMotorWayWidth = width;
+	return *this;
+}
+
+Edge & Edge::setNonMotorWayWidth( qreal width )
+{
+	mNonMotorWayWidth = width;
+	return *this;
+}
+
+Edge & Edge::setWayIsolate( bool isolate )
+{
+	mWayIsolate = isolate;
+	return *this;
+}
+
+Edge & Edge::setRoadType( uint type )
+{
+	mRoadType = type;
+	return *this;
+}
+
+qreal Edge::length() const
+{
+	return mLength;
+}
+
+qreal Edge::motorWayWidth() const
+{
+	return mMotorWayWidth;
+}
+
+qreal Edge::nonMotorWayWidth() const
+{
+	return mNonMotorWayWidth;
+}
+
+bool Edge::wayIsolate() const
+{
+	return mWayIsolate;
+}
+
+uint Edge::roadType() const
+{
+	return mRoadType;
+}
+
+Edge & Edge::setTrafficType( uint type )
+{
+	mTrafficType = type;
+	return *this;
+}
+
+Edge & Edge::setInScale( bool in )
+{
+	mInScale = in;
+	return *this;
+}
+
+uint Edge::trafficType() const
+{
+	return mTrafficType;
+}
+
+bool Edge::inScale() const
+{
+	return mInScale;
+}
+
+int Edge::id() const
+{
+	return mId;
+}
+
+Edge & Edge::setId( int id )
+{
+	mId = id;
+	return *this;
+}
+
+int Edge::sourceNodeId() const
+{
+	return mSourceNodeId;
+}
+
+int Edge::destNodeId() const
+{
+	return mDestNodeId;
+}
+
+Edge & Edge::setSourceNodeId( int id )
+{
+	mSourceNodeId = id;
+	return *this;
+}
+
+Edge & Edge::setDestNodeId( int id )
+{
+	mDestNodeId = id;
+	return *this;
+}
+
+int Edge::busNum() const
+{
+	return mBusNum;
+}
+
+Edge & Edge::setBusNum( int num )
+{
+	mBusNum = num;
+	return *this;
+}
+
+void Edge::addBus()
+{
+	mBusNum++;
+}
+
 

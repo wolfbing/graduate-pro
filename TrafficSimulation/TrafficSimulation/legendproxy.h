@@ -16,6 +16,7 @@ protected:
 	void showEvent(QShowEvent *event);
 
 private:
+	bool mPosInitialized;
 	
 };
 

@@ -37,7 +37,7 @@ protected:
 
 	
 
-private:
+protected:
 	Edge* mEdgeData;
 
 	// »æÍ¼ÊôĞÔ

@@ -40,3 +40,15 @@ bool TreeInt::operator==( const TreeInt & obj) const
 
 
 
+
+TwoInt& TwoInt::operator=( const TwoInt & obj )
+{
+	m1 = obj.m1;
+	m2 = obj.m2;
+	return *this;
+}
+
+bool TwoInt::operator==( const TwoInt & obj ) const
+{
+	return m1==obj.m1 && m2==obj.m2;
+}

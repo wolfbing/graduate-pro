@@ -23,6 +23,7 @@
 #include "Edge.h"
 #include "structsfordb.h"
 #include "node.h"
+#include "BusRoute.h"
 
 
 const QString DB::sDbType = "QSQLITE"; // 使用Sqlite3数据库
@@ -245,38 +246,6 @@ void DB::clearTables()
 
 }
 
-QList<QPair<QPointF*, QPointF*> > DB::loadSec()
-{
-    QList<QPair<QPointF*,QPointF*> > secList;
-    QList<QPair<int,int> > nodePairVec;
-    QSqlQuery query(mDb);
-    QString sql = "select start_node,end_node from "+DB::sConnTableName;
-    if(!query.exec(sql))
-    {
-        QSqlError err = query.lastError();
-        QString errText = err.text();
-        throw new SqlQueryException(errText);
-    }
-    while(query.next()){
-        nodePairVec.append(QPair<int,int>(query.value(0).toInt(),
-                                 query.value(1).toInt()));
-
-    }
-    QString sql2 = "select id,coor_x,coor_y from "+DB::sNodeTableName;
-    query.exec(sql2);
-    QHash<int, QPointF* > points;
-    while(query.next()){
-        points.insert(query.value(0).toInt(),
-                      new QPointF(query.value(1).toDouble(),
-                                  query.value(2).toDouble()));
-    }
-    for(int i=0; i<nodePairVec.size(); ++i){
-        secList.append(QPair<QPointF*,QPointF*>(points.value(nodePairVec.at(i).first),
-                        points.value(nodePairVec.at(i).second)) );
-    }
-    return secList;
-
-}
 
 
 void DB::createNodeTable(QSqlQuery &query)
@@ -874,157 +843,9 @@ void DB::fetchDataFromRoadStatisticsFile(QSqlQuery &query)
                 throw new SqlQueryException(errText);
             }
         }
-
         file->close();
     }
-
     delete file;
-
-}
-
-QList<QPair<Node, Node> >* DB::loadConn()
-{
-	//QList<QPair<QPointF*,QPointF*> > secList;
-	QList<QPair<Node,Node> >* secList = new QList<QPair<Node,Node> >;
-	QList<QPair<int,int> > nodePairVec;
-	QSqlQuery query(mDb);
-	QString sql = "select start_node,end_node from "+DB::sConnTableName;
-	if(!query.exec(sql))
-	{
-		QSqlError err = query.lastError();
-		QString errText = err.text();
-		throw new SqlQueryException(errText);
-	}
-	while(query.next()){
-		nodePairVec.append(QPair<int,int>(query.value(0).toInt(),
-			query.value(1).toInt()));
-
-	}
-	QString sql2 = "select id,node_id,coor_x,coor_y from "+DB::sNodeTableName;
-	query.exec(sql2);
-	QHash<int, Node> points;
-	while(query.next()){
-		points.insert(query.value(0).toInt(),
-			Node(QPointF(query.value(2).toDouble(),	query.value(3).toDouble()),query.value(1).toInt()));
-	}
-	for(int i=0; i<nodePairVec.size(); ++i){
-		secList->append(QPair<Node,Node>(points.value(nodePairVec.at(i).first),
-			points.value(nodePairVec.at(i).second)) );
-	}
-	return secList;
-}
-
-QList<ConnWithCoorLevel>* DB::loadConnWithLevel()
-{
-	QList<ConnWithCoorLevel >* connList = new QList<ConnWithCoorLevel>;
-	QSqlQuery query(mDb);
-
-	// 载入坐标
-	QString sql2 = "select id,coor_x,coor_y from "+DB::sNodeTableName;
-	query.exec(sql2);
-	QHash<int, QPointF> points;
-	while(query.next()){
-		points.insert(query.value(0).toInt(),
-			QPointF(query.value(1).toDouble(),	query.value(2).toDouble()));
-	}
-	// 载入道路
-	QString sql = "select start_node,end_node,road_level from "+DB::sConnTableName;
-	if(!query.exec(sql))
-	{
-		QSqlError err = query.lastError();
-		QString errText = err.text();
-		throw new SqlQueryException(errText);
-	}
-	while(query.next()){
-		int p1 = query.value(0).toInt();
-		int p2 = query.value(1).toInt();
-		connList->append(ConnWithCoorLevel(
-			QPair<QPointF,QPointF>(points.value(p1),points.value(p2)), 
-			query.value(2).toInt()));
-	}
-	
-	return connList;
-}
-
-QList<QString>* DB::loadBusRoute()
-{
-	QList<QString>* routes = new QList<QString>;
-	QSqlQuery query(mDb);
-
-	QString sql = "select nodes from " + sBusTableName ;
-	query.exec(sql);
-	while (query.next())
-	{
-		routes->append(query.value(0).toString());
-	}
-	return routes;
-}
-
-QHash<int,QPointF>* DB::loadNodeById()
-{
-	QSqlQuery query(mDb);
-
-	// 载入坐标
-	QString sql2 = "select id,coor_x,coor_y from "+DB::sNodeTableName;
-	query.exec(sql2);
-	QHash<int, QPointF>* points = new QHash<int, QPointF>;
-	while(query.next()){
-		points->insert(query.value(0).toInt(),
-			QPointF(query.value(1).toDouble(),	query.value(2).toDouble()));
-	}
-	return points;
-}
-
-QVector<ConnWithNoPair>* DB::loadConnByNo()
-{
-	QSqlQuery query(mDb);
-	QString sql = "select start_node,end_node from "+DB::sConnTableName;
-	if(!query.exec(sql))
-	{
-		QSqlError err = query.lastError();
-		QString errText = err.text();
-		throw new SqlQueryException(errText);
-	}
-	//QList<QPair<int,int> >* li = new QList<QPair<int,int> >;
-	QVector<ConnWithNoPair>* vec = new QVector<ConnWithNoPair>;
-	vec->append(ConnWithNoPair(1,2));
-	vec->append(ConnWithNoPair(3,4));
-	//QVector<ConnWithNoPair>* vec = new QVector<ConnWithNoPair>;
-	while(query.next()){
-		int p1 = query.value(0).toInt();
-		int p2 = query.value(1).toInt();
-		vec->append(ConnWithNoPair(p1,p2));
-	}
-	return vec;
-}
-
-QHash<int,QPointF>* DB::loadNodeByNodeId()
-{
-	QSqlQuery query(mDb);
-
-	// 载入坐标
-	QString sql2 = "select node_id,coor_x,coor_y from "+DB::sNodeTableName;
-	query.exec(sql2);
-	QHash<int, QPointF>* points = new QHash<int, QPointF>;
-	while(query.next()){
-		points->insert(query.value(0).toInt(),
-			QPointF(query.value(1).toDouble(),	query.value(2).toDouble()));
-	}
-	return points;
-}
-
-QHash<int,int>* DB::loadNodeIdToId()
-{
-	QHash<int,int>* hash = new QHash<int,int>;
-	QSqlQuery query(mDb);
-
-	// 载入坐标
-	QString sql = "select id, node_id from "+DB::sNodeTableName;
-	query.exec(sql);
-	while(query.next()){
-		hash->insert(query.value(1).toInt(), query.value(0).toInt());
-	}
-	return hash;
 }
 
 QList<Node*> DB::loadNodes()
@@ -1033,122 +854,76 @@ QList<Node*> DB::loadNodes()
 	QSqlQuery query(mDb);
 
 	// 载入坐标
-	QString sql = "select node_id, coor_x, coor_y from "+DB::sNodeTableName;
+	QString sql = "select node_id, coor_x, coor_y, junction_type, in_scale,id from "+DB::sNodeTableName;
 	query.exec(sql);
+	Node * tmpNode;
 	while(query.next()){
-		nodeList.append(new Node(
-			QPointF( query.value(1).toInt(), query.value(2).toInt() ), 
-			query.value(0).toInt() )  );
+		tmpNode = new Node;
+		tmpNode->setCoor(QPointF( query.value(1).toInt(), query.value(2).toInt() ) )
+			.setNo(query.value(0).toInt()).setJunctionType(query.value(3).toInt())
+			.setInScale(query.value(4).toBool()).setId(query.value(5).toInt());
+		nodeList << tmpNode;
 	}
 	return nodeList;
 }
 
-QList<ConnWithCoorPair>* DB::loadConns()
+
+QList<Edge*> DB::loadEdges()
 {
-	QList<ConnWithCoorPair>* secList = new QList<ConnWithCoorPair>;
-	QList<QPair<int,int> > nodePairVec;
+	QList<Edge*> edgeList; // 用于返回值的edge集合
 	QSqlQuery query(mDb);
-	QString sql = "select start_node,end_node from "+DB::sConnTableName;
+	QString sql = QString("select start_node,end_node,road_level,sec_len,")+
+		"motor_driveway_width,non_motor_driveway_width,driveway_isolation, "+
+		"road_type,traffic_type,in_scale,id"+" from " + DB::sConnTableName;
 	if(!query.exec(sql))
 	{
 		QSqlError err = query.lastError();
 		QString errText = err.text();
 		throw new SqlQueryException(errText);
 	}
+	Edge * tmpEdge;
 	while(query.next()){
-		nodePairVec.append(QPair<int,int>(query.value(0).toInt(),
-			query.value(1).toInt()));
+		tmpEdge = new Edge;
+		tmpEdge->setSourceNodeId(query.value(0).toInt()).setDestNodeId(query.value(1).toInt())
+			.setRoadLevel(query.value(2).toInt())
+			.setLength(query.value(3).toReal()).setMotorWayWidth(query.value(4).toReal())
+			.setNonMotorWayWidth(query.value(5).toReal()).setWayIsolate(query.value(6).toBool())
+			.setRoadType(query.value(7).toInt()).setTrafficType(query.value(8).toInt())
+			.setInScale(query.value(9).toBool()).setId(query.value(10).toInt());
+		edgeList << tmpEdge;
+	} 
 
-	}
-	QString sql2 = "select id,coor_x,coor_y from "+DB::sNodeTableName;
-	query.exec(sql2);
-	QHash<int, QPointF> points;
-	while(query.next()){
-		points.insert(query.value(0).toInt(),
-			QPointF(query.value(1).toDouble(),	query.value(2).toDouble() )  );
-	}
-	for(int i=0; i<nodePairVec.size(); ++i){
-		secList->append(ConnWithCoorPair(points.value(nodePairVec.at(i).first),
-			points.value(nodePairVec.at(i).second) )  );
-	}
-	return secList;
-}
-
-QList<ConnWithNoPair>* DB::loadConnsWithNoPair()
-{
-	QList<ConnWithNoPair>* secList = new QList<ConnWithNoPair>;
-	QList<QPair<int,int> > nodePairVec;
-	QSqlQuery query(mDb);
-	QString sql = "select start_node,end_node from "+DB::sConnTableName;
-	if(!query.exec(sql))
-	{
-		QSqlError err = query.lastError();
-		QString errText = err.text();
-		throw new SqlQueryException(errText);
-	}
-	while(query.next()){
-		nodePairVec.append(QPair<int,int>(query.value(0).toInt(),
-			query.value(1).toInt()));
-
-	} // 载入用id表示的conn
-	QString sql2 = "select id,node_id from "+DB::sNodeTableName;
-	query.exec(sql2);
-	QHash<int, int> points;
-	while(query.next()){
-		points.insert(query.value(0).toInt(), query.value(1).toInt()  );
-	} // id和road_id的对应
-	for(int i=0; i<nodePairVec.size(); ++i){
-		secList->append(ConnWithNoPair(points.value(nodePairVec.at(i).first),
-			points.value(nodePairVec.at(i).second) )  );
-	} // 完成road_id对id的替换
-	return secList;
-}
-
-QList<Edge>* DB::loadConnsWithNodeLevel()
-{
-	typedef TreeInt ConnData;// 三个数据依次对应 start_node,end_node,road_level
-	QList<Edge>* edgeList = new QList<Edge>; // 用于返回值的edge集合
-	QList<ConnData> connList; // 从数据库载入的边集
-	QSqlQuery query(mDb);
-	QString sql = "select start_node,end_node,road_level from "+DB::sConnTableName;
-	if(!query.exec(sql))
-	{
-		QSqlError err = query.lastError();
-		QString errText = err.text();
-		throw new SqlQueryException(errText);
-	}
-	while(query.next()){
-		connList.append(ConnData(query.value(0).toInt(),
-			query.value(1).toInt(), query.value(2).toInt() )  );
-
-	} // 载入conn
-
-	QHash<int,Node*> nodes = loadNodeIdCoorHash(); // id：node hash对照
-	
-	for(int i=0; i<connList.size(); ++i){
-		Edge edge;
-		edge.setSourceNode(nodes.value(connList.at(i).m1)  );
-		edge.setDestNode(nodes.value(connList.at(i).m2)  );
-		edge.setRoadLevel(static_cast<uint>(connList.at(i).m3) );
-		edgeList->append(edge);
-	} // 完成road_id对id的替换
 	return edgeList;
 }
 
-QHash<int,Node*> DB::loadNodeIdCoorHash()
+QList<BusRoute*> DB::loadBusRoutes()
 {
-	QHash<int,Node*> hash;
+	QList<BusRoute*> busRouteList;
 	QSqlQuery query(mDb);
-	QString sql = "select id,node_id,coor_x,coor_y from "+DB::sNodeTableName;
-	query.exec(sql);
-	Node * node;
-	while(query.next()){
-		node = new Node;
-		node->setCoor( QPointF(query.value(2).toReal(), query.value(3).toReal() ) );
-		node->setNo(query.value(1).toInt());
-		hash.insert(query.value(0).toInt(), node );
-	} // id和坐标的对应
-	return hash;
+	QString sql = QString("select id,route_id,node_num,nodes,vehicle,equivalent ")
+		+ "from " + sBusTableName;
+	BusRoute* route;
+	QStringList strList;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			route = new BusRoute;
+			route->setId(query.value(0).toInt()).setRouteId(query.value(1).toInt())
+				.setStopNum(query.value(2).toInt()).setVehicle(query.value(4).toInt())
+				.setCarEquivalent(query.value(5).toReal());
+			strList = query.value(3).toString().split(",");
+			QList<int> stops;
+			for (int i=0; i<strList.size(); ++i)
+			{
+				stops << strList.at(i).toInt();
+			}
+			route->setStops(stops);
+			busRouteList << route;
+		}
+		
+	}
+	return busRouteList;
 }
 
 

@@ -5,6 +5,7 @@
 #include "ui_winofgraphicsview.h"
 #include <QResizeEvent>
 #include <QLabel>
+#include "DbAdapter.h"
 
 #include <QGraphicsScene>
 
@@ -34,7 +35,7 @@ private:
 	void initStatusBar();
 	void initActions();
 	void initToolBar();
-
+	void loadDataFromDb();
 	
 	
 
@@ -50,6 +51,11 @@ private:
 	QGraphicsScene* tmpScene;
 	// actions 
 	QAction* mPrintAction;
+
+	DbAdapter mDbAdapter;
+    QList<Edge*> mEdgeDataList;
+	QList<Node*> mNodeDataList;
+	QList<BusRoute*> mBusRouteList;
 
 };
 

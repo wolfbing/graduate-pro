@@ -2,7 +2,31 @@
 #define GRAPHICSSCENE_H
 
 #include <QGraphicsScene>
-#include "DbAdapter.h"
+
+/*
+Base class of other XXXGraphicsScene
+
+Pure virtual functions:
+	- addItems()
+	- updateItems()
+	- addLegend()
+	- doSomething()
+
+The specific XXXGraphicsScene class that inherits from GraphicsScene just need to 
+design their scene and implement the pure virtual functions. Then, the scene will 
+be completed with translate,scale,print functions(implemented by GraphicsScene class).
+
+Before you use a XXXGraphcisScene object, you should setNodeDataList(), setEdgeDataList(),
+and addItems() emplicitly. Just like this:
+	<code>
+	XXXGraphicsScene scene;
+	scene.setNodeDataList(nodelist).setEdgeDataList(edgelist).addItems();
+	</code>
+
+*/
+
+class Node;
+class Edge;
 
 class GraphicsScene : public QGraphicsScene
 {
@@ -11,6 +35,14 @@ class GraphicsScene : public QGraphicsScene
 public:
 	GraphicsScene(QObject *parent = 0);
 	~GraphicsScene();
+
+	int edgeNum() const ;
+	int nodeNum() const ;
+
+	GraphicsScene & setNodeDataList(QList<Node*>);
+	GraphicsScene & setEdgeDataList(QList<Edge*>);
+
+	virtual void addItems()=0;
 
 public slots:	
 	void changeSceneRect(int w, int h);
@@ -22,8 +54,9 @@ signals:
 	void clearMsgFromStatus();
 
 protected:
+	virtual void init()=0;
 	virtual void updateItems()=0;
-	virtual void moveItems(){};
+	virtual void addLegend()=0;
 	QPointF normCoorToSceneCoor(QPointF);
 	QPointF sceneCoorToNormCoor(QPointF);
 	qreal shorterSceneRectSide(); // 返回sceneRect中较短的边
@@ -36,7 +69,8 @@ protected:
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 protected:
-	DbAdapter mDbAdapter;
+	QList<Node*> mNodeDataList;
+	QList<Edge*> mEdgeDataList;
 
 private:
 	qreal mRatio;

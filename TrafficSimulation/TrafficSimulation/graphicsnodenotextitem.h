@@ -4,6 +4,7 @@
 #include <QGraphicsTextItem>
 #include "graphicsnodeitem.h"
 
+class Node;
 
 class GraphicsNodeNoTextItem : public QGraphicsTextItem
 {
@@ -12,13 +13,18 @@ public:
 	GraphicsNodeNoTextItem(GraphicsNodeItem *parent );
 	~GraphicsNodeNoTextItem();
 
-	// 重载
-	//void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */);
-	//void boundingRect();
-	//void shape();
+	//// set
+	GraphicsNodeNoTextItem& setNodeData(Node*);
+	GraphicsNodeNoTextItem& updateNeighbour(GraphicsNodeNoTextItem*);
+
+	//// get
+	Node * nodeData();
+	//// 检测是否可见
+	void updateVisible();
 
 private:
-	//QGraphicsItem* mParentNodeItem;
+	Node * mNodeData;
+	GraphicsNodeNoTextItem* mNeighbour;
 };
 
 #endif // GRAPHICSNODENOTEXTITEM_H

@@ -13,26 +13,14 @@ public:
 	DbAdapter(void);
 	~DbAdapter(void);
 
-	//QList<QPair<Node,Node> >* loadNormConns();
-	QList<ConnWithCoorLevel>* loadNormConnWithLevel();
-	QHash<ConnWithCoorPair,int>* loadNormConnWithBusNum();
-	QList<Node*> loadNormNodesWithNo();
-	QList<ConnWithCoorPair>* loadNormConns();
-	QList<ConnWithNoPair>* loadConnsWithNoPair();
-	QList<Edge>* loadEdgeWithCoorLevel();
+	QList<Node*> loadNormNodes();
+	QList<Edge*> loadEdges();
+	QList<BusRoute*> loadBusRoutes();
 
 private:
 	template <class T>
-	Rect boundingRect(const QList<T> *) const;
-	template <class T>
 	Rect boundingRect(const QList<T*> *) const;
 
-	void normConns(QList<QPair<Node,Node> > *);
-	void normConns(QList<ConnWithCoorLevel>* );
-	void normConns(QHash<ConnWithCoorPair,int>*);
-
-	template <class T>
-	void norm(QList<T>*) const;
 	template <class T>
 	void norm(QList<T*>*) const;
 

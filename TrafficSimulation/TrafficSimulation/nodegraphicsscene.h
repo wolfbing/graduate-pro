@@ -8,6 +8,7 @@
 #include "conn.h"
 #include "graphicsnodeitem.h"
 #include "graphicsedgenetitem.h"
+#include "graphicsnodenotextitem.h"
 
 class NodeGraphicsScene : public GraphicsScene
 {
@@ -17,23 +18,30 @@ public:
 	NodeGraphicsScene(QObject *parent = 0);
 	~NodeGraphicsScene();
 
-	int nodeNum() const;
-	int edgeNum() const;
-
-
+	void addItems();
 
 private:
 	void updateItems();
 	void doSomething();
 	void checkNoTextVisible();
 
+	void init();
+	void addLegend();
+
 private:	
-	DbAdapter mDbAdapter;
-	QList<Node*> mNodeDataList;
 	QList<GraphicsNodeItem*> mNodes;
-	GraphicsEdgetNetItem* mEdgeNet;
-	int mEdgeNum;
-	
+	GraphicsEdgetNetItem* mEdgeNet;	
+	QList<GraphicsNodeNoTextItem*> mNodeNoTextItemList;
+
+	// ªÊÕº Ù–‘
+	qreal mNodeRadius;
+	QColor mNodeInnerColor;
+	QColor mNodeBorderColor;
+	qreal mEdgeNetWidth;
+	QColor mEdgeNetInnerColor;
+	QColor mEdgeNetBorderColor;
+	bool mNodeHaveBorder;
+	bool mEdgeNetHaveBorder;
 
 };
 

@@ -227,6 +227,27 @@
     <ClCompile Include="GeneratedFiles\Release\moc_Communicate.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="busnumgraphicsscene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_busnumgraphicsscene.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_busnumgraphicsscene.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="BusRoute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphicsbusedgeitem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_graphicsbusedgeitem.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_graphicsbusedgeitem.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="trafficsimulation.ui">
@@ -295,6 +316,12 @@
     <CustomBuild Include="Communicate.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="busnumgraphicsscene.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="graphicsbusedgeitem.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_trafficsimulation.h">
@@ -334,6 +361,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="structsfordb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BusRoute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

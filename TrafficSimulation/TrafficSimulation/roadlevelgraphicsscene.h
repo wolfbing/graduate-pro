@@ -5,6 +5,7 @@
 
 class Edge;
 class GraphicsEdgeItem;
+class GraphicsEdgetNetItem;
 
 class RoadLevelGraphicsScene :public GraphicsScene
 {
@@ -14,24 +15,26 @@ public:
 	RoadLevelGraphicsScene(QObject *parent = 0);
 	~RoadLevelGraphicsScene();
 
-	int edgeNum(){return 100;};
-	int nodeNum(){return 100;};
+	void addItems();
 
 private:
 	void updateItems();
 	void doSomething(){};
 	void init();
-
+	void addLegend();
+	
 private:
 	
 	QList<GraphicsEdgeItem*> mEdgeList;
-	QList<Node*> mNodeList;
-
+	QList<GraphicsEdgetNetItem*> mEdgeNetList;
 
 	// 各种路的颜色和宽度
-	QColor mColor0, mColor1, mColor2, mColor3, mColor4, mColor5, mColor6,
-		mOutColor0, mOutColor1, mOutColor2, mOutColor3, mOutColor6;
-	int mWidth0, mWidth1, mWidth2, mWidth3, mWidth4, mWidth5, mWidth6;
+	// 几个list都严格按照道路等级的顺序
+	QList<bool> mHaveBorderList;
+	QList<QColor> mInnerColorList;
+	QList<QColor> mBorderColorList;
+	QList<qreal> mWidthList;
+	QList<qreal> mZValueList;
 
 };
 

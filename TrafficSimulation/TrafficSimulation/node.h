@@ -30,17 +30,29 @@ public:
 
 	// get
 	QPointF coor() const;
+	int id() const;
 	int no() const;
 	QPointF sceneCoor() const;
+	int junctionType() const;
+	bool inScale() const;
 	// set
 	Node& setCoor(QPointF);
 	Node& setNo(int);
 	Node& setSceneCoor(QPointF);
+	Node& setJunctionType(int);
+	Node& setInScale(bool);
+	Node& setId(int);
+	// 计算和其他node距离
+	qreal dis(Node*)const;
+	qreal sceneDis(Node*)const;
 
 private:
 	QPointF mCoor; //坐标
 	QPointF mSceneCoor; // 在scene中的坐标
+	int mId; //rowid
 	int mNo; //编号
+	int mJunctionType; // 连接类型
+	bool mInScale; // 是否在范围内
 
 
 };

@@ -10,7 +10,6 @@ GraphicsScene::GraphicsScene(QObject *parent)
 	, mLeftBtnPressed(false)
 {
 	setItemIndexMethod(QGraphicsScene::NoIndex);
-	
 }
 
 GraphicsScene::~GraphicsScene()
@@ -111,6 +110,28 @@ void GraphicsScene::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 	if(event->isAccepted())
 		return ;
 	event->accept();
+}
+
+GraphicsScene & GraphicsScene::setNodeDataList( QList<Node*> list )
+{
+	mNodeDataList = list;
+	return *this;
+}
+
+GraphicsScene & GraphicsScene::setEdgeDataList( QList<Edge*> list )
+{
+	mEdgeDataList = list;
+	return *this;
+}
+
+int GraphicsScene::edgeNum() const
+{
+	return mEdgeDataList.size();
+}
+
+int GraphicsScene::nodeNum() const
+{
+	return mNodeDataList.size();
 }
 
 

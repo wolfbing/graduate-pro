@@ -13,6 +13,7 @@
 #include "conn.h"
 
 class Edge;
+class BusRoute;
 
 class DB : public QObject
 {
@@ -25,23 +26,12 @@ public:
     void setFileDir(QString dir);
     void clearTables();
 
-    QList<QPair<QPointF*, QPointF*> > loadSec();
-	QList<QPair<Node, Node> >* loadConn();
-	QList<ConnWithCoorLevel>* loadConnWithLevel();
-	QList<QString>* loadBusRoute();
-	QHash<int,QPointF>* loadNodeById();
-	QHash<int,QPointF>* loadNodeByNodeId();
-	QVector<ConnWithNoPair>* loadConnByNo();
-	QHash<int,int>* loadNodeIdToId();
-
 	//  ------------------  new  --------------------
-	QList<Node*> loadNodes();
-	QList<ConnWithCoorPair>* loadConns();
-	QList<ConnWithNoPair>* loadConnsWithNoPair();
-	QList<Edge>* loadConnsWithNodeLevel(); // 载入带有节点对(节点包含编号信息)、道路等级的conn
+	QList<Node*> loadNodes();  // 载入整张node表
+	QList<Edge*> loadEdges();  // 载入整张conn表
+	QList<BusRoute*> loadBusRoutes(); // 载入整张bus表
 
 private:
-	QHash<int,Node*> loadNodeIdCoorHash(); // 从sNodeTableName(节点表)中载入id:coor对照
 
 
 signals:

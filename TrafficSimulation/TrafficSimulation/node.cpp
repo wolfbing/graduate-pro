@@ -70,6 +70,51 @@ Node& Node::setSceneCoor( QPointF coor )
 	return *this;
 }
 
+Node& Node::setJunctionType( int type )
+{
+	mJunctionType = type;
+	return *this;
+}
+
+Node& Node::setInScale( bool in )
+{
+	mInScale = in;
+	return *this;
+}
+
+int Node::junctionType() const
+{
+	return mJunctionType;
+}
+
+bool Node::inScale() const
+{
+	return mInScale;
+}
+
+int Node::id() const
+{
+	return mId;
+}
+
+Node& Node::setId( int id )
+{
+	mId = id;
+	return *this;
+}
+
+qreal Node::dis( Node* node ) const
+{
+	QLineF line(mCoor, node->mCoor);
+	return line.length();
+}
+
+qreal Node::sceneDis( Node* node ) const
+{
+	QLineF line(mSceneCoor, node->mSceneCoor);
+	return line.length();
+}
+
 
 qreal length( QPair<Node,Node> pair )
 {

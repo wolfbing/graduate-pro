@@ -1,7 +1,11 @@
 #include "graphicsnodenotextitem.h"
 
+#include "node.h"
+
+
 GraphicsNodeNoTextItem::GraphicsNodeNoTextItem(GraphicsNodeItem *parent)
 	: QGraphicsTextItem(parent)
+	, mNeighbour(0)
 {
 	parent->setNoTextItem(this);
 	QGraphicsTextItem::setPlainText(QString::number(parent->nodeData()->no() )  );
@@ -15,4 +19,39 @@ GraphicsNodeNoTextItem::GraphicsNodeNoTextItem(GraphicsNodeItem *parent)
 GraphicsNodeNoTextItem::~GraphicsNodeNoTextItem()
 {
 
+}
+
+GraphicsNodeNoTextItem& GraphicsNodeNoTextItem::setNodeData( Node* node )
+{
+	mNodeData = node;
+	return *this;
+}
+
+GraphicsNodeNoTextItem& GraphicsNodeNoTextItem::updateNeighbour( GraphicsNodeNoTextItem* item )
+{
+	if(!mNeighbour)
+		mNeighbour = item;
+	else
+	{
+		if(mNodeData->dis(item->nodeData()) < mNodeData->dis(mNeighbour->nodeData()))
+			mNeighbour = item;
+	}
+	return *this;
+}
+
+Node * GraphicsNodeNoTextItem::nodeData()
+{
+	return mNodeData;
+}
+
+void GraphicsNodeNoTextItem::updateVisible()
+{
+	if (mNeighbour && mNodeData->sceneDis(mNeighbour->nodeData())<30)
+	{
+		hide();
+	}
+	else
+	{
+		show();
+	}
 }

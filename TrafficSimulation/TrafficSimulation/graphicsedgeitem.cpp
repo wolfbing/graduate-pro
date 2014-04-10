@@ -104,7 +104,9 @@ void GraphicsEdgeItem::advance()
 
 void GraphicsEdgeItem::hoverEnterEvent( QGraphicsSceneHoverEvent *event )
 {
-	QString msg = QStringLiteral("道路等级")+QString::number(mEdgeData->roadLevel());
+	QString msg = QStringLiteral("路段编号: ") + QString::number(mEdgeData->sourceNode()->no() )+ 
+		+ "-" + QString::number(mEdgeData->destNode()->no()) + ";  " +
+		QStringLiteral("道路等级: ")+QString::number(mEdgeData->roadLevel());
 	emit sendTmpInfoToStatus(msg);
 }
 
