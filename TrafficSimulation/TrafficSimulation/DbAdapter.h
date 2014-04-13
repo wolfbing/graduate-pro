@@ -6,6 +6,7 @@
 #include "rect.h"
 
 class Edge;
+class TurnRestrict;
 
 class DbAdapter
 {
@@ -16,6 +17,7 @@ public:
 	QList<Node*> loadNormNodes();
 	QList<Edge*> loadEdges();
 	QList<BusRoute*> loadBusRoutes();
+	QList<TurnRestrict*> loadTurnRestrictions();
 
 private:
 	template <class T>

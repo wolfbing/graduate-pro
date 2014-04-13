@@ -19,7 +19,6 @@ GraphicsNodeItem::~GraphicsNodeItem()
 
 void GraphicsNodeItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */ )
 {
-	checkNoItemVisible();
 	painter->setRenderHint(QPainter::Antialiasing);
 	if(mHaveBorder)
 		painter->setPen(mBorderColor);
@@ -47,7 +46,7 @@ void GraphicsNodeItem::init()
 	setZValue(1.0);
 	// 邻居
 	mNeignbour = 0;
-	mNoTextItem = 0;
+	mType = No;
 }
 
 
@@ -111,24 +110,6 @@ qreal GraphicsNodeItem::radius() const
 	return mRadius;
 }
 
-void GraphicsNodeItem::checkNoItemVisible()
-{
-	
-	if(!mNoTextItem)
-		return ;
-	if(!mNeignbour)
-		return ;
-	qreal dis = QLineF(mapToItem(mNeignbour,0,0), QPointF(0,0) ).length();
-	GraphicsNodeNoTextItem* textItem = qgraphicsitem_cast<GraphicsNodeNoTextItem*>(mNoTextItem);
-	if (dis>30)
-	{
-		textItem->show();
-	}
-	else
-	{
-		textItem->hide();
-	}
-}
 
 QVariant GraphicsNodeItem::itemChange( GraphicsItemChange change, const QVariant &value )
 {
@@ -143,15 +124,14 @@ QVariant GraphicsNodeItem::itemChange( GraphicsItemChange change, const QVariant
 	return QGraphicsItem::itemChange(change, value);
 }
 
-GraphicsNodeItem & GraphicsNodeItem::setNoTextItem( QGraphicsItem* item )
-{
-	mNoTextItem = item;
-	return *this;
-}
 
 void GraphicsNodeItem::hoverEnterEvent( QGraphicsSceneHoverEvent *event )
 {
 	QString str = QString::number(mNodeData->no());
+	if(mType==Junction)
+		str += QStringLiteral(";  交叉口类型: ")+QString::number(mNodeData->junctionType());
+	if (mType==Restriction)
+		str += QStringLiteral(";  转向限制: ") + QString::number(mNodeData->haveTurnRestrict() ? 1:0);
 	emit sendTmpInfoToStatus(QStringLiteral("节点编号：")+str);
 }
 
@@ -180,6 +160,12 @@ GraphicsNodeItem & GraphicsNodeItem::setNodeData( Node * node )
 Node * GraphicsNodeItem::nodeData() const
 {
 	return mNodeData;
+}
+
+GraphicsNodeItem & GraphicsNodeItem::setNodeItemType( NodeItemType type )
+{
+	mType = type;
+	return *this;
 }
 
 

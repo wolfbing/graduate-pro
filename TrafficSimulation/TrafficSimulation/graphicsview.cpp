@@ -8,10 +8,9 @@
 #include <QFileDialog>
 
 
-GraphicsView::GraphicsView( GraphicsScene* scene, QWidget* parent/*=0*/ )
-	: QGraphicsView(scene, parent)
+GraphicsView::GraphicsView(QWidget* parent/*=0*/ )
+	: QGraphicsView(parent)
 {
-	init(scene);
 }
 
 GraphicsView::~GraphicsView()
@@ -63,4 +62,10 @@ void GraphicsView::print()
 		render(&painter);
 	}
 	
+}
+
+void GraphicsView::setScene( GraphicsScene *scene )
+{
+	init(scene);
+	QGraphicsView::setScene(scene);
 }

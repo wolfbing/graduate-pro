@@ -24,6 +24,7 @@
 #include "structsfordb.h"
 #include "node.h"
 #include "BusRoute.h"
+#include "TurnRestrict.h"
 
 
 const QString DB::sDbType = "QSQLITE"; // 使用Sqlite3数据库
@@ -924,6 +925,27 @@ QList<BusRoute*> DB::loadBusRoutes()
 		
 	}
 	return busRouteList;
+}
+
+QList<TurnRestrict*> DB::loadTurnRestrictions()
+{
+	QList<TurnRestrict*> restrictionList;
+	QSqlQuery query(mDb);
+	QString sql = "select current_node, from_node, to_node from "+sTurnRestrictTableName;
+	TurnRestrict* restr;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			restr = new TurnRestrict;
+			restr->setCurrentNodeNo(query.value(0).toInt());
+			restr->setFromNodeNo(query.value(1).toInt());
+			restr->setToNodeNo(query.value(2).toInt());
+			restrictionList << restr;
+		}
+	}
+	
+	return restrictionList;
 }
 
 

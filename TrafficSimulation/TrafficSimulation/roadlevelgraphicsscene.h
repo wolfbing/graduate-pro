@@ -5,7 +5,7 @@
 
 class Edge;
 class GraphicsEdgeItem;
-class GraphicsEdgetNetItem;
+class GraphicsEdgeNetItem;
 
 class RoadLevelGraphicsScene :public GraphicsScene
 {
@@ -26,7 +26,7 @@ private:
 private:
 	
 	QList<GraphicsEdgeItem*> mEdgeList;
-	QList<GraphicsEdgetNetItem*> mEdgeNetList;
+	QList<GraphicsEdgeNetItem*> mEdgeNetList;
 
 	// 各种路的颜色和宽度
 	// 几个list都严格按照道路等级的顺序

@@ -15,7 +15,7 @@ public:
 	~SelectGraphicsWidget();
 
 signals:
-	void selectedGraphics(int,int);
+	void selectGraphics(int,int);
 
 public slots:
 	void comboBoxIndexChanged(int index);

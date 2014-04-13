@@ -5,6 +5,16 @@ BusRoute::BusRoute(void)
 {
 }
 
+BusRoute::BusRoute( const BusRoute & route )
+{
+	mId = route.mId;
+	mRouteId = route.mRouteId;
+	mStopNum = route.mStopNum;
+	mStops = route.mStops;
+	mVehicle = route.mVehicle;
+	mCarEquivalent = route.mCarEquivalent;
+}
+
 
 BusRoute::~BusRoute(void)
 {
@@ -74,4 +84,26 @@ int BusRoute::vehicle() const
 qreal BusRoute::carEquivalent() const
 {
 	return mCarEquivalent;
+}
+
+BusRoute& BusRoute::operator=( const BusRoute & route )
+{
+	mId = route.mId;
+	mRouteId = route.mRouteId;
+	mStopNum = route.mStopNum;
+	mStops = route.mStops;
+	mVehicle = route.mVehicle;
+	mCarEquivalent = route.mCarEquivalent;
+	return *this;
+}
+
+bool BusRoute::operator==( const BusRoute & route ) const
+{
+	return 
+	(mId == route.mId)
+	&&(mRouteId == route.mRouteId)
+	&&(mStopNum == route.mStopNum)
+	&&(mStops == route.mStops)
+	&&(mVehicle == route.mVehicle)
+	&&(mCarEquivalent == route.mCarEquivalent);
 }

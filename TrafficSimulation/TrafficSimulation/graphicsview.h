@@ -9,8 +9,10 @@ class GraphicsView : public QGraphicsView
 	Q_OBJECT
 
 public:
-	GraphicsView(GraphicsScene* scene, QWidget* parent=0);
+	GraphicsView(QWidget* parent=0);
 	~GraphicsView();
+
+	void setScene(GraphicsScene *scene);
 
 public slots:
 	void print();

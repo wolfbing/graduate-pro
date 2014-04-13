@@ -26,15 +26,13 @@ NodeGraphicsScene::~NodeGraphicsScene()
 
 void NodeGraphicsScene::updateItems()
 {
+	GraphicsScene::updateItems();
 	QListIterator<GraphicsNodeItem*> ite(mNodes);
 	GraphicsNodeItem* item;
-	QPointF newPos ;
 	while (ite.hasNext())
 	{
 		item = ite.next();
-		newPos = normCoorToSceneCoor(item->nodeData()->coor());
-		item->nodeData()->setSceneCoor(newPos);
-		item->setPos(newPos);
+		item->setPos(item->nodeData()->sceneCoor());
 	}
 	mEdgeNet->advance();
 	checkNoTextVisible();
@@ -84,7 +82,7 @@ void NodeGraphicsScene::addItems()
 	} ////  添加节点和编号完成
 	///// 添加edgenet
 	Edge * tmpEdgeData;
-	mEdgeNet = new GraphicsEdgetNetItem;
+	mEdgeNet = new GraphicsEdgeNetItem;
 	mEdgeNet->setHaveBorder(mEdgeNetHaveBorder).setBorderColor(mEdgeNetBorderColor).setInnerColor(mEdgeNetInnerColor)
 		.setWidth(mEdgeNetWidth);
 	QListIterator<Edge*> edgeIte(mEdgeDataList);

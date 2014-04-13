@@ -8,6 +8,10 @@ public:
 	BusRoute(void);
 	~BusRoute(void);
 
+	BusRoute(const BusRoute & );
+	BusRoute& operator=(const BusRoute &);
+	bool operator==(const BusRoute &) const;
+
 	/// set
 	BusRoute& setId(int);
 	BusRoute& setRouteId(int);

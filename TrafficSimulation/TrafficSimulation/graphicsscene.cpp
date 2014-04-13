@@ -1,6 +1,7 @@
 #include "graphicsscene.h"
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
+#include "node.h"
 
 GraphicsScene::GraphicsScene(QObject *parent)
 	: QGraphicsScene(parent)
@@ -132,6 +133,17 @@ int GraphicsScene::edgeNum() const
 int GraphicsScene::nodeNum() const
 {
 	return mNodeDataList.size();
+}
+
+void GraphicsScene::updateItems()
+{
+	QListIterator<Node*> nodeDataIte(mNodeDataList);
+	Node * tmpNodeData;
+	while (nodeDataIte.hasNext())
+	{
+		tmpNodeData = nodeDataIte.next();
+		tmpNodeData->setSceneCoor(normCoorToSceneCoor(tmpNodeData->coor()));
+	}
 }
 
 

@@ -23,15 +23,7 @@ RoadLevelGraphicsScene::~RoadLevelGraphicsScene()
 
 void RoadLevelGraphicsScene::updateItems()
 {
-	QListIterator<Node*> ite(mNodeDataList);
-	Node * tmpNode;
-	QPointF point;
-	while (ite.hasNext())
-	{
-		tmpNode = ite.next();
-		point = normCoorToSceneCoor(tmpNode->coor() );
-		tmpNode->setSceneCoor(point);
-	}
+	GraphicsScene::updateItems();
 	QListIterator<GraphicsEdgeItem*> edgeIte(mEdgeList);
 	GraphicsEdgeItem* tmpEdge;
 	QPointF source, dest;
@@ -40,8 +32,8 @@ void RoadLevelGraphicsScene::updateItems()
 		tmpEdge = edgeIte.next();
 		tmpEdge->advance();
 	}
-	GraphicsEdgetNetItem* tmpNetItem;
-	QListIterator<GraphicsEdgetNetItem*> netIte(mEdgeNetList);
+	GraphicsEdgeNetItem* tmpNetItem;
+	QListIterator<GraphicsEdgeNetItem*> netIte(mEdgeNetList);
 	while (netIte.hasNext())
 	{
 		tmpNetItem = netIte.next();
@@ -93,10 +85,10 @@ void RoadLevelGraphicsScene::addItems()
 	Edge* tmpEdge;
 	GraphicsEdgeItem* item;
 	QListIterator<Edge*> ite(mEdgeDataList);
-	mEdgeNetList << new GraphicsEdgetNetItem << new GraphicsEdgetNetItem << new GraphicsEdgetNetItem 
-		<< new GraphicsEdgetNetItem << new GraphicsEdgetNetItem << new GraphicsEdgetNetItem 
-		<< new GraphicsEdgetNetItem ;
-	GraphicsEdgetNetItem* tmpNetItem;
+	mEdgeNetList << new GraphicsEdgeNetItem << new GraphicsEdgeNetItem << new GraphicsEdgeNetItem 
+		<< new GraphicsEdgeNetItem << new GraphicsEdgeNetItem << new GraphicsEdgeNetItem 
+		<< new GraphicsEdgeNetItem ;
+	GraphicsEdgeNetItem* tmpNetItem;
 	while (ite.hasNext())
 	{
 		tmpEdge = ite.next();

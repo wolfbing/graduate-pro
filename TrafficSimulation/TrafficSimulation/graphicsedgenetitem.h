@@ -4,12 +4,12 @@
 #include <QGraphicsItem>
 #include "Edge.h"
 
-class GraphicsEdgetNetItem : public QGraphicsItem
+class GraphicsEdgeNetItem : public QGraphicsItem
 {
 
 public:
-	GraphicsEdgetNetItem(QGraphicsItem *parent = 0);
-	~GraphicsEdgetNetItem();
+	GraphicsEdgeNetItem(QGraphicsItem *parent = 0);
+	~GraphicsEdgeNetItem();
 
 	void addEdgeData(Edge*);
 
@@ -21,10 +21,10 @@ public:
 	QPainterPath shape() const;
 	 
 	// …Ë÷√ªÊÕº Ù–‘
-	GraphicsEdgetNetItem & setWidth(qreal width);
-	GraphicsEdgetNetItem & setBorderColor(QColor borderColor);
-	GraphicsEdgetNetItem & setInnerColor(QColor innerColor);
-	GraphicsEdgetNetItem & setHaveBorder(bool haveBorder);
+	GraphicsEdgeNetItem & setWidth(qreal width);
+	GraphicsEdgeNetItem & setBorderColor(QColor borderColor);
+	GraphicsEdgeNetItem & setInnerColor(QColor innerColor);
+	GraphicsEdgeNetItem & setHaveBorder(bool haveBorder);
 
 	qreal edgeWidth() const ;
 	QColor innerColor() const;

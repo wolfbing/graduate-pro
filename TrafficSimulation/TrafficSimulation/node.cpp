@@ -3,6 +3,7 @@
 
 // 包含位置和编号信息的节点
 Node::Node( QPointF p, int no)
+	: mHaveTurnRestrict(false)
 {
 	mCoor = p;
 	mNo = no;
@@ -12,17 +13,36 @@ Node::Node( const Node & node )
 {
 	mCoor = node.mCoor;
 	mNo = node.mNo;
+	mSceneCoor = node.mSceneCoor;
+	mId = node.mId;
+	mJunctionType = node.mJunctionType;
+	mInScale = node.mInScale;
+	mHaveTurnRestrict = node.mHaveTurnRestrict;
+}
+
+Node::Node()
+	: mHaveTurnRestrict(false)
+{
+
 }
 
 bool Node::operator==( const Node & node ) const
 {
-	return (this->mCoor==node.mCoor) && (this->mNo==node.mNo);
+	return (this->mCoor==node.mCoor) && (this->mNo==node.mNo)
+		&& (mSceneCoor==node.mSceneCoor) && (mId==node.mId)
+		&& (mJunctionType==node.mJunctionType) && (mInScale==node.mInScale)
+		&& (mHaveTurnRestrict==node.mHaveTurnRestrict);
 }
 
 Node & Node::operator=( const Node & node )
 {
 	mCoor = node.mCoor;
 	mNo = node.mNo;
+	mSceneCoor = node.mSceneCoor;
+	mId= node.mId;
+	mJunctionType = node.mJunctionType;
+	mInScale = node.mInScale;
+	mJunctionType = node.mJunctionType;
 	return *this;
 }
 
@@ -113,6 +133,17 @@ qreal Node::sceneDis( Node* node ) const
 {
 	QLineF line(mSceneCoor, node->mSceneCoor);
 	return line.length();
+}
+
+bool Node::haveTurnRestrict()
+{
+	return mHaveTurnRestrict;
+}
+
+Node& Node::setHaveTurnRestrict( bool restr )
+{
+	mHaveTurnRestrict = restr;
+	return *this;
 }
 
 

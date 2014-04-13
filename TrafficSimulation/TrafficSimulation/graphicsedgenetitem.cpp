@@ -2,20 +2,20 @@
 #include <QPainter>
 #include <QPainterPath>
 
-GraphicsEdgetNetItem::GraphicsEdgetNetItem(QGraphicsItem *parent)
+GraphicsEdgeNetItem::GraphicsEdgeNetItem(QGraphicsItem *parent)
 	: QGraphicsItem(parent)
 {
 	setFlag(ItemSendsGeometryChanges);
 	init();
 }
 
-GraphicsEdgetNetItem::~GraphicsEdgetNetItem()
+GraphicsEdgeNetItem::~GraphicsEdgeNetItem()
 {
 
 }
 
 
-QRectF GraphicsEdgetNetItem::boundingRect() const
+QRectF GraphicsEdgeNetItem::boundingRect() const
 {
 	QListIterator<Edge*> ite(mEdgeDataList);
 	qreal left, right, top, bottom;
@@ -44,7 +44,7 @@ QRectF GraphicsEdgetNetItem::boundingRect() const
 
 }
 
-void GraphicsEdgetNetItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */ )
+void GraphicsEdgeNetItem::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */ )
 {
 	QPainterPath path;
 	QListIterator<Edge*> ite(mEdgeDataList);
@@ -72,44 +72,44 @@ void GraphicsEdgetNetItem::paint( QPainter *painter, const QStyleOptionGraphicsI
 	
 }
 
-QPainterPath GraphicsEdgetNetItem::shape() const
+QPainterPath GraphicsEdgeNetItem::shape() const
 {
 	QPainterPath path;
 	path.addRect(boundingRect());
 	return path;
 }
 
-void GraphicsEdgetNetItem::advance()
+void GraphicsEdgeNetItem::advance()
 {
 	prepareGeometryChange();
 	
 }
 
-GraphicsEdgetNetItem & GraphicsEdgetNetItem::setWidth( qreal width )
+GraphicsEdgeNetItem & GraphicsEdgeNetItem::setWidth( qreal width )
 {
 	mEdgeWidth = width;
 	return *this;
 }
 
-GraphicsEdgetNetItem & GraphicsEdgetNetItem::setBorderColor( QColor borderColor )
+GraphicsEdgeNetItem & GraphicsEdgeNetItem::setBorderColor( QColor borderColor )
 {
 	mBorderColor = borderColor;
 	return *this;
 }
 
-GraphicsEdgetNetItem & GraphicsEdgetNetItem::setInnerColor( QColor innerColor )
+GraphicsEdgeNetItem & GraphicsEdgeNetItem::setInnerColor( QColor innerColor )
 {
 	mInnerColor = innerColor;
 	return *this;
 }
 
-GraphicsEdgetNetItem & GraphicsEdgetNetItem::setHaveBorder( bool haveBorder )
+GraphicsEdgeNetItem & GraphicsEdgeNetItem::setHaveBorder( bool haveBorder )
 {
 	mHaveBorder = haveBorder;
 	return *this;
 }
 
-void GraphicsEdgetNetItem::init()
+void GraphicsEdgeNetItem::init()
 {
 	mHaveBorder = true;
 	mBorderColor = QColor(203,168,87);
@@ -117,22 +117,22 @@ void GraphicsEdgetNetItem::init()
 	mEdgeWidth = 4.0;
 }
 
-qreal GraphicsEdgetNetItem::edgeWidth() const
+qreal GraphicsEdgeNetItem::edgeWidth() const
 {
 	return mEdgeWidth;
 }
 
-QColor GraphicsEdgetNetItem::innerColor() const
+QColor GraphicsEdgeNetItem::innerColor() const
 {
 	return mInnerColor;
 }
 
-QColor GraphicsEdgetNetItem::borderColor() const
+QColor GraphicsEdgeNetItem::borderColor() const
 {
 	return mBorderColor;
 }
 
-void GraphicsEdgetNetItem::addEdgeData( Edge* edgeData )
+void GraphicsEdgeNetItem::addEdgeData( Edge* edgeData )
 {
 	mEdgeDataList << edgeData;
 }

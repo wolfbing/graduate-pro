@@ -7,10 +7,11 @@
 Base class of other XXXGraphicsScene
 
 Pure virtual functions:
-	- addItems()
-	- updateItems()
-	- addLegend()
-	- doSomething()
+	- init() - should not be public
+	- addItems() - must be public
+	- updateItems() - should not be public
+	- addLegend() - should not be public
+	- doSomething() - should not be public
 
 The specific XXXGraphicsScene class that inherits from GraphicsScene just need to 
 design their scene and implement the pure virtual functions. Then, the scene will 
@@ -55,7 +56,7 @@ signals:
 
 protected:
 	virtual void init()=0;
-	virtual void updateItems()=0;
+	virtual void updateItems();
 	virtual void addLegend()=0;
 	QPointF normCoorToSceneCoor(QPointF);
 	QPointF sceneCoorToNormCoor(QPointF);

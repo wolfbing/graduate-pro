@@ -22,15 +22,9 @@ BusNumGraphicsScene::~BusNumGraphicsScene()
 
 void BusNumGraphicsScene::updateItems()
 {
+	GraphicsScene::updateItems();
 	QListIterator<GraphicsBusEdgeItem*> edgeIte(mEdgeList);
-	QListIterator<Node*> nodeIte(mNodeDataList);
 	GraphicsBusEdgeItem * edgeItem;
-	Node * tmpNode;
-	while (nodeIte.hasNext())
-	{
-		tmpNode = nodeIte.next();
-		tmpNode->setSceneCoor(normCoorToSceneCoor(tmpNode->coor()));
-	}
 	while (edgeIte.hasNext())
 	{
 		edgeItem = edgeIte.next();

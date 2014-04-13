@@ -248,6 +248,27 @@
     <ClCompile Include="GeneratedFiles\Release\moc_graphicsbusedgeitem.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="junctiontypegraphicsscene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_junctiontypegraphicsscene.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_junctiontypegraphicsscene.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="turnrestrictgraphicsscene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_turnrestrictgraphicsscene.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_turnrestrictgraphicsscene.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="TurnRestrict.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="trafficsimulation.ui">
@@ -322,6 +343,12 @@
     <CustomBuild Include="graphicsbusedgeitem.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="junctiontypegraphicsscene.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="turnrestrictgraphicsscene.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_trafficsimulation.h">
@@ -364,6 +391,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BusRoute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TurnRestrict.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -14,6 +14,7 @@
 
 class Edge;
 class BusRoute;
+class TurnRestrict;
 
 class DB : public QObject
 {
@@ -30,6 +31,7 @@ public:
 	QList<Node*> loadNodes();  // 载入整张node表
 	QList<Edge*> loadEdges();  // 载入整张conn表
 	QList<BusRoute*> loadBusRoutes(); // 载入整张bus表
+	QList<TurnRestrict*> loadTurnRestrictions();
 
 private:
 

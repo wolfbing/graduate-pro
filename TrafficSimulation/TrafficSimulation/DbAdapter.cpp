@@ -84,3 +84,8 @@ QList<BusRoute*> DbAdapter::loadBusRoutes()
 {
 	return mDb->loadBusRoutes();
 }
+
+QList<TurnRestrict*> DbAdapter::loadTurnRestrictions()
+{
+	return mDb->loadTurnRestrictions();
+}

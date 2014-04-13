@@ -19,7 +19,7 @@ class Node
 	: virtual public Normal
 {
 public:
-	Node(){};
+	Node();
 	Node(const Node & );
 	Node & operator = (const Node & );
 	Node(QPointF, int);
@@ -35,6 +35,7 @@ public:
 	QPointF sceneCoor() const;
 	int junctionType() const;
 	bool inScale() const;
+	bool haveTurnRestrict();
 	// set
 	Node& setCoor(QPointF);
 	Node& setNo(int);
@@ -42,9 +43,11 @@ public:
 	Node& setJunctionType(int);
 	Node& setInScale(bool);
 	Node& setId(int);
+	Node& setHaveTurnRestrict(bool);
 	// 计算和其他node距离
 	qreal dis(Node*)const;
 	qreal sceneDis(Node*)const;
+	
 
 private:
 	QPointF mCoor; //坐标
@@ -53,7 +56,7 @@ private:
 	int mNo; //编号
 	int mJunctionType; // 连接类型
 	bool mInScale; // 是否在范围内
-
+	bool mHaveTurnRestrict;
 
 };
 

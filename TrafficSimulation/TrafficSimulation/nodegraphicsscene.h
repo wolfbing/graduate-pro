@@ -30,7 +30,7 @@ private:
 
 private:	
 	QList<GraphicsNodeItem*> mNodes;
-	GraphicsEdgetNetItem* mEdgeNet;	
+	GraphicsEdgeNetItem* mEdgeNet;	
 	QList<GraphicsNodeNoTextItem*> mNodeNoTextItemList;
 
 	// ªÊÕº Ù–‘

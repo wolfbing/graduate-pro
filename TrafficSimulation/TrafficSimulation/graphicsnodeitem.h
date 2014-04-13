@@ -13,6 +13,9 @@ public:
 	GraphicsNodeItem(QGraphicsItem *parent = 0);
 	~GraphicsNodeItem();
 
+	// 节点类型
+	enum NodeItemType {No,Junction,Restriction};
+
 	// 重载
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */);
 	QRectF boundingRect() const;
@@ -25,6 +28,7 @@ public:
 	GraphicsNodeItem & setHaveBorder(bool haveBorder);
 	GraphicsNodeItem & setBorderColor(QColor borderColor);
 	GraphicsNodeItem & setInnerColor(QColor innerColor);
+	GraphicsNodeItem & setNodeItemType(NodeItemType);
 	// 检查最近节点, 并设为邻居
 	void checkNeighbour(GraphicsNodeItem*);
 	// get
@@ -32,10 +36,6 @@ public:
 	QColor borderColor() const;
 	QColor innerColor() const;
 	Node * nodeData() const;
-	// 设置编号item
-	GraphicsNodeItem & setNoTextItem(QGraphicsItem*);
-
-	void checkNoItemVisible();
 
 signals:
 
@@ -59,7 +59,8 @@ private:
 	// 最邻近的节点
 	GraphicsNodeItem* mNeignbour;
 	qreal mNearestDistance;
-	QGraphicsItem* mNoTextItem;
+	// 节点类型
+	NodeItemType mType;
 
 };
 
