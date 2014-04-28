@@ -9,10 +9,21 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include "BusRoute.h"
+#include "RoadPermission.h"
 #include "structsfordb.h"
 #include "junctiontypegraphicsscene.h"
 #include "TurnRestrict.h"
 #include "turnrestrictgraphicsscene.h"
+#include "roadtypegraphicsscene.h"
+#include "trafficmanagegraphicsscene.h"
+#include "trafficforbidgraphicsscene.h"
+#include "trafficnumlimitgraphicsscene.h"
+#include <QFileDialog>
+#include "commonexception.h"
+#include "pathnotexistsexception.h"
+#include "TrafficVolume.h"
+#include "trafficroadvolumegraphicsscene.h"
+#include "trafficnodevolumegraphicsscene.h"
 
 
 WinOfGraphicsView::WinOfGraphicsView(QWidget *parent)
@@ -26,7 +37,7 @@ WinOfGraphicsView::WinOfGraphicsView(QWidget *parent)
 
 	initStatusBar();
 
-	loadDataFromDb(); // 在其他操作之前
+	//loadDataFromDb(); // 在其他操作之前
 
 	mView = new GraphicsView;
 	setCentralWidget(mView);
@@ -84,6 +95,10 @@ void WinOfGraphicsView::initActions()
 	mPrintAction = new QAction("Print", this);
 	mPrintAction->setStatusTip("Print view");
 	connect(mPrintAction, SIGNAL(triggered()),mView, SLOT(print()) );
+	mCreateDbAction = new QAction("Create db", this);
+	connect(mCreateDbAction, SIGNAL(triggered()), this, SLOT(createDb()));
+	mSelectDbAction = new QAction("Select db",this);
+	connect(mSelectDbAction, SIGNAL(triggered()), this, SLOT(selectDb()));
 	
 }
 
@@ -92,6 +107,8 @@ void WinOfGraphicsView::initToolBar()
 	mToolBar = addToolBar("toolbar");
 	mToolBar->addAction(mSelectSceneAction);
 	mToolBar->addAction(mPrintAction);
+	mToolBar->addAction(mCreateDbAction);
+	mToolBar->addAction(mSelectDbAction);
 }
 
 void WinOfGraphicsView::loadDataFromDb()
@@ -100,6 +117,10 @@ void WinOfGraphicsView::loadDataFromDb()
 	mEdgeDataList = mDbAdapter.loadEdges();
 	mBusRouteList = mDbAdapter.loadBusRoutes();
 	mTurnRestrictionList = mDbAdapter.loadTurnRestrictions();
+	mRoadForbidList = mDbAdapter.loadTrafficForbid();
+	mRoadNumLimitList = mDbAdapter.loadTrafficNumLimit();
+	mNodeTrafficVolumeList = mDbAdapter.loadNodeTrafficVolume();
+	mRoadTrafficVolumeList = mDbAdapter.loadRoadTrafficVolume();
 	
 	{  ///// 对Edge中的Node初始化
 		QHash<int,Node*> idNodeHash;
@@ -122,6 +143,7 @@ void WinOfGraphicsView::loadDataFromDb()
 			tmpEdge->setDestNode(idNodeHash.value(destNodeId));
 			tmpEdge->setSourceNode(idNodeHash.value(sourceNodeId));
 		}
+
 	} //// 对Edge中的Node初始化
 
 	{ ///// 计算每条路段上的公交路线数量
@@ -151,22 +173,72 @@ void WinOfGraphicsView::loadDataFromDb()
 
 	} ////// 完成计算每条线路上的公交数量
 
-	{ //// 节点是否是限制转弯的
-		QHash<int,Node*> noNodeHash;
+	{ ///// 依赖 id-node映射
+		//// 节点是否是限制转弯的
+		QHash<int,Node*> idNodeHash;
 		QListIterator<Node*> nodeDataIte(mNodeDataList);
 		Node * tmpNode;
 		while (nodeDataIte.hasNext())
 		{
 			tmpNode = nodeDataIte.next();
-			noNodeHash.insert(tmpNode->id(), tmpNode);
+			idNodeHash.insert(tmpNode->id(), tmpNode);
 		}
 		QListIterator<TurnRestrict*> turnIte(mTurnRestrictionList);
 		TurnRestrict * restr;
 		while (turnIte.hasNext())
 		{
 			restr = turnIte.next();
-			tmpNode = noNodeHash.value(restr->currentNodeNo());
+			tmpNode = idNodeHash.value(restr->currentNodeNo());
 			tmpNode->setHaveTurnRestrict(true);
+		}
+		///// 交通量
+		QListIterator<TrafficVolume*> volumeIte(mNodeTrafficVolumeList);
+		TrafficVolume* tmpVolume;
+		while (volumeIte.hasNext())
+		{
+			tmpVolume = volumeIte.next();
+			tmpNode = idNodeHash.value(tmpVolume->id());
+			tmpNode->setTrafficVolume(tmpVolume);
+
+		}
+
+	}
+
+	{ ///// 依赖于 id-edge 映射
+		//// road设置对应的禁行
+		///// road 设置相应的限号通行
+		QHash<int, Edge*> idEdgeHash;
+		QListIterator<Edge*> edgeIte(mEdgeDataList);
+		Edge* tmpEdgeData;
+		while (edgeIte.hasNext())
+		{
+			tmpEdgeData = edgeIte.next();
+			idEdgeHash.insert(tmpEdgeData->id(), tmpEdgeData);
+		}
+		QListIterator<RoadPermission*> forbidIte(mRoadForbidList);
+		RoadPermission* tmpForbid;
+		while (forbidIte.hasNext())
+		{
+			tmpForbid = forbidIte.next();
+			tmpEdgeData = idEdgeHash.value(tmpForbid->roadId());
+			tmpEdgeData->setTrafficForbid(tmpForbid);
+		}
+		QListIterator<RoadPermission*> numLimitIte(mRoadNumLimitList);
+		RoadPermission* tmpLimit;
+		while (numLimitIte.hasNext())
+		{
+			tmpLimit = numLimitIte.next();
+			tmpEdgeData = idEdgeHash.value(tmpLimit->roadId());
+			tmpEdgeData->setTrafficNumLimit(tmpLimit);
+		}
+		//// 设置交通量
+		QListIterator<TrafficVolume*> volumeIte(mRoadTrafficVolumeList);
+		TrafficVolume* tmpVolume;
+		while (volumeIte.hasNext())
+		{
+			tmpVolume = volumeIte.next();
+			tmpEdgeData = idEdgeHash.value(tmpVolume->id());
+			tmpEdgeData->setTrafficVolume(tmpVolume);
 		}
 
 	}
@@ -182,12 +254,15 @@ void WinOfGraphicsView::changeScene( int index1, int index2 )
 		{
 		case 0:
 			mScene = new RoadLevelGraphicsScene;
+			mScene->setTitle(QStringLiteral("道路网络等级分布"));
 			break;
 		case 1:
 			mScene = new NodeGraphicsScene;
+			mScene->setTitle(QStringLiteral("道路网络节点编号"));
 			break;
 		case 2:
 			mScene = new BusNumGraphicsScene;
+			mScene->setTitle(QStringLiteral("公共交通线网分布"));
 		default:
 			break;
 		}
@@ -197,15 +272,149 @@ void WinOfGraphicsView::changeScene( int index1, int index2 )
 		{
 		case 0:
 			mScene = new JunctionTypeGraphicsScene;
+			mScene->setTitle(QStringLiteral("交叉口类型分布"));
 			break;
 		case 1:
 			mScene = new TurnRestrictGraphicsScene;
+			mScene->setTitle(QStringLiteral("转向限制交叉口分布"));
+			break;
+		case 2:
+			mScene = new RoadTypeGraphicsScene;
+			mScene->setTitle(QStringLiteral("道路类型管理信息"));
+			break;
+		case 3:
+			mScene = new TrafficManageGraphicsScene;
+			mScene->setTitle(QStringLiteral("道路交通管理"));
+		case 4:
+			mScene = new TrafficForbidGraphicsScene;
+			((TrafficForbidGraphicsScene*) mScene)->setForbidType(TrafficForbidGraphicsScene::BikeForbid);
+			mScene->setTitle(QStringLiteral("自行车禁止通行区域分布"));
+			break;
+		case 5:
+			mScene = new TrafficForbidGraphicsScene;
+			((TrafficForbidGraphicsScene*) mScene)->setForbidType(TrafficForbidGraphicsScene::CarForbid);
+			mScene->setTitle(QStringLiteral("客车禁止通行区域分布"));
+			break;
+		case 6:
+			mScene = new TrafficForbidGraphicsScene;
+			((TrafficForbidGraphicsScene*) mScene)->setForbidType(TrafficForbidGraphicsScene::MotorForbid);
+			mScene->setTitle(QStringLiteral("摩托车禁止通行区域分布"));
+			break;
+		case 7:
+			mScene = new TrafficForbidGraphicsScene;
+			((TrafficForbidGraphicsScene*) mScene)->setForbidType(TrafficForbidGraphicsScene::TaxiForbid);
+			mScene->setTitle(QStringLiteral("出租车禁止通行区域分布"));
+			break;
+		case 8:
+			mScene = new TrafficForbidGraphicsScene;
+			((TrafficForbidGraphicsScene*) mScene)->setForbidType(TrafficForbidGraphicsScene::BusForbid);
+			mScene->setTitle(QStringLiteral("公交车禁止通行区域分布"));
+			break;
+		case 9:
+			mScene = new TrafficForbidGraphicsScene;
+			((TrafficForbidGraphicsScene*) mScene)->setForbidType(TrafficForbidGraphicsScene::TruckForbid);
+			mScene->setTitle(QStringLiteral("货车禁止通行区域分布"));
+			break;
+		case 10:
+			mScene = new TrafficNumLimitGraphicsScene;
+			((TrafficNumLimitGraphicsScene*) mScene)->setLimitType(TrafficNumLimitGraphicsScene::CarLimit);
+			mScene->setTitle(QStringLiteral("客车限号通行区域分布"));
+			break;
+		case 11:
+			mScene = new TrafficNumLimitGraphicsScene;
+			((TrafficNumLimitGraphicsScene*) mScene)->setLimitType(TrafficNumLimitGraphicsScene::MotorLimit);
+			mScene->setTitle(QStringLiteral("摩托车限号通行区域分布"));
+			break;
+		case 12:
+			mScene = new TrafficNumLimitGraphicsScene;
+			((TrafficNumLimitGraphicsScene*) mScene)->setLimitType(TrafficNumLimitGraphicsScene::TaxiLimit);
+			mScene->setTitle(QStringLiteral("出租车限号通行区域分布"));
+			break;
+		case 13:
+			mScene = new TrafficNumLimitGraphicsScene;
+			((TrafficNumLimitGraphicsScene*) mScene)->setLimitType(TrafficNumLimitGraphicsScene::TruckLimit);
+			mScene->setTitle(QStringLiteral("货车限号通行区域分布"));
 			break;
 		default:
 			break;
 		}
 		break;
 	case 2:
+		switch (index2)
+		{
+		case 0:
+			mScene = new TrafficRoadVolumeGraphicsScene;
+			((TrafficRoadVolumeGraphicsScene*)mScene)->setVolumeType(TrafficRoadVolumeGraphicsScene::MotorVolume);
+			mScene->setTitle(QStringLiteral("机动车路段交通量分布"));
+			break;
+		case 1:
+			mScene = new TrafficNodeVolumeGraphicsScene;
+			((TrafficNodeVolumeGraphicsScene*)mScene)->setVolumeType(TrafficNodeVolumeGraphicsScene::MotorVolume);
+			mScene->setTitle(QStringLiteral("机动车交叉口交通量分布"));
+			break;
+		case 2:
+			mScene = new TrafficRoadVolumeGraphicsScene;
+			((TrafficRoadVolumeGraphicsScene*)mScene)->setVolumeType(TrafficRoadVolumeGraphicsScene::NonMotorVolume);
+			mScene->setTitle(QStringLiteral("非机动车路段交通量分布"));
+			break;
+		case 3:
+			mScene = new TrafficNodeVolumeGraphicsScene;
+			((TrafficNodeVolumeGraphicsScene*)mScene)->setVolumeType(TrafficNodeVolumeGraphicsScene::NonMotorVolume);
+			mScene->setTitle(QStringLiteral("非机动车交叉口交通量分布"));
+			break;
+		case 4:
+			mScene = new TrafficRoadVolumeGraphicsScene;
+			((TrafficRoadVolumeGraphicsScene*)mScene)->setVolumeType(TrafficRoadVolumeGraphicsScene::CarVolume);
+			mScene->setTitle(QStringLiteral("客车路段交通量分布"));
+			break;
+		case 5:
+			mScene = new TrafficRoadVolumeGraphicsScene;
+			((TrafficRoadVolumeGraphicsScene*)mScene)->setVolumeType(TrafficRoadVolumeGraphicsScene::BusVolume);
+			mScene->setTitle(QStringLiteral("公交车路段交通量分布"));
+			break;
+		case 6:
+			mScene = new TrafficRoadVolumeGraphicsScene;
+			((TrafficRoadVolumeGraphicsScene*)mScene)->setVolumeType(TrafficRoadVolumeGraphicsScene::MotorbikeVolume);
+			mScene->setTitle(QStringLiteral("摩托车路段交通量分布"));
+			break;
+		case 7:
+			mScene = new TrafficRoadVolumeGraphicsScene;
+			((TrafficRoadVolumeGraphicsScene*)mScene)->setVolumeType(TrafficRoadVolumeGraphicsScene::TruckVolume);
+			mScene->setTitle(QStringLiteral("货车路段交通量分布"));
+			break;
+		case 8:
+			mScene = new TrafficRoadVolumeGraphicsScene;
+			((TrafficRoadVolumeGraphicsScene*)mScene)->setVolumeType(TrafficRoadVolumeGraphicsScene::TaxiVolume);
+			mScene->setTitle(QStringLiteral("出租车路段交通量分布"));
+			break;
+		case 9:
+			mScene = new TrafficNodeVolumeGraphicsScene;
+			((TrafficNodeVolumeGraphicsScene*)mScene)->setVolumeType(TrafficNodeVolumeGraphicsScene::CarVolume);
+			mScene->setTitle(QStringLiteral("客车交叉口交通量分布"));
+			break;
+		case 10:
+			mScene = new TrafficNodeVolumeGraphicsScene;
+			((TrafficNodeVolumeGraphicsScene*)mScene)->setVolumeType(TrafficNodeVolumeGraphicsScene::BusVolume);
+			mScene->setTitle(QStringLiteral("公交车交叉口交通量分布"));
+			break;
+		case 11:
+			mScene = new TrafficNodeVolumeGraphicsScene;
+			((TrafficNodeVolumeGraphicsScene*)mScene)->setVolumeType(TrafficNodeVolumeGraphicsScene::MotorbikeVolume);
+			mScene->setTitle(QStringLiteral("摩托车交叉口交通量分布"));
+			break;
+		case 12:
+			mScene = new TrafficNodeVolumeGraphicsScene;
+			((TrafficNodeVolumeGraphicsScene*)mScene)->setVolumeType(TrafficNodeVolumeGraphicsScene::TruckVolume);
+			mScene->setTitle(QStringLiteral("货车交叉口交通量分布"));
+			break;
+		case 13:
+			mScene = new TrafficNodeVolumeGraphicsScene;
+			((TrafficNodeVolumeGraphicsScene*)mScene)->setVolumeType(TrafficNodeVolumeGraphicsScene::TaxiVolume);
+			mScene->setTitle(QStringLiteral("出租车交叉口交通量分布"));
+			break;
+		default:
+			break;
+		}
 		break;
 	case 3:
 		break;
@@ -228,14 +437,47 @@ void WinOfGraphicsView::showEvent( QShowEvent * evt )
 		mSelectWidget = new SelectGraphicsWidget(this);
 		connect(mSelectWidget, SIGNAL(selectGraphics(int,int)),this,SLOT(changeScene(int,int)) );
 	}
-	if(!mScene)
-		mSelectWidget->show();
+	//if(!mScene)
+	//	mSelectWidget->show();
 	QMainWindow::showEvent(evt);
 }
 
 void WinOfGraphicsView::selectGraphics()
 {
 	mSelectWidget->show();
+}
+
+void WinOfGraphicsView::createDb()
+{
+	try{
+		QString path = QFileDialog::getExistingDirectory(this, QStringLiteral("请选择数据文件所在路径"));
+		DB db;
+		db.setFileDir(path);
+		QDir dir(path);
+		db.setCreateDbName(dir.dirName()+".db");
+		db.createTablesAndFetchData();
+	}
+	catch(CommonException & e){
+		qDebug() << e.info();
+	}
+	catch(PathNotExistsException & e){
+		qDebug() << e.what();
+	}
+	catch(QException){
+		qDebug() << "error!!";
+	}
+	QMessageBox::information(this, QStringLiteral("数据库创建成功"), QStringLiteral("数据库创建成功"),QMessageBox::Yes );
+}
+
+void WinOfGraphicsView::selectDb()
+{
+	QString filepath = QFileDialog::getOpenFileName(this, QStringLiteral("选择数据库"));
+	if (!filepath.isNull())
+	{
+		mDbAdapter.setDbPath(filepath);
+		loadDataFromDb();
+	}
+	
 }
 
 

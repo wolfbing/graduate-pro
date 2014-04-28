@@ -2,6 +2,9 @@
 
 #include "node.h"
 
+class RoadPermission;
+class TrafficVolume;
+
 /*
 用于存放与边有关的数据, 诟病与Node相同
 边是有向的
@@ -32,6 +35,9 @@ public:
 	int sourceNodeId() const;
 	int destNodeId() const;
 	int busNum() const;
+	RoadPermission* trafficForbid() const;
+	RoadPermission* trafficNumLimit() const;
+	TrafficVolume* trafficVolume() const;
 
 	// set
 	Edge & setSourceNode(Node *);
@@ -48,6 +54,9 @@ public:
 	Edge & setSourceNodeId(int);
 	Edge & setDestNodeId(int);
 	Edge & setBusNum(int);
+	Edge & setTrafficForbid(RoadPermission*);
+	Edge & setTrafficNumLimit(RoadPermission*);
+	Edge & setTrafficVolume(TrafficVolume*);
 	void addBus();
 
 private:
@@ -67,6 +76,8 @@ private:
 	uint mTrafficType;
 	bool mInScale;
 	int mBusNum;
-
+	RoadPermission* mTrafficForbid;
+	RoadPermission* mTrafficNumLimit;
+	TrafficVolume* mVolume;
 };
 

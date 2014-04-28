@@ -19,12 +19,17 @@
 
 #include "db.h"
 #include "pathnotexistsexception.h"
+#include "commonexception.h"
 #include "sqlqueryexception.h"
 #include "Edge.h"
 #include "structsfordb.h"
 #include "node.h"
 #include "BusRoute.h"
 #include "TurnRestrict.h"
+#include "RoadPermission.h"
+#include "TrafficVolume.h"
+#include "Capability.h"
+#include "Speed.h"
 
 
 const QString DB::sDbType = "QSQLITE"; // 使用Sqlite3数据库
@@ -37,6 +42,11 @@ const QString DB::sTurnRestrictTableName = "turn_restriction";
 const QString DB::sBusTableName = "bus";
 const QString DB::sForbiddenConnTableName = "forbid_section";
 const QString DB::sRestrictConnTableName = "restric_section";
+const QString DB::sNodeVolumeTableName = "node_volume";
+const QString DB::sRoadVolumeTableName = "road_volume";
+const QString DB::sNodeCapabilityTableName = "node_capability";
+const QString DB::sRoadCapabilityTableName = "road_capability";
+const QString DB::sSpeedTableName = "speed";
 // file names
 const QString DB::sConnFileName = "Conn.txt";
 const QString DB::sSectionFileName = "Geom.txt";
@@ -51,6 +61,28 @@ const QString DB::sBusStopFileName = "Busstop.txt";
 const QString DB::sBusNumFileName = "Busveh.txt";
 const QString DB::sNodeStatisticsFileName = "Rtin.txt";
 const QString DB::sRoadStatisticsFileName = "Rtil.txt";
+///// 交通量
+const QString DB::sNodeMotorVolumeFileName = "node-v.veh";
+const QString DB::sNodeNonMotorVolumeFileName = "node-v.bic";
+const QString DB::sNodeBusVolumeFileName = "node-v.bus";
+const QString DB::sNodeCarVolumeFileName = "node-v.car";
+const QString DB::sNodeMotorbikeVolumeFileName = "node-v.mot";
+const QString DB::sNodeTaxiVolumeFileName = "node-v.tax";
+const QString DB::sNodeTruckVolumeFileName = "node-v.trk";
+///// 交通承载量
+const QString DB::sNodeMotorCapabilityFileName = "link-vc.veh";
+const QString DB::sNodeNonMotorCapabilityFileName = "link-vc.bic";
+const QString DB::sRoadMotorCapabilityFileName = "node-vc.veh";
+const QString DB::sRoadNonMotorCapabilityFileName = "node-vc.bic";
+const QString DB::sSpeedFileName = "speed.veh";
+
+const QString DB::sRoadMotorVolumeFileName = "link-v.veh";
+const QString DB::sRoadNonMotorVolumeFileName = "link-v.bic";
+const QString DB::sRoadBusVolumeFileName = "link-v.bus";
+const QString DB::sRoadCarVolumeFileName = "link-v.car";
+const QString DB::sRoadMotorbikeVolumeFileName = "link-v.mot";
+const QString DB::sRoadTaxiVolumeFileName = "link-v.tax";
+const QString DB::sRoadTruckVolumeFileName = "link-v.trk";
 // sql statements
 const QString DB::sSqlCreateNodeTable =
         "create table  if not exists "+ DB::sNodeTableName +" ("+
@@ -128,103 +160,128 @@ const QString DB::sSqlCreateRestrictConnTable =
         bus integer,"+
         "foreign key (road_id) references "+DB::sConnTableName+"(id)"+
         ");";
+const QString DB::sSqlCreateNodeVolumeTable = 
+	"create table if not exists "+DB::sNodeVolumeTableName+" ( "
+	+ "id integer primary key,"
+	+ "node_id integer,"
+	+ "motor float,"
+	+ "non_motor float,"
+	+ "car float,"
+	+ "bus float,"
+	+ "motorbike float,"
+	+ "truck float,"
+	+ "taxi float,"
+	+ "foreign key (node_id) references "+DB::sNodeTableName+"(id)"
+	+");"
+	;
+const QString DB::sSqlCreateRoadVolumeTable = 
+	"create table if not exists "+DB::sRoadVolumeTableName+ " ("
+	+ "id integer primary key,"
+	+ "road_id integer,"
+	+ "motor float,"
+	+ "non_motor float,"
+	+ "car float,"
+	+ "bus float,"
+	+ "motorbike float,"
+	+ "truck float,"
+	+ "taxi float,"
+	+ "foreign key (road_id) references "+DB::sConnTableName+"(id)"
+	+");"
+	;
+const QString DB::sSqlCreateNodeCapabilityTable = 
+	"create table if not exists "+DB::sNodeCapabilityTableName+" ("
+	+"id integer primary key,"
+	+"node_id integer,"
+	+"motor float,"
+	+"non_motor float,"
+	+"foreign key (node_id) references "+DB::sNodeTableName+"(id)"
+	+");";
+
+const QString DB::sSqlCreateRoadCapabilityTable = 
+	"create table if not exists "+DB::sRoadCapabilityTableName+" ("
+	+"id integer primary key,"
+	+"road_id integer,"
+	+"motor float,"
+	+"non_motor float,"
+	+"foreign key (road_id) references "+DB::sConnTableName+"(id)"
+	+");";
+
+const QString DB::sSqlCreateSpeedTable = 
+	"create table if not exists "+DB::sSpeedTableName+" ("
+	+"road_id integer primary key,"
+	+"speed float,"
+	+"foreign key (road_id) references "+ DB::sConnTableName+"(id)"
+	+");";
+
 
 
 DB::DB(QObject *parent) :
     QObject(parent)
 {
-    this->mDb = QSqlDatabase::addDatabase(DB::sDbType);
-    mDb.setDatabaseName(sDbName);
-    if(!mDb.isOpen())
-        mDb.open();
 	mFileDir = NULL;
 }
 
 DB::~DB()
 {
-    if(mDb.isOpen())
-        mDb.close();
     if(mFileDir != NULL)
         delete mFileDir;
 }
 
 // 将会搜索目录下的数据文件然后转存到数据库
 // 返回搜索到的数据文件名列表
-QStringList DB::createTablesAndFetchData()
+void DB::createTablesAndFetchData()
 {
-    QSqlQuery query = QSqlQuery(mDb);
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType, "create_db");
+	db.setDatabaseName("./db/"+ mCreateDbName);
+	db.open();
+    QSqlQuery query = QSqlQuery(db);
     QDir dir = *mFileDir;
-    QStringList fileNameList;
+    //QStringList fileNameList;
     if(!dir.exists())
-        throw new PathNotExistsException;
-    mDb.transaction();
-    // 转存文件时注意: 原始数据文件之间有依赖关系,
-    // 在不进行数据库创建的时候, 这时所操作的文件应该是对上面的文件有所依赖的
-    try{
-        clearTables();
-        if(dir.exists(DB::sCoorFileName)){
-            createNodeTable(query);
-            fetchDataFromCoorFile(query);
-            fileNameList<<DB::sCoorFileName;
-        }
-        if(dir.exists(DB::sSectionFileName)){
-            createConnTable(query);
-            fetchDataFromSectionFile(query);
-            fileNameList<<DB::sConnFileName;
-        }
-        if(dir.exists(DB::sTrafficNode2OriNodeFileName)){
-            createTrafficAreaTable(query);
-            fetchDataFromTrafficNode2OriNodeFile(query);
-            fileNameList<<DB::sTrafficNode2OriNodeFileName;
-        }
-        if(dir.exists(DB::sTrafficNodeTypeFileName)){
-            fetchDataFromTrafficNodeTypeFile(query);
-            fileNameList<<DB::sTrafficNodeTypeFileName;
-        }
-        if(dir.exists(DB::sRestrictTurnFileName)){
-            createTurnRestrictTable(query);
-            fetchDataFromRestrictTurnFile(query);
-            fileNameList<<DB::sRestrictTurnFileName;
-        }
-        if(dir.exists(DB::sRoadTypeFileName)){
-            fetchDataFromRoadTypeFile(query);
-            fileNameList<<DB::sRoadTypeFileName;
-        }
-        if(dir.exists(DB::sForbiddenAreaFileName)){
-            createForbidCoonTable(query);
-            fetchDataFromForbiddenAreaFile(query);
-            fileNameList<<DB::sForbiddenAreaFileName;
-        }
-        if(dir.exists(DB::sRestrictAreaFileName)){
-            createRestrictConnTable(query);
-            fetchDataFromRestrictAreaFile(query);
-            fileNameList<<DB::sRestrictAreaFileName;
-        }
-        if(dir.exists(DB::sBusStopFileName)){
-            createBusTable(query);
-            fetchDataFromBusStopFile(query);
-            fileNameList<<DB::sBusStopFileName;
-        }
-        if(dir.exists(DB::sBusNumFileName)){
-            fetchDataFromBusNumFile(query);
-            fileNameList<<DB::sBusNumFileName;
-        }
-        if(dir.exists(DB::sNodeStatisticsFileName)){
-            fetchDataFromNodeStatisticsFile(query);
-            fileNameList<<DB::sNodeStatisticsFileName;
-        }
-        if(dir.exists(DB::sRoadStatisticsFileName)){
-            fetchDataFromRoadStatisticsFile(query);
-            fileNameList<<DB::sRoadStatisticsFileName;
-        }
+        throw PathNotExistsException("directory does not exist!");
+	try
+	{
+		db.transaction();
+		// 转存文件时注意: 原始数据文件之间有依赖关系,
+		// 在不进行数据库创建的时候, 这时所操作的文件应该是对上面的文件有所依赖的
+		clearTables(db);
+		createNodeTable(query);
+		createConnTable(query);
+		createTrafficAreaTable(query);
+		createTurnRestrictTable(query);
+		createForbidCoonTable(query);
+		createRestrictConnTable(query);
+		createBusTable(query);
+		createNodeVolumeTable(query);
+		createRoadVolumeTable(query);
 
-        mDb.commit();
-        return fileNameList;
-    }
-    catch(QException &e){
-        mDb.rollback();
-        throw e;
-    }
+		fetchDataFromCoorFile(query);
+		fetchDataFromSectionFile(query);
+		fetchDataFromTrafficNode2OriNodeFile(query);
+		fetchDataFromTrafficNodeTypeFile(query);
+		fetchDataFromRestrictTurnFile(query);
+		fetchDataFromRoadTypeFile(query);
+		fetchDataFromForbiddenAreaFile(query);
+		fetchDataFromRestrictAreaFile(query);
+		fetchDataFromBusStopFile(query);
+		fetchDataFromBusNumFile(query);
+		fetchDataFromNodeStatisticsFile(query);
+		fetchDataFromRoadStatisticsFile(query);
+		fetchDataFromNodeVolumeFiles(query);
+		fetchDataFromRoadVolumeFiles(query);
+		fetchDataFromNodeCapabilityFile(query);
+		fetchDataFromRoadCapabilityFile(query);
+		fetchDataFromSpeedFile(query);
+	}
+	catch (QException& e)
+	{
+		db.rollback();
+		db.close();
+		throw e;
+	}
+	db.commit();
+	db.close();
+
 }
 
 
@@ -234,10 +291,12 @@ void DB::setFileDir(QString dir)
 }
 
 
-void DB::clearTables()
+void DB::clearTables(QSqlDatabase& db)
 {
-    QSqlQuery query(mDb);
-    QStringList tables = mDb.tables();
+	if(!db.isOpen())
+		db.open();
+    QSqlQuery query(db);
+    QStringList tables = db.tables();
     QString sql = "drop table if exists ";
     for(int i=0; i<tables.size();++i){
         if(!query.exec(sql + tables.at(i) +";")){
@@ -355,7 +414,7 @@ void DB::fetchDataFromSectionFile(QSqlQuery &query)
 void DB::fetchDataFromCoorFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sCoorFileName))
-        throw new PathNotExistsException("cannot find file"+DB::sCoorFileName);
+        throw PathNotExistsException("cannot find file"+DB::sCoorFileName);
     QString filePath = mFileDir->absoluteFilePath(DB::sCoorFileName);
     QFile file(filePath);
     if(file.open(QIODevice::ReadOnly)){
@@ -384,15 +443,11 @@ void DB::fetchDataFromCoorFile(QSqlQuery &query)
             query.addBindValue(node_ids);
             query.addBindValue(coor_xs);
             query.addBindValue(coor_ys);
-            mDb.transaction();
             if(!query.execBatch()){
                 QSqlError err = query.lastError();
-                mDb.rollback();
                 throw new SqlQueryException("处理文件"+DB::sCoorFileName+"时出错,"+
                                             "sqlerror:"+err.text());
             }
-            mDb.commit();
-
 
         }
         file.close();
@@ -409,7 +464,7 @@ void DB::fetchDataFromCoorFile(QSqlQuery &query)
 void DB::fetchDataFromTrafficNode2OriNodeFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sTrafficNode2OriNodeFileName))
-        throw new PathNotExistsException("cannot find file "+
+        throw PathNotExistsException("cannot find file "+
                                          DB::sTrafficNode2OriNodeFileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sTrafficNode2OriNodeFileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -457,7 +512,7 @@ void DB::fetchDataFromTrafficNode2OriNodeFile(QSqlQuery &query)
 void DB::fetchDataFromTrafficNodeTypeFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sTrafficNodeTypeFileName))
-        throw new PathNotExistsException("cannot find file "
+        throw PathNotExistsException("cannot find file "
                                          +DB::sTrafficNodeTypeFileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sTrafficNodeTypeFileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -502,7 +557,7 @@ void DB::fetchDataFromTrafficNodeTypeFile(QSqlQuery &query)
 void DB::fetchDataFromRestrictTurnFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sRestrictTurnFileName))
-        throw new PathNotExistsException("cannot find file "
+        throw PathNotExistsException("cannot find file "
                                          + DB::sRestrictTurnFileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sRestrictTurnFileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -548,7 +603,7 @@ void DB::fetchDataFromRestrictTurnFile(QSqlQuery &query)
 void DB::fetchDataFromRoadTypeFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sRoadTypeFileName))
-        throw new PathNotExistsException("cannot find file "+
+        throw PathNotExistsException("cannot find file "+
                                          DB::sRoadTypeFileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sRoadTypeFileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -594,7 +649,7 @@ void DB::fetchDataFromRoadTypeFile(QSqlQuery &query)
 
 void DB::insertForbidAndRestrict(QSqlQuery & query, QString tbName, QString fileName){
     if(!mFileDir->exists(fileName))
-        throw new PathNotExistsException("cannot find file "
+        throw PathNotExistsException("cannot find file "
                                          +fileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(fileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -672,7 +727,7 @@ void DB::fetchDataFromRestrictAreaFile(QSqlQuery &query)
 void DB::fetchDataFromBusStopFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sBusStopFileName))
-        throw new PathNotExistsException("cannot find file "+
+        throw PathNotExistsException("cannot find file "+
                                          DB::sBusStopFileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sBusStopFileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -725,7 +780,7 @@ void DB::fetchDataFromBusStopFile(QSqlQuery &query)
 void DB::fetchDataFromBusNumFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sBusNumFileName))
-        throw new PathNotExistsException("cannot find file "
+        throw PathNotExistsException("cannot find file "
                                          +DB::sBusNumFileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sBusNumFileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -770,7 +825,7 @@ void DB::fetchDataFromBusNumFile(QSqlQuery &query)
 void DB::fetchDataFromNodeStatisticsFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sNodeStatisticsFileName))
-        throw new PathNotExistsException("cannot find file "
+        throw PathNotExistsException("cannot find file "
                                          +DB::sNodeStatisticsFileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sNodeStatisticsFileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -811,7 +866,7 @@ void DB::fetchDataFromNodeStatisticsFile(QSqlQuery &query)
 void DB::fetchDataFromRoadStatisticsFile(QSqlQuery &query)
 {
     if(!mFileDir->exists(DB::sRoadStatisticsFileName))
-        throw new PathNotExistsException("cannot find file "
+        throw PathNotExistsException("cannot find file "
                                          + DB::sRoadStatisticsFileName);
     QFile* file = new QFile(mFileDir->absoluteFilePath(DB::sRoadStatisticsFileName));
     if(file->open(QIODevice::ReadOnly)){
@@ -851,8 +906,12 @@ void DB::fetchDataFromRoadStatisticsFile(QSqlQuery &query)
 
 QList<Node*> DB::loadNodes()
 {
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	db.transaction();
 	QList<Node*> nodeList;
-	QSqlQuery query(mDb);
+	QSqlQuery query(db);
 
 	// 载入坐标
 	QString sql = "select node_id, coor_x, coor_y, junction_type, in_scale,id from "+DB::sNodeTableName;
@@ -865,14 +924,20 @@ QList<Node*> DB::loadNodes()
 			.setInScale(query.value(4).toBool()).setId(query.value(5).toInt());
 		nodeList << tmpNode;
 	}
+	db.commit();
+	db.close();
 	return nodeList;
 }
 
 
 QList<Edge*> DB::loadEdges()
 {
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	db.transaction();
 	QList<Edge*> edgeList; // 用于返回值的edge集合
-	QSqlQuery query(mDb);
+	QSqlQuery query(db);
 	QString sql = QString("select start_node,end_node,road_level,sec_len,")+
 		"motor_driveway_width,non_motor_driveway_width,driveway_isolation, "+
 		"road_type,traffic_type,in_scale,id"+" from " + DB::sConnTableName;
@@ -893,14 +958,19 @@ QList<Edge*> DB::loadEdges()
 			.setInScale(query.value(9).toBool()).setId(query.value(10).toInt());
 		edgeList << tmpEdge;
 	} 
-
+	db.commit();
+	db.close();
 	return edgeList;
 }
 
 QList<BusRoute*> DB::loadBusRoutes()
 {
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	db.transaction();
 	QList<BusRoute*> busRouteList;
-	QSqlQuery query(mDb);
+	QSqlQuery query(db);
 	QString sql = QString("select id,route_id,node_num,nodes,vehicle,equivalent ")
 		+ "from " + sBusTableName;
 	BusRoute* route;
@@ -924,13 +994,19 @@ QList<BusRoute*> DB::loadBusRoutes()
 		}
 		
 	}
+	db.commit();
+	db.close();
 	return busRouteList;
 }
 
 QList<TurnRestrict*> DB::loadTurnRestrictions()
 {
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	db.transaction();
 	QList<TurnRestrict*> restrictionList;
-	QSqlQuery query(mDb);
+	QSqlQuery query(db);
 	QString sql = "select current_node, from_node, to_node from "+sTurnRestrictTableName;
 	TurnRestrict* restr;
 	if (query.exec(sql))
@@ -944,8 +1020,551 @@ QList<TurnRestrict*> DB::loadTurnRestrictions()
 			restrictionList << restr;
 		}
 	}
-	
+	db.commit();
+	db.close();
 	return restrictionList;
+}
+
+QList<RoadPermission*> DB::loadTrafficForbid()
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	db.transaction();
+	QSqlQuery query(db);
+	QString sql = "select road_id, bike, car, motor, taxi, truck, bus from "
+		+ sForbiddenConnTableName;
+	QList<RoadPermission*> forbidList;
+	RoadPermission* tmpForbid;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			tmpForbid = new RoadPermission;
+			tmpForbid->setRoadId(query.value(0).toInt()).setPermitBike(query.value(1).toInt())
+				.setPermitCar(query.value(2).toInt()).setPermitMotor(query.value(3).toInt())
+				.setPermitTaxi(query.value(4).toInt()).setPermitTruck(query.value(5).toInt())
+				.setPermitBus(query.value(6).toInt());
+			forbidList << tmpForbid;
+		}
+	}
+	db.commit();
+	db.close();
+	return forbidList;
+}
+
+QList<RoadPermission*> DB::loadTrafficNumLimit()
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	db.transaction();
+	QSqlQuery query(db);
+	QString sql = "select road_id, bike, car, motor, taxi, truck, bus from "
+		+ sRestrictConnTableName;
+	QList<RoadPermission*> forbidList;
+	RoadPermission* tmpForbid;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			tmpForbid = new RoadPermission;
+			tmpForbid->setRoadId(query.value(0).toInt()).setPermitBike(query.value(1).toInt())
+				.setPermitCar(query.value(2).toInt()).setPermitMotor(query.value(3).toInt())
+				.setPermitTaxi(query.value(4).toInt()).setPermitTruck(query.value(5).toInt())
+				.setPermitBus(query.value(6).toInt());
+			forbidList << tmpForbid;
+		}
+	}
+	db.commit();
+	db.close();
+	return forbidList;
+}
+
+void DB::fetchDataFromNodeVolumeFiles(QSqlQuery & query)
+{
+	if (!mFileDir->exists(sNodeCarVolumeFileName))
+		throw PathNotExistsException(sNodeCarVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sNodeNonMotorVolumeFileName))
+		throw PathNotExistsException(sNodeNonMotorVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sNodeMotorVolumeFileName))
+		throw PathNotExistsException(sNodeMotorVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sNodeMotorbikeVolumeFileName))
+		throw PathNotExistsException(sNodeMotorbikeVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sNodeTaxiVolumeFileName))
+		throw PathNotExistsException(sNodeTaxiVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sNodeTruckVolumeFileName))
+		throw PathNotExistsException(sNodeTruckVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sNodeBusVolumeFileName))
+		throw PathNotExistsException(sNodeBusVolumeFileName + "do not exist!");
+	QFile fileMotor(mFileDir->absoluteFilePath(sNodeMotorVolumeFileName));
+	QFile fileNonMotor(mFileDir->absoluteFilePath(sNodeNonMotorVolumeFileName));
+	QFile fileMotorbike(mFileDir->absoluteFilePath(sNodeMotorbikeVolumeFileName));
+	QFile fileCar(mFileDir->absoluteFilePath(sNodeCarVolumeFileName));
+	QFile fileBus(mFileDir->absoluteFilePath(sNodeBusVolumeFileName));
+	QFile fileTruck(mFileDir->absoluteFilePath(sNodeTruckVolumeFileName));
+	QFile fileTaxi(mFileDir->absoluteFilePath(sNodeTaxiVolumeFileName));
+	if(!fileMotor.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sNodeMotorVolumeFileName + " open failed!");
+	if(!fileNonMotor.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sNodeNonMotorVolumeFileName + " open failed!");
+	if(!fileMotorbike.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sNodeMotorbikeVolumeFileName + " open failed!");
+	if(!fileCar.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sNodeCarVolumeFileName + " open failed!");
+	if(!fileBus.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sNodeBusVolumeFileName + " open failed!");
+	if(!fileTruck.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sNodeTruckVolumeFileName + " open failed!");
+	if(!fileTaxi.open( QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sNodeTaxiVolumeFileName + " open failed!");
+	QTextStream streamMotor(&fileMotor);
+	QTextStream streamNonMotor(&fileNonMotor);
+	QTextStream streamMotorbike(&fileMotorbike);
+	QTextStream streamCar(&fileCar);
+	QTextStream streamBus(&fileBus);
+	QTextStream streamTruck(&fileTruck);
+	QTextStream streamTaxi(&fileTaxi);
+	qreal motorV, nonMotorV, motorbikeV, carV, busV, truckV, taxiV;
+	const int NUM_ONCE = 500;
+	int num = 1;
+	QString sql = "insert into "+sNodeVolumeTableName+" (node_id,motor,non_motor,car,bus,motorbike,truck,taxi) "
+		+"values(?,?,?,?,?,?,?,?);";
+	while (!streamMotor.atEnd() && !streamNonMotor.atEnd() && !streamMotorbike.atEnd()
+		&& !streamCar.atEnd() && !streamBus.atEnd() && !streamTruck.atEnd() && !streamTaxi.atEnd() )
+	{
+		int i=0;
+		QVariantList node_ids,motors, nonMotors, motorbikes, cars, buses, trucks, taxis;
+		query.prepare(sql);
+		while (!streamMotor.atEnd() && !streamNonMotor.atEnd() && !streamMotorbike.atEnd() 
+			&& !streamCar.atEnd() && !streamBus.atEnd() && !streamTaxi.atEnd() && !streamTruck.atEnd()
+			&& i < NUM_ONCE)
+		{
+			streamMotor >> motorV; 
+			streamNonMotor >> nonMotorV; 
+			streamMotorbike >> motorbikeV;
+			streamCar >> carV; 
+			streamBus >> busV;
+			streamTruck >> truckV; 
+			streamTaxi >> taxiV; 
+			if (streamMotor.status() || streamNonMotor.status() || streamMotorbike.status() || streamCar.status()
+				|| streamBus.status() || streamTruck.status() || streamTaxi.status() )
+				break;
+			else{
+				node_ids << num;
+				motors << motorV;
+				nonMotors << nonMotorV;
+				motorbikes << motorbikeV;
+				cars << carV; 
+				buses << busV;
+				trucks << truckV;
+				taxis << taxiV;
+			}
+			i++; num++;
+		}
+		query.bindValue(0, node_ids);
+		query.bindValue(1, motors);
+		query.bindValue(2, nonMotors);
+		query.bindValue(3, cars);
+		query.bindValue(4, buses);
+		query.bindValue(5, motorbikes);
+		query.bindValue(6, trucks);
+		query.bindValue(7, taxis);
+		if (!query.execBatch())
+		{
+			throw CommonException("insert "+sNodeVolumeTableName+" failed");
+		}
+
+	}
+
+}
+
+void DB::createNodeVolumeTable(QSqlQuery & query)
+{
+	query.exec(sSqlCreateNodeVolumeTable);
+}
+
+void DB::createRoadVolumeTable(QSqlQuery & query)
+{
+	query.exec(sSqlCreateRoadVolumeTable);
+}
+
+void DB::setCreateDbName(QString name)
+{
+	mCreateDbName = name;
+}
+
+void DB::setSelectedDbName(QString name)
+{
+	mSelectedDbName = name;
+}
+
+void DB::fetchDataFromRoadVolumeFiles(QSqlQuery & query)
+{
+	if (!mFileDir->exists(sRoadCarVolumeFileName))
+		throw PathNotExistsException(sNodeCarVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sRoadNonMotorVolumeFileName))
+		throw PathNotExistsException(sRoadNonMotorVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sRoadMotorVolumeFileName))
+		throw PathNotExistsException(sRoadMotorVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sRoadMotorbikeVolumeFileName))
+		throw PathNotExistsException(sRoadMotorbikeVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sRoadTaxiVolumeFileName))
+		throw PathNotExistsException(sRoadTaxiVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sRoadTruckVolumeFileName))
+		throw PathNotExistsException(sRoadTruckVolumeFileName + "do not exist!");
+	if (!mFileDir->exists(sRoadBusVolumeFileName))
+		throw PathNotExistsException(sRoadBusVolumeFileName + "do not exist!");
+	QFile fileMotor(mFileDir->absoluteFilePath(sRoadMotorVolumeFileName));
+	QFile fileNonMotor(mFileDir->absoluteFilePath(sRoadNonMotorVolumeFileName));
+	QFile fileMotorbike(mFileDir->absoluteFilePath(sRoadMotorbikeVolumeFileName));
+	QFile fileCar(mFileDir->absoluteFilePath(sRoadCarVolumeFileName));
+	QFile fileBus(mFileDir->absoluteFilePath(sRoadBusVolumeFileName));
+	QFile fileTruck(mFileDir->absoluteFilePath(sRoadTruckVolumeFileName));
+	QFile fileTaxi(mFileDir->absoluteFilePath(sRoadTaxiVolumeFileName));
+	if(!fileMotor.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sRoadMotorVolumeFileName + " open failed!");
+	if(!fileNonMotor.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sRoadNonMotorVolumeFileName + " open failed!");
+	if(!fileMotorbike.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sRoadMotorbikeVolumeFileName + " open failed!");
+	if(!fileCar.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sRoadCarVolumeFileName + " open failed!");
+	if(!fileBus.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sRoadBusVolumeFileName + " open failed!");
+	if(!fileTruck.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sRoadTruckVolumeFileName + " open failed!");
+	if(!fileTaxi.open( QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException( sRoadTaxiVolumeFileName + " open failed!");
+	QTextStream streamMotor(&fileMotor);
+	QTextStream streamNonMotor(&fileNonMotor);
+	QTextStream streamMotorbike(&fileMotorbike);
+	QTextStream streamCar(&fileCar);
+	QTextStream streamBus(&fileBus);
+	QTextStream streamTruck(&fileTruck);
+	QTextStream streamTaxi(&fileTaxi);
+	qreal motorV, nonMotorV, motorbikeV, carV, busV, truckV, taxiV;
+	const int NUM_ONCE = 500;
+	int num = 1;
+	QString sql = "insert into "+sRoadVolumeTableName+" (road_id,motor,non_motor,car,bus,motorbike,truck,taxi) "
+		+"values(?,?,?,?,?,?,?,?);";
+	while (!streamMotor.atEnd() && !streamNonMotor.atEnd() && !streamMotorbike.atEnd()
+		&& !streamCar.atEnd() && !streamBus.atEnd() && !streamTruck.atEnd() && !streamTaxi.atEnd() )
+	{
+		int i=0;
+		QVariantList road_ids,motors, nonMotors, motorbikes, cars, buses, trucks, taxis;
+		query.prepare(sql);
+		while (!streamMotor.atEnd() && !streamNonMotor.atEnd() && !streamMotorbike.atEnd() 
+			&& !streamCar.atEnd() && !streamBus.atEnd() && !streamTaxi.atEnd() && !streamTruck.atEnd()
+			&& i < NUM_ONCE)
+		{
+			
+			streamMotor >> motorV; 
+			streamNonMotor >> nonMotorV; 
+			streamMotorbike >> motorbikeV; 
+			streamCar >> carV; 
+			streamBus >> busV; 
+			streamTruck >> truckV; 
+			streamTaxi >> taxiV; 
+			if (streamMotor.status() || streamNonMotor.status() || streamMotorbike.status() || streamCar.status()
+				|| streamBus.status() || streamTruck.status() || streamTaxi.status() )
+				break;
+			else{
+				road_ids << num;
+				motors << motorV;
+				nonMotors << nonMotorV;
+				motorbikes << motorbikeV;
+				cars << carV; 
+				buses << busV;
+				trucks << truckV;
+				taxis << taxiV;
+			}
+
+			i++; num++;
+		}
+		query.bindValue(0, road_ids);
+		query.bindValue(1, motors);
+		query.bindValue(2, nonMotors);
+		query.bindValue(3, cars);
+		query.bindValue(4, buses);
+		query.bindValue(5, motorbikes);
+		query.bindValue(6, trucks);
+		query.bindValue(7, taxis);
+		if (!query.execBatch())
+		{
+			QString str = query.lastError().text();
+			throw CommonException("insert "+sRoadVolumeTableName+" failed; "+str);
+		}
+
+	}
+}
+
+QList<TrafficVolume*> DB::loadNodeTrafficVolume()
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	QSqlQuery query(db);
+	QString sql = "select node_id,motor,non_motor,car,bus,motorbike,truck,taxi from "+sNodeVolumeTableName;
+	QList<TrafficVolume*> volumeList;
+	TrafficVolume* tmpVolume;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			tmpVolume = new TrafficVolume;
+			tmpVolume->setId(query.value(0).toInt()).setMotorVolume(query.value(1).toReal())
+				.setNonMotorVolume(query.value(2).toReal()).setCarVolume(query.value(3).toReal())
+				.setBusVolume(query.value(4).toReal()).setMotorbikeVolume(query.value(5).toReal())
+				.setTruckVolume(query.value(6).toReal()).setTaxiVolume(query.value(7).toReal());
+			volumeList << tmpVolume;
+		}
+
+	}
+	db.close();
+	return volumeList;
+}
+
+QList<TrafficVolume*> DB::loadRoadTrafficVolume()
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	QSqlQuery query(db);
+	QString sql = "select road_id,motor,non_motor,car,bus,motorbike,truck,taxi from "+sRoadVolumeTableName;
+	QList<TrafficVolume*> volumeList;
+	TrafficVolume* tmpVolume;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			tmpVolume = new TrafficVolume;
+			tmpVolume->setId(query.value(0).toInt()).setMotorVolume(query.value(1).toReal())
+				.setNonMotorVolume(query.value(2).toReal()).setCarVolume(query.value(3).toReal())
+				.setBusVolume(query.value(4).toReal()).setMotorbikeVolume(query.value(5).toReal())
+				.setTruckVolume(query.value(6).toReal()).setTaxiVolume(query.value(7).toReal());
+			volumeList << tmpVolume;
+		}
+
+	}
+	db.close();
+	return volumeList;
+}
+
+void DB::createNodeCapabilityTable(QSqlQuery & query)
+{
+	query.exec(sSqlCreateNodeCapabilityTable);
+}
+
+void DB::createRoadCapabilityTable(QSqlQuery & query)
+{
+	query.exec(sSqlCreateRoadCapabilityTable);
+}
+
+void DB::createSpeedTable(QSqlQuery & query)
+{
+	query.exec(sSqlCreateSpeedTable);
+}
+
+void DB::fetchDataFromNodeCapabilityFile(QSqlQuery & query)
+{
+	if(mFileDir->exists(sNodeMotorCapabilityFileName))
+		throw PathNotExistsException(sNodeMotorCapabilityFileName+" does not exist!");
+	if(mFileDir->exists(sNodeNonMotorCapabilityFileName))
+		throw PathNotExistsException(sNodeNonMotorCapabilityFileName+" does not exist!");
+	QFile fileMotor(mFileDir->absoluteFilePath(sNodeMotorCapabilityFileName));
+	QFile fileNonMotor(mFileDir->absoluteFilePath(sNodeNonMotorCapabilityFileName));
+	if(!fileMotor.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException("open "+sNodeMotorCapabilityFileName+" failed!");
+	if(!fileNonMotor.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException("open "+sNodeNonMotorCapabilityFileName+" failed!");
+	QTextStream streamMotor(&fileMotor);
+	QTextStream streamNonMotor(&fileNonMotor);
+	qreal motorCapability, nonMotorCapability;
+	const int NUM_ONCE=500;
+	int num=1;
+	QString sql = "insert into "+sNodeCapabilityTableName+" (node_id,motor,non_motor) "
+		+" values (?,?,?);";
+	query.prepare(sql);
+	while (!streamMotor.atEnd() && !streamNonMotor.atEnd())
+	{
+		QVariantList node_ids,motors, nonMotors;
+		int i=0;
+		while (!streamMotor.atEnd() && !streamNonMotor.atEnd() && i<NUM_ONCE)
+		{
+			streamMotor >> motorCapability;
+			streamNonMotor >> nonMotorCapability;
+			if(streamMotor.status() || streamNonMotor.status())
+				break;
+			node_ids << num;
+			motors << motorCapability;
+			nonMotors << nonMotorCapability;
+			++i; ++num;
+		}
+		query.bindValue(0, node_ids);
+		query.bindValue(1, motors);
+		query.bindValue(2, nonMotors);
+		if(!query.execBatch()){
+			QString str = query.lastError().text();
+			throw CommonException(str);
+		}
+
+	}
+
+}
+
+void DB::fetchDataFromRoadCapabilityFile(QSqlQuery & query)
+{
+	if(mFileDir->exists(sRoadMotorCapabilityFileName))
+		throw PathNotExistsException(sRoadMotorCapabilityFileName+" does not exist!");
+	if(mFileDir->exists(sRoadNonMotorCapabilityFileName))
+		throw PathNotExistsException(sRoadNonMotorCapabilityFileName+" does not exist!");
+	QFile fileMotor(mFileDir->absoluteFilePath(sRoadMotorCapabilityFileName));
+	QFile fileNonMotor(mFileDir->absoluteFilePath(sRoadNonMotorCapabilityFileName));
+	if(!fileMotor.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException("open "+sRoadMotorCapabilityFileName+" failed!");
+	if(!fileNonMotor.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException("open "+sRoadNonMotorCapabilityFileName+" failed!");
+	QTextStream streamMotor(&fileMotor);
+	QTextStream streamNonMotor(&fileNonMotor);
+	qreal motorCapability, nonMotorCapability;
+	const int NUM_ONCE=500;
+	int num=1;
+	QString sql = "insert into "+sRoadCapabilityTableName+" (road_id,motor,non_motor) "
+		+" values (?,?,?);";
+	query.prepare(sql);
+	while (!streamMotor.atEnd() && !streamNonMotor.atEnd())
+	{
+		QVariantList node_ids,motors, nonMotors;
+		int i=0;
+		while (!streamMotor.atEnd() && !streamNonMotor.atEnd() && i<NUM_ONCE)
+		{
+			streamMotor >> motorCapability;
+			streamNonMotor >> nonMotorCapability;
+			if(streamMotor.status() || streamNonMotor.status())
+				break;
+			node_ids << num;
+			motors << motorCapability;
+			nonMotors << nonMotorCapability;
+			++i; ++num;
+		}
+		query.bindValue(0, node_ids);
+		query.bindValue(1, motors);
+		query.bindValue(2, nonMotors);
+		if(!query.execBatch()){
+			QString str = query.lastError().text();
+			throw CommonException(str);
+		}
+
+	}
+}
+
+void DB::fetchDataFromSpeedFile(QSqlQuery & query)
+{
+	if(mFileDir->exists(sSpeedFileName))
+		throw PathNotExistsException(sSpeedFileName+" does not exist!");
+	QFile fileSpeed(mFileDir->absoluteFilePath(sSpeedFileName));
+	if(!fileSpeed.open(QIODevice::ReadOnly | QIODevice::Text))
+		throw CommonException("open "+sSpeedFileName+" failed!");
+	QTextStream streamSpeed(&fileSpeed);
+	qreal speed;
+	const int NUM_ONCE=500;
+	int num=1;
+	QString sql = "insert into "+sSpeedTableName+" (road_id,speed) "
+		+" values (?,?);";
+	query.prepare(sql);
+	while (!streamSpeed.atEnd())
+	{
+		QVariantList node_ids,speeds;
+		int i=0;
+		while (!streamSpeed.atEnd() && i<NUM_ONCE)
+		{
+			streamSpeed >> speed;
+			if(streamSpeed.status())
+				break;
+			node_ids << num;
+			speeds << speed;
+			++i; ++num;
+		}
+		query.bindValue(0, node_ids);
+		query.bindValue(1, speeds);
+		if(!query.execBatch()){
+			QString str = query.lastError().text();
+			throw CommonException(str);
+		}
+
+	}
+}
+
+QList<Capability*> DB::loadNodeCapability()
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	QSqlQuery query(db);
+	QString sql = "select node_id,motor,non_motor from "+sNodeCapabilityTableName;
+	QList<Capability*> capabilityList;
+	Capability* tmpCapability;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			tmpCapability = new Capability;
+			tmpCapability->setId(query.value(0).toInt()).setMotorCapability(query.value(1).toReal())
+				.setNonMotorCapability(query.value(2).toReal());
+			capabilityList << tmpCapability;
+		}
+
+	}
+	db.close();
+	return capabilityList;
+}
+
+QList<Capability*> DB::loadRoadCapability()
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	QSqlQuery query(db);
+	QString sql = "select road_id,motor,non_motor from "+sRoadCapabilityTableName;
+	QList<Capability*> capabilityList;
+	Capability* tmpCapability;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			tmpCapability = new Capability;
+			tmpCapability->setId(query.value(0).toInt()).setMotorCapability(query.value(1).toReal())
+				.setNonMotorCapability(query.value(2).toReal());
+			capabilityList << tmpCapability;
+		}
+
+	}
+	db.close();
+	return capabilityList;
+}
+
+QList<Speed*> DB::loadSpeed()
+{
+	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType);
+	db.setDatabaseName(mSelectedDbName);
+	db.open();
+	QSqlQuery query(db);
+	QString sql = "select road_id,speed from "+sSpeedTableName;
+	QList<Speed*> speedList;
+	Speed* tmpSpeed;
+	if (query.exec(sql))
+	{
+		while (query.next())
+		{
+			tmpSpeed = new Speed;
+			tmpSpeed->setId(query.value(0).toInt()).setSpeed(query.value(1).toReal());
+			speedList << tmpSpeed;
+		}
+
+	}
+	db.close();
+	return speedList;
 }
 
 

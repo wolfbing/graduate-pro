@@ -197,4 +197,37 @@ void Edge::addBus()
 	mBusNum++;
 }
 
+Edge & Edge::setTrafficForbid(RoadPermission* forbid)
+{
+	mTrafficForbid = forbid;
+	return *this;
+}
+
+RoadPermission* Edge::trafficForbid() const
+{
+	return mTrafficForbid;
+}
+
+Edge & Edge::setTrafficNumLimit(RoadPermission* p)
+{
+	mTrafficNumLimit = p;
+	return *this;
+}
+
+RoadPermission* Edge::trafficNumLimit() const
+{
+	return mTrafficNumLimit;
+}
+
+TrafficVolume* Edge::trafficVolume() const
+{
+	return mVolume;
+}
+
+Edge & Edge::setTrafficVolume(TrafficVolume* volume)
+{
+	mVolume = volume;
+	return *this;
+}
+
 

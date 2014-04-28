@@ -135,7 +135,7 @@ qreal Node::sceneDis( Node* node ) const
 	return line.length();
 }
 
-bool Node::haveTurnRestrict()
+bool Node::haveTurnRestrict() const
 {
 	return mHaveTurnRestrict;
 }
@@ -145,6 +145,18 @@ Node& Node::setHaveTurnRestrict( bool restr )
 	mHaveTurnRestrict = restr;
 	return *this;
 }
+
+TrafficVolume* Node::trafficVolume() const
+{
+	return mVolume;
+}
+
+Node& Node::setTrafficVolume(TrafficVolume* volume)
+{
+	mVolume = volume;
+	return *this;
+}
+
 
 
 qreal length( QPair<Node,Node> pair )

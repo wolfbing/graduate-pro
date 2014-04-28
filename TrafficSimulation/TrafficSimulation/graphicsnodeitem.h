@@ -8,13 +8,18 @@
 class GraphicsNodeItem :public Communicate, public QGraphicsItem
 {
 	Q_OBJECT
+	Q_INTERFACES(QGraphicsItem)
 
 public:
 	GraphicsNodeItem(QGraphicsItem *parent = 0);
 	~GraphicsNodeItem();
 
 	// 节点类型
-	enum NodeItemType {No,Junction,Restriction};
+	enum NodeItemType {
+		No,Junction,Restriction,
+		MotorVolumeGraph, NonMotorVolumeGraph, CarVolumeGraph, BusVolumeGraph,  // 车载量图
+		MotorbikeVolumeGraph, TaxiVolumeGraph, TruckVolumeGraph     // 车载量图
+	};
 
 	// 重载
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */);
@@ -23,6 +28,7 @@ public:
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 	//set 
 	GraphicsNodeItem & setNodeData(Node *);
+	GraphicsNodeItem & setGraphType(NodeItemType);
 	// 设置绘制属性
 	GraphicsNodeItem & setRadius(qreal radius);
 	GraphicsNodeItem & setHaveBorder(bool haveBorder);

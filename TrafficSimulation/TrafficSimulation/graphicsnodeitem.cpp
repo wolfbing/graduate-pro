@@ -2,6 +2,7 @@
 #include <QPainter>
 #include "graphicsnodenotextitem.h"
 #include <QStringListIterator>
+#include "TrafficVolume.h"
 
 GraphicsNodeItem::GraphicsNodeItem(QGraphicsItem *parent)
 	: QGraphicsItem(parent), Communicate()
@@ -128,10 +129,40 @@ QVariant GraphicsNodeItem::itemChange( GraphicsItemChange change, const QVariant
 void GraphicsNodeItem::hoverEnterEvent( QGraphicsSceneHoverEvent *event )
 {
 	QString str = QString::number(mNodeData->no());
-	if(mType==Junction)
+	switch (mType)
+	{
+	case GraphicsNodeItem::No:
+		break;
+	case GraphicsNodeItem::Junction:
 		str += QStringLiteral(";  交叉口类型: ")+QString::number(mNodeData->junctionType());
-	if (mType==Restriction)
+		break;
+	case GraphicsNodeItem::Restriction:
 		str += QStringLiteral(";  转向限制: ") + QString::number(mNodeData->haveTurnRestrict() ? 1:0);
+		break;
+	case GraphicsNodeItem::MotorVolumeGraph:
+		str += QStringLiteral("机动车交通量") + QString::number(mNodeData->trafficVolume()->motorVolume());
+		break;
+	case GraphicsNodeItem::NonMotorVolumeGraph:
+		str += QStringLiteral("非机动车交通量") + QString::number(mNodeData->trafficVolume()->nonMotorVolume());
+		break;
+	case GraphicsNodeItem::CarVolumeGraph:
+		str += QStringLiteral("客车交通量") + QString::number(mNodeData->trafficVolume()->carVolume());
+		break;
+	case GraphicsNodeItem::BusVolumeGraph:
+		str += QStringLiteral("公交车交通量") + QString::number(mNodeData->trafficVolume()->busVolume());
+		break;
+	case GraphicsNodeItem::MotorbikeVolumeGraph:
+		str += QStringLiteral("摩托车交通量") + QString::number(mNodeData->trafficVolume()->motorbikeVolume());
+		break;
+	case GraphicsNodeItem::TaxiVolumeGraph:
+		str += QStringLiteral("出租车交通量") + QString::number(mNodeData->trafficVolume()->taxiVolume());
+		break;
+	case GraphicsNodeItem::TruckVolumeGraph:
+		str += QStringLiteral("货车交通量") + QString::number(mNodeData->trafficVolume()->truckVolume());
+		break;
+	default:
+		break;
+	}
 	emit sendTmpInfoToStatus(QStringLiteral("节点编号：")+str);
 }
 
@@ -163,6 +194,12 @@ Node * GraphicsNodeItem::nodeData() const
 }
 
 GraphicsNodeItem & GraphicsNodeItem::setNodeItemType( NodeItemType type )
+{
+	mType = type;
+	return *this;
+}
+
+GraphicsNodeItem & GraphicsNodeItem::setGraphType(NodeItemType type)
 {
 	mType = type;
 	return *this;

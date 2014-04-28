@@ -13,6 +13,8 @@
 
 class GraphicsView;
 class TurnRestrict;
+class RoadPermission;
+class TrafficVolume;
 
 class WinOfGraphicsView : public QMainWindow
 {
@@ -32,6 +34,8 @@ public slots:
 	void updatePermanentStatus(QString, QString);
 	void changeScene(int index1, int index2);
 	void selectGraphics();
+	void createDb();
+	void selectDb();
 
 protected:
 	void showEvent(QShowEvent *);
@@ -59,13 +63,18 @@ private:
 	// actions 
 	QAction* mPrintAction;
 	QAction* mSelectSceneAction;
+	QAction* mCreateDbAction;
+	QAction* mSelectDbAction;
 
 	DbAdapter mDbAdapter;
     QList<Edge*> mEdgeDataList;
 	QList<Node*> mNodeDataList;
 	QList<BusRoute*> mBusRouteList;
 	QList<TurnRestrict*> mTurnRestrictionList;
-
+	QList<RoadPermission*> mRoadForbidList;
+	QList<RoadPermission*> mRoadNumLimitList;
+	QList<TrafficVolume*> mNodeTrafficVolumeList;
+	QList<TrafficVolume*> mRoadTrafficVolumeList;
 };
 
 #endif // WINOFGRAPHICSVIEW_H

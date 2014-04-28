@@ -89,3 +89,44 @@ QList<TurnRestrict*> DbAdapter::loadTurnRestrictions()
 {
 	return mDb->loadTurnRestrictions();
 }
+
+QList<RoadPermission*> DbAdapter::loadTrafficForbid()
+{
+	return mDb->loadTrafficForbid();
+}
+
+QList<RoadPermission*> DbAdapter::loadTrafficNumLimit()
+{
+	return mDb->loadTrafficNumLimit();
+}
+
+void DbAdapter::setDbPath(QString path)
+{
+	mDb->setSelectedDbName(path);
+	
+}
+
+QList<TrafficVolume*> DbAdapter::loadNodeTrafficVolume()
+{
+	return mDb->loadNodeTrafficVolume();
+}
+
+QList<TrafficVolume*> DbAdapter::loadRoadTrafficVolume()
+{
+	return mDb->loadRoadTrafficVolume();
+}
+
+QList<Capability*> DbAdapter::loadNodeCapability()
+{
+	return mDb->loadNodeCapability();
+}
+
+QList<Capability*> DbAdapter::loadRoadCapability()
+{
+	return mDb->loadRoadCapability();
+}
+
+QList<Speed*> DbAdapter::loadSpeed()
+{
+	return mDb->loadSpeed();
+}

@@ -6,6 +6,8 @@
 #include "node.h"
 #include "Normal.h"
 
+class TrafficVolume;
+
 class Positionable{
 public:
 	virtual QPointF coor() const = 0;
@@ -35,7 +37,8 @@ public:
 	QPointF sceneCoor() const;
 	int junctionType() const;
 	bool inScale() const;
-	bool haveTurnRestrict();
+	bool haveTurnRestrict() const;
+	TrafficVolume* trafficVolume() const;
 	// set
 	Node& setCoor(QPointF);
 	Node& setNo(int);
@@ -44,6 +47,8 @@ public:
 	Node& setInScale(bool);
 	Node& setId(int);
 	Node& setHaveTurnRestrict(bool);
+	Node& setTrafficVolume(TrafficVolume*);
+
 	// 计算和其他node距离
 	qreal dis(Node*)const;
 	qreal sceneDis(Node*)const;
@@ -57,7 +62,7 @@ private:
 	int mJunctionType; // 连接类型
 	bool mInScale; // 是否在范围内
 	bool mHaveTurnRestrict;
-
+	TrafficVolume* mVolume; // 交通量
 };
 
 

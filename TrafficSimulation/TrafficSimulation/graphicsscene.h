@@ -42,6 +42,7 @@ public:
 
 	GraphicsScene & setNodeDataList(QList<Node*>);
 	GraphicsScene & setEdgeDataList(QList<Edge*>);
+	GraphicsScene & setTitle(QString title);
 
 	virtual void addItems()=0;
 
@@ -62,9 +63,10 @@ protected:
 	QPointF sceneCoorToNormCoor(QPointF);
 	qreal shorterSceneRectSide(); // 返回sceneRect中较短的边
 
-	virtual void doSomething()=0;
+	virtual void doSomething(){};
 	// 重载
 	void drawBackground(QPainter *painter, const QRectF &rect);
+	void drawForeground(QPainter *painter, const QRectF &rect);
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mousePressEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -80,6 +82,8 @@ private:
 	QColor mBackColor;
 
 	bool mLeftBtnPressed;
+
+	QString mTitle;
 
 };
 

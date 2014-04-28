@@ -146,6 +146,25 @@ void GraphicsScene::updateItems()
 	}
 }
 
+void GraphicsScene::drawForeground(QPainter *painter, const QRectF &rect)
+{
+
+	QRectF textRect(rect.left(), rect.bottom()-100, rect.width(), 100);
+	painter->drawText(textRect, QString("copyright @ Wang Wei. SEU. Nanjing"), QTextOption(Qt::AlignCenter) );
+	QRectF titleRect(rect.left(), rect.top(), rect.width(), 50);
+	QFont titleFont;
+	titleFont.setPointSizeF(20);
+	titleFont.setWeight(QFont::Bold);
+	painter->setFont(titleFont);
+	painter->drawText(titleRect, QString(mTitle), QTextOption(Qt::AlignCenter));
+}
+
+GraphicsScene & GraphicsScene::setTitle(QString title)
+{
+	mTitle = title;
+	return *this;
+}
+
 
 
 
