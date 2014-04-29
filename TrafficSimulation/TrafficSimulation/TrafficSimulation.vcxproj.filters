@@ -38,27 +38,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="trafficsimulation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_trafficsimulation.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_trafficsimulation.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_trafficsimulation.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-=======
     <ClCompile Include="GeneratedFiles\qrc_trafficsimulation.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="conn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
->>>>>>> graphics_view_test
     <ClCompile Include="db.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -68,39 +53,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_db.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="pathnotexistsexception.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sqlqueryexception.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DbAdapter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="conn.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="graphicswidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_graphicswidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_graphicswidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="dotwidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_dotwidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_dotwidget.cpp">
-=======
     <ClCompile Include="DbAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,7 +78,6 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_graphicsscene.cpp">
->>>>>>> graphics_view_test
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="legend.cpp">
@@ -156,17 +107,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_linewidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="thicklinewidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_thicklinewidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_thicklinewidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-=======
     <ClCompile Include="node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -188,7 +128,6 @@
     <ClCompile Include="rect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
->>>>>>> graphics_view_test
     <ClCompile Include="selectgraphicswidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -198,12 +137,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_selectgraphicswidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-<<<<<<< HEAD
-=======
     <ClCompile Include="sqlqueryexception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
->>>>>>> graphics_view_test
     <ClCompile Include="thickdotwidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -213,33 +149,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_thickdotwidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="busnumgraphicswidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_busnumgraphicswidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_busnumgraphicswidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="nodegraphicswidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_nodegraphicswidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_nodegraphicswidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="roadlevelgraphicswidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_roadlevelgraphicswidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_roadlevelgraphicswidget.cpp">
-=======
     <ClCompile Include="thicklinewidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -463,17 +372,10 @@
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_speedgraphicsscene.cpp">
->>>>>>> graphics_view_test
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <CustomBuild Include="trafficsimulation.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-=======
->>>>>>> graphics_view_test
     <CustomBuild Include="trafficsimulation.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
@@ -483,17 +385,10 @@
     <CustomBuild Include="db.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-<<<<<<< HEAD
-    <CustomBuild Include="graphicswidget.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="dotwidget.h">
-=======
     <CustomBuild Include="dotwidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="graphicsscene.h">
->>>>>>> graphics_view_test
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="legend.h">
@@ -505,11 +400,7 @@
     <CustomBuild Include="linewidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-<<<<<<< HEAD
-    <CustomBuild Include="thicklinewidget.h">
-=======
     <CustomBuild Include="nodegraphicsscene.h">
->>>>>>> graphics_view_test
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="selectgraphicswidget.h">
@@ -521,15 +412,6 @@
     <CustomBuild Include="thickdotwidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-<<<<<<< HEAD
-    <CustomBuild Include="busnumgraphicswidget.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="nodegraphicswidget.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="roadlevelgraphicswidget.h">
-=======
     <CustomBuild Include="thicklinewidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -603,7 +485,6 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="speedgraphicsscene.h">
->>>>>>> graphics_view_test
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -611,12 +492,6 @@
     <ClInclude Include="GeneratedFiles\ui_trafficsimulation.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="pathnotexistsexception.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sqlqueryexception.h">
-=======
     <ClInclude Include="conn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -624,18 +499,11 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="graphicsedgenetitem.h">
->>>>>>> graphics_view_test
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="DbAdapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="conn.h">
-=======
     <ClInclude Include="Normal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -643,14 +511,11 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rect.h">
->>>>>>> graphics_view_test
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_selectgraphicswidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
-=======
     <ClInclude Include="sqlqueryexception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -681,7 +546,6 @@
     <ClInclude Include="Speed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
->>>>>>> graphics_view_test
   </ItemGroup>
   <ItemGroup>
     <None Include="road.db" />
