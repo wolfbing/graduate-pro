@@ -19,16 +19,8 @@ void ConnWithCoorLevel::setLevel( int level )
 
 ConnWithNoPair::ConnWithNoPair( int n1,int n2 )
 {
-	if (n1 < n2)
-	{
-		node1 = n1;
-		node2 = n2;
-	}
-	else
-	{
-		node1 = n2;
-		node2 = n1;
-	}
+	node1 = n1;
+	node2 = n2;
 }
 
 ConnWithNoPair::ConnWithNoPair( const ConnWithNoPair & conn )
@@ -57,10 +49,53 @@ ConnWithCoorPair::ConnWithCoorPair( QPointF p1,QPointF p2 )
 
 }
 
+ConnWithCoorPair::ConnWithCoorPair( const ConnWithCoorPair & conn )
+{
+	mCoorPair = conn.mCoorPair;
+}
+
 bool ConnWithCoorPair::operator==(const ConnWithCoorPair & conn ) const
 {
 	return (this->mCoorPair.first==conn.mCoorPair.first)
 		&& (this->mCoorPair.second==conn.mCoorPair.second);
+}
+
+ConnWithCoorPair & ConnWithCoorPair::operator=( const ConnWithCoorPair & conn )
+{
+	mCoorPair = conn.mCoorPair;
+	return *this;
+}
+
+Rect ConnWithCoorPair::border() const
+{
+	qreal left, right, top, bottom;
+	if (mCoorPair.first.x()<mCoorPair.second.x())
+	{
+		left = mCoorPair.first.x();
+		right = mCoorPair.second.x();
+	}
+	else
+	{
+		left = mCoorPair.second.x();
+		right = mCoorPair.first.x();
+	}
+	if (mCoorPair.first.y()>mCoorPair.second.y())
+	{
+		top = mCoorPair.first.y();
+		bottom = mCoorPair.second.y();
+	}
+	else
+	{
+		top = mCoorPair.second.y();
+		bottom = mCoorPair.first.y();
+	}
+	return Rect(left, top, right-left, top-bottom);
+	 
+}
+
+void ConnWithCoorPair::norm( qreal factor, QPointF c )
+{
+	mCoorPair = QPair<QPointF, QPointF>((mCoorPair.first-c)/factor,(mCoorPair.second-c)/factor );
 }
 
 QDataStream& operator<<( QDataStream& out, const ConnWithNoPair& conn )

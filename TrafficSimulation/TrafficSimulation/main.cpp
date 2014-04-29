@@ -1,16 +1,19 @@
-#include "trafficsimulation.h"
+
 #include <QtWidgets/QApplication>
-#include <QTextCodec>
+#include <QtWidgets>
+#include <QGLWidget>
+
+#include <QtDebug>
+
+#include "winofgraphicsview.h"
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	// 以下部分解决中文乱码   
-	//QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));    
-	// 以上部分解决中文乱码
+	WinOfGraphicsView w;
 
-	TrafficSimulation w;
 	w.show();
+
 	return a.exec();
 }

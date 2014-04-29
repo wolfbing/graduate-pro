@@ -1,5 +1,6 @@
-#include "DbAdapter.h"
+ï»¿#include "DbAdapter.h"
 #include <QtMath>
+#include "Edge.h"
 
 DbAdapter::DbAdapter(void)
 	: mDb(0)
@@ -15,233 +16,117 @@ DbAdapter::~DbAdapter(void)
 
 }
 
-// ÔØÈë¹éÒ»»¯µÄÁ¬½Ó
-QList<QPair<Node,Node> >* DbAdapter::loadNormConns()
+
+QList<Node*> DbAdapter::loadNormNodes()
 {
-	QList<QPair<Node,Node> >* connList = mDb->loadConn();
-	normConns(connList);
-	return connList;
+	QList<Node*> pointList = mDb->loadNodes();
+	norm(&pointList);
+	return pointList;
 }
 
-void DbAdapter::normConns( QList<QPair<Node,Node> > *connList )
+
+
+template <class T>
+void DbAdapter::norm( QList<T*>* tList ) const
 {
-	if (connList->size() > 0)
+	Rect rect = boundingRect(tList);
+	QPointF center = rect.center();
+	qreal width = rect.width();
+	qreal height = rect.height();
+	qreal maxLen = width>height ? width : height;
+	QMutableListIterator<T*> mIte(*tList);
+	while (mIte.hasNext())
 	{
-		QPointF tmpPoint = connList->at(0).first.mCoor;
-		qreal left = tmpPoint.rx();
-		qreal right = tmpPoint.rx();
-		qreal top = tmpPoint.ry();
-		qreal bottom = tmpPoint.ry();
-		QMutableListIterator<QPair<Node,Node> > ite(*connList);
-		while (ite.hasNext())
-		{
-			QPair<Node,Node> conn = ite.next();
-			QPointF firstPoint = conn.first.mCoor;
-			QPointF secondPoint = conn.second.mCoor;
-			if (firstPoint.rx() < left)
-				left = firstPoint.rx();
-			if(firstPoint.rx() > right)
-				right = firstPoint.rx();
-			if(firstPoint.ry() > top )
-				top = firstPoint.ry();
-			if(firstPoint.ry() < bottom)
-				bottom = firstPoint.ry();
-			if(secondPoint.rx() < left)
-				left = secondPoint.rx();
-			if(secondPoint.rx() > right)
-				right = secondPoint.rx();
-			if(secondPoint.ry() < bottom)
-				bottom =secondPoint.ry();
-			if(secondPoint.ry() > top)
-				top = secondPoint.ry();
-		}
-		QPointF center = QPointF( (left+right)/2, (top+bottom)/2);
-		qreal width = qAbs(right - left);
-		qreal height = qAbs(top - bottom);
-		qreal maxL = (width > height ? width : height)*1.1;
-		ite.toFront();
-		while (ite.hasNext())
-		{
-			QPair<Node,Node>& conn = ite.next(); // connÊÇÒıÓÃÀàĞÍµÄ
-			QPointF firstPoint = conn.first.mCoor;
-			QPointF secondPoint = conn.second.mCoor;
-			conn.first.mCoor = (firstPoint-center)/maxL;
-			conn.second.mCoor = (secondPoint-center)/maxL;
-		}
+		T* tmpT = mIte.next();
+		tmpT->norm(maxLen, center);
+		//mIte.setValue(tmpT);
 	}
 }
 
-void DbAdapter::normConns( QList<ConnWithCoorLevel>* connList )
+
+template <class T>
+Rect DbAdapter::boundingRect( const QList<T*> * tList) const
 {
-	if (connList->size() > 0)
+	QListIterator<T*> ite(*tList);
+	if(!ite.hasNext())
+		return Rect(0,0,0,0);
+	T* tmpT;
+	Rect rect;
+	tmpT = ite.next();
+	rect = tmpT->border();
+	qreal left=rect.left(), right = rect.right(),
+		top = rect.top(), bottom = rect.bottom();
+	while (ite.hasNext())
 	{
-		QPointF tmpPoint = connList->at(0).mCoorPair.first;
-		qreal left = tmpPoint.rx();
-		qreal right = tmpPoint.rx();
-		qreal top = tmpPoint.ry();
-		qreal bottom = tmpPoint.ry();
-		QMutableListIterator<ConnWithCoorLevel> ite(*connList);
-		while (ite.hasNext())
-		{
-			ConnWithCoorLevel conn = ite.next();
-			QPointF firstPoint = conn.mCoorPair.first;
-			QPointF secondPoint = conn.mCoorPair.second;
-			if (firstPoint.rx() < left)
-				left = firstPoint.rx();
-			if(firstPoint.rx() > right)
-				right = firstPoint.rx();
-			if(firstPoint.ry() > top )
-				top = firstPoint.ry();
-			if(firstPoint.ry() < bottom)
-				bottom = firstPoint.ry();
-			if(secondPoint.rx() < left)
-				left = secondPoint.rx();
-			if(secondPoint.rx() > right)
-				right = secondPoint.rx();
-			if(secondPoint.ry() < bottom)
-				bottom =secondPoint.ry();
-			if(secondPoint.ry() > top)
-				top = secondPoint.ry();
-		} // Ñ°ÕÒ±ß½çÑ­»·½áÊø
-		QPointF center = QPointF( (left+right)/2, (top+bottom)/2);
-		qreal width = qAbs(right - left);
-		qreal height = qAbs(top - bottom);
-		qreal maxL = (width > height ? width : height)*1.1;
-		ite.toFront();
-		while (ite.hasNext())
-		{
-			ConnWithCoorLevel& conn = ite.next(); // connÊÇÒıÓÃÀàĞÍµÄ
-			QPointF firstPoint = conn.mCoorPair.first;
-			QPointF secondPoint = conn.mCoorPair.second;
-			conn.mCoorPair.first = (firstPoint-center)/maxL;
-			conn.mCoorPair.second = (secondPoint-center)/maxL;
-		}
+		tmpT = ite.next();
+		rect = tmpT->border();
+		if(rect.left()<left)
+			left = rect.left();
+		if(rect.right()>right)
+			right = rect.right();
+		if(rect.bottom()<bottom)
+			bottom = rect.bottom();
+		if(rect.top()>top)
+			top = rect.top();
 	}
+	// è¿™é‡Œåˆè¦è¿›è¡Œåæ ‡ç³»çš„è½¬æ¢
+	return Rect(left,top, qAbs(right-left), qAbs(top-bottom));
 }
 
-void DbAdapter::normConns( QHash<ConnWithCoorPair,int>* connHash )
+
+QList<Edge*> DbAdapter::loadEdges()
 {
-	if (connHash->size() > 0)
-	{
-		QMutableHashIterator<ConnWithCoorPair,int> hashIte(*connHash);
-		hashIte.next();
-		QPointF tmpPoint = hashIte.key().mCoorPair.first;
-		qreal left = tmpPoint.rx();
-		qreal right = tmpPoint.rx();
-		qreal top = tmpPoint.ry();
-		qreal bottom = tmpPoint.ry();
-		hashIte.toFront();
-		while (hashIte.hasNext())
-		{
-			ConnWithCoorPair conn = hashIte.next().key();
-			QPointF firstPoint = conn.mCoorPair.first;
-			QPointF secondPoint = conn.mCoorPair.second;
-			if (firstPoint.rx() < left)
-				left = firstPoint.rx();
-			if(firstPoint.rx() > right)
-				right = firstPoint.rx();
-			if(firstPoint.ry() > top )
-				top = firstPoint.ry();
-			if(firstPoint.ry() < bottom)
-				bottom = firstPoint.ry();
-			if(secondPoint.rx() < left)
-				left = secondPoint.rx();
-			if(secondPoint.rx() > right)
-				right = secondPoint.rx();
-			if(secondPoint.ry() < bottom)
-				bottom =secondPoint.ry();
-			if(secondPoint.ry() > top)
-				top = secondPoint.ry();
-		}
-		QPointF center = QPointF( (left+right)/2, (top+bottom)/2);
-		qreal width = qAbs(right - left);
-		qreal height = qAbs(top - bottom);
-		qreal maxL = (width > height ? width : height)*1.1;
-		hashIte.toFront();
-		QHash<ConnWithCoorPair,int>* tmpHash = new QHash<ConnWithCoorPair,int>;
-		while (hashIte.hasNext())
-		{
-			hashIte.next(); // connÊÇÒıÓÃÀàĞÍµÄ
-			QPointF firstPoint = hashIte.key().mCoorPair.first;
-			QPointF secondPoint = hashIte.key().mCoorPair.second;
-			QPointF normFirstPoint = (firstPoint-center)/maxL;
-			QPointF normSecondPoint = (secondPoint-center)/maxL;
-			tmpHash->insert(ConnWithCoorPair(normFirstPoint,normSecondPoint),hashIte.value());
-			hashIte.remove();
-		}
-		QHashIterator<ConnWithCoorPair,int> tmpIte(*tmpHash);
-		while (tmpIte.hasNext())
-		{
-			tmpIte.next();
-			connHash->insert(tmpIte.key(),tmpIte.value());
-		}
-
-		delete tmpHash;
-
-	}
+	QList<Edge*> edgeList = mDb->loadEdges();
+	return edgeList;
 }
 
-QList<ConnWithCoorLevel>* DbAdapter::loadNormConnWithLevel()
+QList<BusRoute*> DbAdapter::loadBusRoutes()
 {
-	QList<ConnWithCoorLevel>* connList = new QList<ConnWithCoorLevel>;
-	connList = mDb->loadConnWithLevel();
-	normConns(connList);
-	return connList;
+	return mDb->loadBusRoutes();
 }
 
-QHash<ConnWithCoorPair,int>* DbAdapter::loadNormConnWithBusNum()
+QList<TurnRestrict*> DbAdapter::loadTurnRestrictions()
 {
-	QHash<ConnWithNoPair,int>* connHash = new QHash<ConnWithNoPair,int>;
-	QList<QString>* routes = mDb->loadBusRoute();
-	QHash<int,int>* nodeIdToId = mDb->loadNodeIdToId(); // µÀÂ·±àºÅºÍÊı¾İ¿âÖ÷¼üµÄ¶ÔÓ¦
-	QListIterator<QString> routeIte(*routes);
-	QString route;
-	QStringList sNodeList;
-	int node1,node2;
-	ConnWithNoPair conn;
-	while (routeIte.hasNext())
-	{
-		route = routeIte.next();
-		sNodeList = route.split(QString(","));
-		if (sNodeList.size()>1)
-		{
-			node1 = nodeIdToId->value(sNodeList.at(0).toInt());
-			for (int i=1;i<sNodeList.size();++i)
-			{
-				node2 = nodeIdToId->value(sNodeList.at(i).toInt());
-				if(node1<node2)
-					conn = ConnWithNoPair(node1,node2);
-				else
-					conn = ConnWithNoPair(node2,node1);
+	return mDb->loadTurnRestrictions();
+}
 
-				if(connHash->contains(conn))
-					connHash->insert(conn,connHash->value(conn)+1);
-				else
-					connHash->insert(conn,1);
-				
-				node1 = node2;
-			}// Ò»Ìõ¹«½»ÏßÂ·ÕûÀíÍê³É
-		}
-		routeIte.next(); // Ìø¹ıÍ¬Ò»Ìõ¹«½»Â·ÏßµÄ·´Ïò
-	}// ËùÓĞÏßÂ·ÕûÀíÍê³É
-	QHash<int,QPointF>* points = mDb->loadNodeById(); // Ö÷¼üºÍµã×ø±êµÄ¶ÔÓ¦
-	QVector<ConnWithNoPair>* connList = mDb->loadConnByNo(); // ËùÓĞµÄÂ·¶Î
-	QVectorIterator<ConnWithNoPair> connVecIte(*connList);
-	QHash<ConnWithCoorPair,int>* result = new QHash<ConnWithCoorPair,int>;
-	while (connVecIte.hasNext())
-	{
-		ConnWithNoPair tmpConn = connVecIte.next();
-		int busNum = 0;
-		if (connHash->contains(tmpConn))
-			busNum = connHash->value(tmpConn);
-		result->insert(ConnWithCoorPair(
-			points->value(tmpConn.node1),
-			points->value(tmpConn.node2) ),
-			busNum);
+QList<RoadPermission*> DbAdapter::loadTrafficForbid()
+{
+	return mDb->loadTrafficForbid();
+}
 
-	}
-	// °Ñµã×ø±ê¹éÒ»»¯
-	normConns(result);
-	return result;
+QList<RoadPermission*> DbAdapter::loadTrafficNumLimit()
+{
+	return mDb->loadTrafficNumLimit();
+}
 
+void DbAdapter::setDbPath(QString path)
+{
+	mDb->setSelectedDbName(path);
+	
+}
+
+QList<TrafficVolume*> DbAdapter::loadNodeTrafficVolume()
+{
+	return mDb->loadNodeTrafficVolume();
+}
+
+QList<TrafficVolume*> DbAdapter::loadRoadTrafficVolume()
+{
+	return mDb->loadRoadTrafficVolume();
+}
+
+QList<Capability*> DbAdapter::loadNodeCapability()
+{
+	return mDb->loadNodeCapability();
+}
+
+QList<Capability*> DbAdapter::loadRoadCapability()
+{
+	return mDb->loadRoadCapability();
+}
+
+QList<Speed*> DbAdapter::loadSpeed()
+{
+	return mDb->loadSpeed();
 }

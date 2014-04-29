@@ -9,6 +9,8 @@ class LegendElement : public QObject
     Q_OBJECT
 public:
     explicit LegendElement(QObject *parent = 0);
+	// size： 点-半径， 线-宽度
+	// color1: 内部颜色, color2：外部颜色
     LegendElement(QString name, int type, float size, QColor color1, QColor color2=QColor());
 	LegendElement(const LegendElement & element);
 	void operator=(const LegendElement & element);

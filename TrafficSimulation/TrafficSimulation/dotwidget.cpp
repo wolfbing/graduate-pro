@@ -25,7 +25,7 @@ DotWidget *DotWidget::setColor(QColor color)
 
 QSize DotWidget::sizeHint() const
 {
-    return QSize(100, 20);
+    return QSize(2*mRadius+2, 2*mRadius+2);
 }
 
 void DotWidget::paintEvent(QPaintEvent *)

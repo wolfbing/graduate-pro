@@ -16,10 +16,13 @@ signals:
 public slots:
 
 public:
-    QSize sizeHint() const;
+	QSize sizeHint() const;
+    
 
 protected:
     void paintEvent(QPaintEvent*);
+	
+	
 
 private:
     QColor mColor;

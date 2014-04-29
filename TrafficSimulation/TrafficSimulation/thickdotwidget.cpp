@@ -8,12 +8,12 @@ ThickDotWidget::ThickDotWidget(QWidget *parent)
 	
 }
 
-ThickDotWidget::ThickDotWidget(qreal size,  QColor inColor, QColor outColor, QWidget* parent )
+ThickDotWidget::ThickDotWidget(qreal radius,  QColor inColor, QColor outColor, QWidget* parent )
 	: QWidget(parent)
 {
 	mInColor = inColor;
 	mOutColor = outColor;
-	mSize = size;
+	mSize = radius;
 }
 
 

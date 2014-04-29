@@ -9,7 +9,8 @@ class ThickDotWidget : public QWidget
 
 public:
 	ThickDotWidget(QWidget *parent = 0);
-	ThickDotWidget(qreal size, QColor inColor, QColor outColor, QWidget* parent=0);
+	
+	ThickDotWidget(qreal radius, QColor inColor, QColor outColor, QWidget* parent=0);
 	~ThickDotWidget();
 
 protected:

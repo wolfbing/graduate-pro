@@ -13,6 +13,7 @@ TrafficSimulation/*.db
 TrafficSimulation/x64/
 TrafficSimulation/Win32/
 TrafficSimulation/TrafficSimulation/Debug/
+TrafficSimulation/TrafficSimulation/db/
 TrafficSimulation/TrafficSimulation/GeneratedFiles/
 TrafficSimulation/TrafficSimulation/Resources/
 TrafficSimulation/TrafficSimulation/x64/
