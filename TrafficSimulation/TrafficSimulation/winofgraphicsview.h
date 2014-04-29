@@ -15,6 +15,8 @@ class GraphicsView;
 class TurnRestrict;
 class RoadPermission;
 class TrafficVolume;
+class Capability;
+class Speed;
 
 class WinOfGraphicsView : public QMainWindow
 {
@@ -75,6 +77,9 @@ private:
 	QList<RoadPermission*> mRoadNumLimitList;
 	QList<TrafficVolume*> mNodeTrafficVolumeList;
 	QList<TrafficVolume*> mRoadTrafficVolumeList;
+	QList<Capability*> mNodeCapabilityList;
+	QList<Capability*> mRoadCapabilityList;
+	QList<Speed*> mSpeedList;
 };
 
 #endif // WINOFGRAPHICSVIEW_H

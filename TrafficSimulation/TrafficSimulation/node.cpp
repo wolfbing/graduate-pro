@@ -157,6 +157,17 @@ Node& Node::setTrafficVolume(TrafficVolume* volume)
 	return *this;
 }
 
+Node& Node::setTrafficCapability(Capability* capability)
+{
+	mCapability = capability;
+	return *this;
+}
+
+Capability* Node::trafficCapability() const
+{
+	return mCapability;
+}
+
 
 
 qreal length( QPair<Node,Node> pair )

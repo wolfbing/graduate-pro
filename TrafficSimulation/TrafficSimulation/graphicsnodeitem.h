@@ -18,7 +18,8 @@ public:
 	enum NodeItemType {
 		No,Junction,Restriction,
 		MotorVolumeGraph, NonMotorVolumeGraph, CarVolumeGraph, BusVolumeGraph,  // 车载量图
-		MotorbikeVolumeGraph, TaxiVolumeGraph, TruckVolumeGraph     // 车载量图
+		MotorbikeVolumeGraph, TaxiVolumeGraph, TruckVolumeGraph,     // 车载量图
+		MotorCapabilityGraph, NonMotorCapabilityGraph,  // 承载量
 	};
 
 	// 重载

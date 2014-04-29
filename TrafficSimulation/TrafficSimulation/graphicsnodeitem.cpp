@@ -3,6 +3,7 @@
 #include "graphicsnodenotextitem.h"
 #include <QStringListIterator>
 #include "TrafficVolume.h"
+#include "Capability.h"
 
 GraphicsNodeItem::GraphicsNodeItem(QGraphicsItem *parent)
 	: QGraphicsItem(parent), Communicate()
@@ -159,6 +160,12 @@ void GraphicsNodeItem::hoverEnterEvent( QGraphicsSceneHoverEvent *event )
 		break;
 	case GraphicsNodeItem::TruckVolumeGraph:
 		str += QStringLiteral("货车交通量") + QString::number(mNodeData->trafficVolume()->truckVolume());
+		break;
+	case MotorCapabilityGraph:
+		str += QStringLiteral("") + QString::number(mNodeData->trafficCapability()->motorCapability());
+		break;
+	case NonMotorCapabilityGraph:
+		str += QStringLiteral("") + QString::number(mNodeData->trafficCapability()->nonMotorCapability());
 		break;
 	default:
 		break;

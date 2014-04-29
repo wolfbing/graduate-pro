@@ -230,4 +230,26 @@ Edge & Edge::setTrafficVolume(TrafficVolume* volume)
 	return *this;
 }
 
+Edge & Edge::setTrafficCapability(Capability*capability)
+{
+	mCapability = capability;
+	return *this;
+}
+
+Capability* Edge::trafficCapability() const
+{
+	return mCapability;
+}
+
+Edge & Edge::setSpeed(Speed* speed)
+{
+	mSpeed = speed;
+	return *this;
+}
+
+Speed* Edge::speed() const
+{
+	return mSpeed;
+}
+
 

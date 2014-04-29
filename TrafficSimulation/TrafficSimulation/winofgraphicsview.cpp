@@ -24,6 +24,11 @@
 #include "TrafficVolume.h"
 #include "trafficroadvolumegraphicsscene.h"
 #include "trafficnodevolumegraphicsscene.h"
+#include "Capability.h"
+#include "trafficnodecapabilitygraphicsscene.h"
+#include "trafficroadcapabilitygraphicsscene.h"
+#include "Speed.h"
+#include "speedgraphicsscene.h"
 
 
 WinOfGraphicsView::WinOfGraphicsView(QWidget *parent)
@@ -121,6 +126,9 @@ void WinOfGraphicsView::loadDataFromDb()
 	mRoadNumLimitList = mDbAdapter.loadTrafficNumLimit();
 	mNodeTrafficVolumeList = mDbAdapter.loadNodeTrafficVolume();
 	mRoadTrafficVolumeList = mDbAdapter.loadRoadTrafficVolume();
+	mNodeCapabilityList = mDbAdapter.loadNodeCapability();
+	mRoadCapabilityList = mDbAdapter.loadRoadCapability();
+	mSpeedList = mDbAdapter.loadSpeed();
 	
 	{  ///// 对Edge中的Node初始化
 		QHash<int,Node*> idNodeHash;
@@ -199,7 +207,15 @@ void WinOfGraphicsView::loadDataFromDb()
 			tmpVolume = volumeIte.next();
 			tmpNode = idNodeHash.value(tmpVolume->id());
 			tmpNode->setTrafficVolume(tmpVolume);
-
+		}
+		//// 交通承载量
+		QListIterator<Capability*> capabilityIte(mNodeCapabilityList);
+		Capability* tmpCapability;
+		while (capabilityIte.hasNext())
+		{
+			tmpCapability = capabilityIte.next();
+			tmpNode = idNodeHash.value(tmpCapability->id());
+			tmpNode->setTrafficCapability(tmpCapability);
 		}
 
 	}
@@ -239,6 +255,24 @@ void WinOfGraphicsView::loadDataFromDb()
 			tmpVolume = volumeIte.next();
 			tmpEdgeData = idEdgeHash.value(tmpVolume->id());
 			tmpEdgeData->setTrafficVolume(tmpVolume);
+		}
+		///// 设置承载量
+		QListIterator<Capability*> capabilityIte(mRoadCapabilityList);
+		Capability* tmpCapability;
+		while (capabilityIte.hasNext())
+		{
+			tmpCapability = capabilityIte.next();
+			tmpEdgeData = idEdgeHash.value(tmpCapability->id());
+			tmpEdgeData->setTrafficCapability(tmpCapability);
+		}
+		/////  路段车速
+		QListIterator<Speed*> speedIte(mSpeedList);
+		Speed* tmpSpeed;
+		while (speedIte.hasNext())
+		{
+			tmpSpeed = speedIte.next();
+			tmpEdgeData = idEdgeHash.value(tmpSpeed->id());
+			tmpEdgeData->setSpeed(tmpSpeed);
 		}
 
 	}
@@ -417,6 +451,35 @@ void WinOfGraphicsView::changeScene( int index1, int index2 )
 		}
 		break;
 	case 3:
+		switch (index2)
+		{
+		case 0:
+			mScene = new TrafficRoadCapabilityGraphicsScene;
+			((TrafficRoadCapabilityGraphicsScene*)mScene)->setCapabilityType(TrafficRoadCapabilityGraphicsScene::MotorCapability);
+			mScene->setTitle(QStringLiteral("机动车路段交通负荷分布"));
+			break;
+		case 1:
+			mScene = new TrafficNodeCapabilityGraphicsScene;
+			((TrafficNodeCapabilityGraphicsScene*)mScene)->setCapabilityType(TrafficNodeCapabilityGraphicsScene::MotorCapability);
+			mScene->setTitle(QStringLiteral("机动车交叉口交通负荷分布"));
+			break;
+		case 2:
+			mScene = new TrafficRoadCapabilityGraphicsScene;
+			((TrafficRoadCapabilityGraphicsScene*)mScene)->setCapabilityType(TrafficRoadCapabilityGraphicsScene::NonMotorCapability);
+			mScene->setTitle(QStringLiteral("非机动车路段交通负荷分布"));
+			break;
+		case 3:
+			mScene = new TrafficNodeCapabilityGraphicsScene;
+			((TrafficNodeCapabilityGraphicsScene*)mScene)->setCapabilityType(TrafficNodeCapabilityGraphicsScene::MotorCapability);
+			mScene->setTitle(QStringLiteral("机动车交叉口交通负荷分布"));
+			break;
+		case 4:
+			mScene = new SpeedGraphicsScene;
+			mScene->setTitle(QStringLiteral("机动车路段平均车速分布"));
+			break;
+		default:
+			break;
+		}
 		break;
 	default:
 		break;

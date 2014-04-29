@@ -4,6 +4,8 @@
 
 class RoadPermission;
 class TrafficVolume;
+class Capability;
+class Speed;
 
 /*
 用于存放与边有关的数据, 诟病与Node相同
@@ -38,6 +40,8 @@ public:
 	RoadPermission* trafficForbid() const;
 	RoadPermission* trafficNumLimit() const;
 	TrafficVolume* trafficVolume() const;
+	Capability* trafficCapability() const;
+	Speed* speed() const;
 
 	// set
 	Edge & setSourceNode(Node *);
@@ -57,6 +61,8 @@ public:
 	Edge & setTrafficForbid(RoadPermission*);
 	Edge & setTrafficNumLimit(RoadPermission*);
 	Edge & setTrafficVolume(TrafficVolume*);
+	Edge & setTrafficCapability(Capability*);
+	Edge & setSpeed(Speed*);
 	void addBus();
 
 private:
@@ -79,5 +85,7 @@ private:
 	RoadPermission* mTrafficForbid;
 	RoadPermission* mTrafficNumLimit;
 	TrafficVolume* mVolume;
+	Capability* mCapability;
+	Speed* mSpeed;
 };
 

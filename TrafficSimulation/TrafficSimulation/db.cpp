@@ -70,10 +70,10 @@ const QString DB::sNodeMotorbikeVolumeFileName = "node-v.mot";
 const QString DB::sNodeTaxiVolumeFileName = "node-v.tax";
 const QString DB::sNodeTruckVolumeFileName = "node-v.trk";
 ///// ½»Í¨³ÐÔØÁ¿
-const QString DB::sNodeMotorCapabilityFileName = "link-vc.veh";
-const QString DB::sNodeNonMotorCapabilityFileName = "link-vc.bic";
-const QString DB::sRoadMotorCapabilityFileName = "node-vc.veh";
-const QString DB::sRoadNonMotorCapabilityFileName = "node-vc.bic";
+const QString DB::sNodeMotorCapabilityFileName = "node-vc.veh";
+const QString DB::sNodeNonMotorCapabilityFileName = "node-vc.bic";
+const QString DB::sRoadMotorCapabilityFileName = "link-vc.veh";
+const QString DB::sRoadNonMotorCapabilityFileName = "link-vc.bic";
 const QString DB::sSpeedFileName = "speed.veh";
 
 const QString DB::sRoadMotorVolumeFileName = "link-v.veh";
@@ -254,6 +254,9 @@ void DB::createTablesAndFetchData()
 		createBusTable(query);
 		createNodeVolumeTable(query);
 		createRoadVolumeTable(query);
+		createNodeCapabilityTable(query);
+		createRoadCapabilityTable(query);
+		createSpeedTable(query);
 
 		fetchDataFromCoorFile(query);
 		fetchDataFromSectionFile(query);
@@ -272,6 +275,16 @@ void DB::createTablesAndFetchData()
 		fetchDataFromNodeCapabilityFile(query);
 		fetchDataFromRoadCapabilityFile(query);
 		fetchDataFromSpeedFile(query);
+	}
+	catch(PathNotExistsException&e){
+		db.rollback();
+		db.close();
+		throw e;
+	}
+	catch(CommonException&e){
+		db.rollback();
+		db.close();
+		throw e;
 	}
 	catch (QException& e)
 	{
@@ -1368,9 +1381,9 @@ void DB::createSpeedTable(QSqlQuery & query)
 
 void DB::fetchDataFromNodeCapabilityFile(QSqlQuery & query)
 {
-	if(mFileDir->exists(sNodeMotorCapabilityFileName))
+	if(!mFileDir->exists(sNodeMotorCapabilityFileName))
 		throw PathNotExistsException(sNodeMotorCapabilityFileName+" does not exist!");
-	if(mFileDir->exists(sNodeNonMotorCapabilityFileName))
+	if(!mFileDir->exists(sNodeNonMotorCapabilityFileName))
 		throw PathNotExistsException(sNodeNonMotorCapabilityFileName+" does not exist!");
 	QFile fileMotor(mFileDir->absoluteFilePath(sNodeMotorCapabilityFileName));
 	QFile fileNonMotor(mFileDir->absoluteFilePath(sNodeNonMotorCapabilityFileName));
@@ -1415,9 +1428,9 @@ void DB::fetchDataFromNodeCapabilityFile(QSqlQuery & query)
 
 void DB::fetchDataFromRoadCapabilityFile(QSqlQuery & query)
 {
-	if(mFileDir->exists(sRoadMotorCapabilityFileName))
+	if(!mFileDir->exists(sRoadMotorCapabilityFileName))
 		throw PathNotExistsException(sRoadMotorCapabilityFileName+" does not exist!");
-	if(mFileDir->exists(sRoadNonMotorCapabilityFileName))
+	if(!mFileDir->exists(sRoadNonMotorCapabilityFileName))
 		throw PathNotExistsException(sRoadNonMotorCapabilityFileName+" does not exist!");
 	QFile fileMotor(mFileDir->absoluteFilePath(sRoadMotorCapabilityFileName));
 	QFile fileNonMotor(mFileDir->absoluteFilePath(sRoadNonMotorCapabilityFileName));
@@ -1461,7 +1474,7 @@ void DB::fetchDataFromRoadCapabilityFile(QSqlQuery & query)
 
 void DB::fetchDataFromSpeedFile(QSqlQuery & query)
 {
-	if(mFileDir->exists(sSpeedFileName))
+	if(!mFileDir->exists(sSpeedFileName))
 		throw PathNotExistsException(sSpeedFileName+" does not exist!");
 	QFile fileSpeed(mFileDir->absoluteFilePath(sSpeedFileName));
 	if(!fileSpeed.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -1475,18 +1488,18 @@ void DB::fetchDataFromSpeedFile(QSqlQuery & query)
 	query.prepare(sql);
 	while (!streamSpeed.atEnd())
 	{
-		QVariantList node_ids,speeds;
+		QVariantList road_ids,speeds;
 		int i=0;
 		while (!streamSpeed.atEnd() && i<NUM_ONCE)
 		{
 			streamSpeed >> speed;
 			if(streamSpeed.status())
 				break;
-			node_ids << num;
+			road_ids << num;
 			speeds << speed;
 			++i; ++num;
 		}
-		query.bindValue(0, node_ids);
+		query.bindValue(0, road_ids);
 		query.bindValue(1, speeds);
 		if(!query.execBatch()){
 			QString str = query.lastError().text();

@@ -7,6 +7,7 @@
 #include "Normal.h"
 
 class TrafficVolume;
+class Capability;
 
 class Positionable{
 public:
@@ -39,6 +40,8 @@ public:
 	bool inScale() const;
 	bool haveTurnRestrict() const;
 	TrafficVolume* trafficVolume() const;
+	Capability* trafficCapability() const;
+
 	// set
 	Node& setCoor(QPointF);
 	Node& setNo(int);
@@ -48,6 +51,7 @@ public:
 	Node& setId(int);
 	Node& setHaveTurnRestrict(bool);
 	Node& setTrafficVolume(TrafficVolume*);
+	Node& setTrafficCapability(Capability*);
 
 	// 计算和其他node距离
 	qreal dis(Node*)const;
@@ -63,6 +67,7 @@ private:
 	bool mInScale; // 是否在范围内
 	bool mHaveTurnRestrict;
 	TrafficVolume* mVolume; // 交通量
+	Capability* mCapability; // 交通承载量
 };
 
 
