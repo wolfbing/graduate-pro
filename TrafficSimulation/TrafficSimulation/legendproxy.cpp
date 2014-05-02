@@ -1,10 +1,12 @@
 #include "legendproxy.h"
 #include <QGraphicsScene>
 #include <QPainter>
+#include "legend.h"
 
 LegendProxy::LegendProxy(QWidget *widget)
 	: QGraphicsProxyWidget(0, Qt::Window)
 	, mPosInitialized(false)
+	, mLegendWidget((Legend*)widget)
 {
 	setWidget(widget);
 	setZValue(1E10);
@@ -48,6 +50,17 @@ void LegendProxy::showEvent( QShowEvent *event )
 	}
 	QGraphicsProxyWidget::showEvent(event);
 	
+}
+
+
+void LegendProxy::updateAttr(QList<QColor> colorList, QList<qreal> widthList)
+{
+	mLegendWidget->updateAttr(colorList, widthList);
+}
+
+void LegendProxy::updateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QList<qreal> sizeList)
+{
+	mLegendWidget->updateAttr(colorList1, colorList2, sizeList);
 }
 
 

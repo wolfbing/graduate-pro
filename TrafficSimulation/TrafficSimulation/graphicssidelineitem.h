@@ -37,6 +37,8 @@ public:
 	GraphicsSideLineItem & setGraphType(GraphType);
 
 	void advance();
+	Edge* edgeData() const;
+	void updateAttr(QColor, qreal);
 
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */);

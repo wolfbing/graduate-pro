@@ -44,6 +44,8 @@ public:
 	QColor innerColor() const;
 	Node * nodeData() const;
 
+	void updateAttr(QColor innerColor, QColor borderColor, qreal radius, bool haveBorder);
+
 signals:
 
 

@@ -30,6 +30,8 @@ public:
 	QColor innerColor() const;
 	QColor borderColor() const;
 
+	void updateAttr(QColor innerColor, QColor borderColor, qreal width, bool haveBorder);
+
 private:
 	void init();
 

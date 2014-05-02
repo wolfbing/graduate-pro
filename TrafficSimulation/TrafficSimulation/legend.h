@@ -9,6 +9,8 @@
 
 #include "legendelement.h"
 
+class QGridLayout;
+
 /*
 * 输入图例内容的name type color等信息, Legend类会根据相应的类型进行绘制
 */
@@ -19,6 +21,8 @@ public:
     explicit Legend(QList<LegendElement> elements, QWidget *parent=0);
     Legend* setElements(QList<LegendElement> elelist);
 	void draw();
+	void updateAttr(QList<QColor>, QList<qreal>);
+	void updateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QList<qreal> sizeList);
 
 signals:
 	void posChange(QString);
@@ -29,7 +33,7 @@ protected:
 	void paintEvent(QPaintEvent *);
 
 private:
-
+	QGridLayout* mLayout;
     QList<LegendElement> mElements;
 	bool mFirstShow;
 };

@@ -18,6 +18,7 @@ Legend::Legend(QList<LegendElement> elements, QWidget *parent) :
     QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint)
 	,mElements(elements)
 	, mFirstShow(true)
+	, mLayout(0)
 {
     this->setWindowTitle(tr("legend"));
     this->setWindowOpacity(0.75);
@@ -36,18 +37,18 @@ Legend *Legend::setElements(QList<LegendElement> elelist)
 }
 
 void Legend::draw(){
-	QGridLayout* layout = new QGridLayout;
-	this->setLayout(layout);
+	mLayout = new QGridLayout;
+	this->setLayout(mLayout);
 	for(int i=0; i<mElements.size(); ++i){
 		LegendElement element = mElements.at(i);
-		int rowNum = layout->rowCount();
+		int rowNum = mLayout->rowCount();
 		if(element.type() == LegendElement::DOT ){
 			QLabel* label = new QLabel(element.name());
 			DotWidget* dotWidget = new DotWidget;
 			dotWidget->setColor(element.color1());
 			dotWidget->setRadius(element.size());
-			layout->addWidget(label, rowNum, 0);
-			layout->addWidget(dotWidget, rowNum, 1);
+			mLayout->addWidget(label, rowNum, 0);
+			mLayout->addWidget(dotWidget, rowNum, 1);
 			
 		}
 		if(element.type() == LegendElement::LINE){
@@ -55,24 +56,24 @@ void Legend::draw(){
 			LineWidget* lineWidget = new LineWidget;
 			lineWidget->setColor(element.color1());
 			lineWidget->setWidth(element.size());
-			layout->addWidget(label, rowNum, 0);
-			layout->addWidget(lineWidget,rowNum,1);
+			mLayout->addWidget(label, rowNum, 0);
+			mLayout->addWidget(lineWidget,rowNum,1);
 		}
 		if (element.type() == LegendElement::THICK_LINE)
 		{
 			QLabel* label = new QLabel(element.name());
 			ThickLineWidget* tLineWidget = new ThickLineWidget(
 				element.size(), element.color1(),element.color2());
-			layout->addWidget(label,rowNum, 0);
-			layout->addWidget(tLineWidget, rowNum,1);
+			mLayout->addWidget(label,rowNum, 0);
+			mLayout->addWidget(tLineWidget, rowNum,1);
 		}
 		if (element.type() == LegendElement::THICK_DOT)
 		{
 			QLabel* label = new QLabel(element.name());
 			ThickDotWidget* tDotWidget = new ThickDotWidget(
 				element.size(), element.color1(),element.color2());
-			layout->addWidget(label,rowNum,0);
-			layout->addWidget(tDotWidget,rowNum,1);
+			mLayout->addWidget(label,rowNum,0);
+			mLayout->addWidget(tDotWidget,rowNum,1);
 		}
 	}
 	
@@ -83,6 +84,29 @@ void Legend::paintEvent( QPaintEvent * event )
 {
 	QDialog::paintEvent(event);
 
+}
+
+void Legend::updateAttr(QList<QColor> colorList, QList<qreal> widthList)
+{
+	for (int i=0; i<mElements.size(); ++i)
+	{
+		mElements[i].setElementColor1(colorList[i]);
+		mElements[i].setElementSize(widthList[i]);
+	}
+	delete mLayout;
+	draw();
+}
+
+void Legend::updateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QList<qreal> sizeList)
+{
+	for (int i=0; i<mElements.size(); ++i)
+	{
+		mElements[i].setElementColor1(colorList1[i]);
+		mElements[i].setElementColor2(colorList2[i]);
+		mElements[i].setElementSize(sizeList[i]);
+	}
+	delete mLayout;
+	draw();
 }
 
 

@@ -1,12 +1,12 @@
 #ifndef TRAFFICROADCAPABILITYGRAPHICSSCENE_H
 #define TRAFFICROADCAPABILITYGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "roadgraphicsscene.h"
 
 class GraphicsSideLineItem;
 
 
-class TrafficRoadCapabilityGraphicsScene : public GraphicsScene
+class TrafficRoadCapabilityGraphicsScene : public RoadGraphicsScene
 {
 	Q_OBJECT
 
@@ -20,18 +20,13 @@ public:
 	};
 	TrafficRoadCapabilityGraphicsScene& setCapabilityType(CapabilityType);
 	void addItems();
+	void updateItemsAttr();
 
 protected:
 	void init();
 	void addLegend();
-	void updateItems();
 
 private:
-	QList<GraphicsSideLineItem*> mSideLineItemList;
-	// ªÊ÷∆ Ù–‘
-	QList<QColor> mColorList;
-	QList<qreal> mWidthList;
-	QList<qreal> mZValueList;
 	/// type
 	CapabilityType mCapabilityType;
 

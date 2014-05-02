@@ -9,12 +9,14 @@ class LineWidget : public QWidget
     Q_OBJECT
 public:
     explicit LineWidget(QWidget *parent = 0);
-    LineWidget* setWidth(int width);
+    LineWidget* setWidth(qreal width);
     LineWidget* setColor(QColor color);
 
 signals:
 
 public slots:
+	void changeColor(QColor);
+	void changeWidth(qreal);
 
 protected:
     void paintEvent(QPaintEvent* event);
@@ -24,7 +26,7 @@ public:
 
 private:
     QColor mColor;
-    float mWidth;
+    qreal mWidth;
 
 
 

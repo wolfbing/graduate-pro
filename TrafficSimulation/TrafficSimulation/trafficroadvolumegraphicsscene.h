@@ -1,11 +1,11 @@
 #ifndef TRAFFICVOLUMEGRAPHICSSCENE_H
 #define TRAFFICVOLUMEGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "roadgraphicsscene.h"
 
 class GraphicsSideLineItem;
 
-class TrafficRoadVolumeGraphicsScene : public GraphicsScene
+class TrafficRoadVolumeGraphicsScene : public RoadGraphicsScene
 {
 	Q_OBJECT
 
@@ -24,14 +24,9 @@ public:
 protected:
 	void init();
 	void addLegend();
-	void updateItems();
+	void updateItemsAttr();
 
 private:
-	QList<GraphicsSideLineItem*> mSideLineItemList;
-	// ªÊ÷∆ Ù–‘
-	QList<QColor> mColorList;
-	QList<qreal> mWidthList;
-	QList<qreal> mZValueList;
 	/// type
 	VolumeType mVolumeType;
 };

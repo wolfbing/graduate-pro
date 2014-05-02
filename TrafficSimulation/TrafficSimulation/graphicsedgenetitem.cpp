@@ -136,3 +136,12 @@ void GraphicsEdgeNetItem::addEdgeData( Edge* edgeData )
 {
 	mEdgeDataList << edgeData;
 }
+
+void GraphicsEdgeNetItem::updateAttr(QColor innerColor, QColor borderColor, qreal width, bool haveBorder)
+{
+	mInnerColor = innerColor;
+	mBorderColor = borderColor;
+	mEdgeWidth = width;
+	mHaveBorder = haveBorder;
+	update();
+}

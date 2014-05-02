@@ -181,3 +181,15 @@ GraphicsSideLineItem & GraphicsSideLineItem::setGraphType(GraphType type)
 	mGraphType = type;
 	return *this;
 }
+
+Edge* GraphicsSideLineItem::edgeData() const
+{
+	return mEdgeData;
+}
+
+void GraphicsSideLineItem::updateAttr(QColor color, qreal width)
+{
+	mColor = color;
+	mWidth = width;
+	update();
+}
