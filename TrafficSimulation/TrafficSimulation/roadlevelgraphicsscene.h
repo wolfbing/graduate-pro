@@ -1,13 +1,13 @@
 #ifndef ROADLEVELGRAPHICSSCENE_H
 #define ROADLEVELGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "roadgraphicsscene.h"
 
 class Edge;
 class GraphicsEdgeItem;
 class GraphicsEdgeNetItem;
 
-class RoadLevelGraphicsScene :public GraphicsScene
+class RoadLevelGraphicsScene :public RoadGraphicsScene
 {
 	Q_OBJECT
 
@@ -18,23 +18,11 @@ public:
 	void addItems();
 
 private:
-	void updateItems();
-	void doSomething(){};
 	void init();
 	void addLegend();
+	void updateItemsAttr();
 	
 private:
-	
-	QList<GraphicsEdgeItem*> mEdgeList;
-	QList<GraphicsEdgeNetItem*> mEdgeNetList;
-
-	// 各种路的颜色和宽度
-	// 几个list都严格按照道路等级的顺序
-	QList<bool> mHaveBorderList;
-	QList<QColor> mInnerColorList;
-	QList<QColor> mBorderColorList;
-	QList<qreal> mWidthList;
-	QList<qreal> mZValueList;
 
 };
 

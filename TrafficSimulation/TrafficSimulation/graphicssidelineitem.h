@@ -22,7 +22,7 @@ public:
 	// graph type
 	enum GraphType
 	{
-		RoadTypeGraph, TrafficTypeGraph,
+		RoadTypeGraph, TrafficTypeGraph, BusNumGraph, RoadLevelGraph,
 		BikeForbidGraph, CarForbidGraph, MotorForbidGraph,  // 禁行类型图
 		BusForbidGraph, TaxiForbidGraph, TruckForbidGraph,  // 禁行类型图
 		CarLimitGraph, TaxiLimitGraph, TruckLimitGraph, MotorLimitGraph,  // 限号通行类型图

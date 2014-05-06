@@ -4,6 +4,7 @@
 #include <QGraphicsProxyWidget>
 
 class Legend;
+class LegendElement;
 
 class LegendProxy : public QGraphicsProxyWidget
 {
@@ -15,6 +16,10 @@ public:
 
 	void updateAttr(QList<QColor>, QList<qreal>);
 	void updateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QList<qreal> sizeList);
+	void setElements(QList<LegendElement>);
+	void updateLegend();
+	void newUpdateAttr(QList<QColor>, QList<qreal>);
+	void newUpdateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QList<qreal> sizeList);
 
 protected:
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
@@ -23,6 +28,7 @@ protected:
 private:
 	bool mPosInitialized;
 	Legend* mLegendWidget;
+	QList<LegendElement> mElements;
 	
 };
 

@@ -23,6 +23,7 @@ public:
 	void draw();
 	void updateAttr(QList<QColor>, QList<qreal>);
 	void updateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QList<qreal> sizeList);
+	QList<LegendElement> elements() const;
 
 signals:
 	void posChange(QString);
@@ -35,6 +36,7 @@ protected:
 private:
 	QGridLayout* mLayout;
     QList<LegendElement> mElements;
+	QList<QWidget*> mWidgetList;
 	bool mFirstShow;
 };
 

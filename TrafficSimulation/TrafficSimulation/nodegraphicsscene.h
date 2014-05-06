@@ -1,7 +1,7 @@
 #ifndef NODEGRAPHICSSCENE_H
 #define NODEGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "commonnodegraphicsscene.h"
 #include "node.h"
 #include "DbAdapter.h"
 #include <QGraphicsEllipseItem>
@@ -10,7 +10,7 @@
 #include "graphicsedgenetitem.h"
 #include "graphicsnodenotextitem.h"
 
-class NodeGraphicsScene : public GraphicsScene
+class NodeGraphicsScene : public CommonNodeGraphicsScene
 {
 	Q_OBJECT
 
@@ -24,24 +24,15 @@ private:
 	void updateItems();
 	void doSomething();
 	void checkNoTextVisible();
+	void updateItemsAttr();
+
 
 	void init();
 	void addLegend();
 
 private:	
-	QList<GraphicsNodeItem*> mNodes;
-	GraphicsEdgeNetItem* mEdgeNet;	
 	QList<GraphicsNodeNoTextItem*> mNodeNoTextItemList;
 
-	// ªÊÕº Ù–‘
-	qreal mNodeRadius;
-	QColor mNodeInnerColor;
-	QColor mNodeBorderColor;
-	qreal mEdgeNetWidth;
-	QColor mEdgeNetInnerColor;
-	QColor mEdgeNetBorderColor;
-	bool mNodeHaveBorder;
-	bool mEdgeNetHaveBorder;
 
 };
 

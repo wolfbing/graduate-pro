@@ -325,6 +325,7 @@ void WinOfGraphicsView::changeScene( int index1, int index2 )
 		case 3:
 			mScene = new TrafficManageGraphicsScene;
 			mScene->setTitle(QStringLiteral("道路交通管理"));
+			break;
 		case 4:
 			mScene = new TrafficForbidGraphicsScene;
 			((TrafficForbidGraphicsScene*) mScene)->setForbidType(TrafficForbidGraphicsScene::BikeForbid);

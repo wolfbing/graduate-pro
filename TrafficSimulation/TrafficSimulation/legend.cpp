@@ -12,6 +12,7 @@
 #include <QtWidgets\qgridlayout.h>
 #include <QMoveEvent>
 #include <QPalette>
+#include <QDebug>
 
 
 Legend::Legend(QList<LegendElement> elements, QWidget *parent) :
@@ -37,7 +38,8 @@ Legend *Legend::setElements(QList<LegendElement> elelist)
 }
 
 void Legend::draw(){
-	mLayout = new QGridLayout;
+	if(!mLayout)
+		mLayout = new QGridLayout;
 	this->setLayout(mLayout);
 	for(int i=0; i<mElements.size(); ++i){
 		LegendElement element = mElements.at(i);
@@ -49,6 +51,7 @@ void Legend::draw(){
 			dotWidget->setRadius(element.size());
 			mLayout->addWidget(label, rowNum, 0);
 			mLayout->addWidget(dotWidget, rowNum, 1);
+			mWidgetList << dotWidget << label;
 			
 		}
 		if(element.type() == LegendElement::LINE){
@@ -58,6 +61,7 @@ void Legend::draw(){
 			lineWidget->setWidth(element.size());
 			mLayout->addWidget(label, rowNum, 0);
 			mLayout->addWidget(lineWidget,rowNum,1);
+			mWidgetList << label << lineWidget;
 		}
 		if (element.type() == LegendElement::THICK_LINE)
 		{
@@ -66,6 +70,7 @@ void Legend::draw(){
 				element.size(), element.color1(),element.color2());
 			mLayout->addWidget(label,rowNum, 0);
 			mLayout->addWidget(tLineWidget, rowNum,1);
+			mWidgetList << label << tLineWidget;
 		}
 		if (element.type() == LegendElement::THICK_DOT)
 		{
@@ -74,8 +79,10 @@ void Legend::draw(){
 				element.size(), element.color1(),element.color2());
 			mLayout->addWidget(label,rowNum,0);
 			mLayout->addWidget(tDotWidget,rowNum,1);
+			mWidgetList << label << tDotWidget;
 		}
 	}
+	update();
 	
 }
 
@@ -93,7 +100,14 @@ void Legend::updateAttr(QList<QColor> colorList, QList<qreal> widthList)
 		mElements[i].setElementColor1(colorList[i]);
 		mElements[i].setElementSize(widthList[i]);
 	}
-	delete mLayout;
+	for (int i=0; i<mWidgetList.size(); ++i)
+	{
+		mLayout->removeWidget(mWidgetList[i]);
+	}
+	while (mWidgetList.size()>0)
+	{
+		delete mWidgetList.takeLast();
+	}
 	draw();
 }
 
@@ -105,8 +119,20 @@ void Legend::updateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QLis
 		mElements[i].setElementColor2(colorList2[i]);
 		mElements[i].setElementSize(sizeList[i]);
 	}
-	delete mLayout;
+	for (int i=0; i<mWidgetList.size(); ++i)
+	{
+		mLayout->removeWidget(mWidgetList[i]);
+	}
+	while (mWidgetList.size()>0)
+	{
+		delete mWidgetList.takeLast();
+	}
 	draw();
+}
+
+QList<LegendElement> Legend::elements() const
+{
+	return mElements;
 }
 
 

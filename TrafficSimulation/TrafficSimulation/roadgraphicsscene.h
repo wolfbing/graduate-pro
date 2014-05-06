@@ -6,6 +6,7 @@
 class GraphicsSideLineItem;
 class RoadGraphicsConfigDialog;
 class LegendProxy;
+class Legend;
 
 class RoadGraphicsScene : public GraphicsScene
 {
@@ -40,6 +41,7 @@ protected:
 	RoadGraphicsConfigDialog* mConfigDialog;
 	// Í¼Àý
 	LegendProxy* mLegendProxy;
+	Legend* mLegend;
 
 	
 };

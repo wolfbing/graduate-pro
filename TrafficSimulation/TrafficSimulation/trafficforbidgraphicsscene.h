@@ -1,12 +1,12 @@
 #ifndef TRAFFICFORBIDGRAPHICSSCENE_H
 #define TRAFFICFORBIDGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "roadgraphicsscene.h"
 
 class GraphicsSideLineItem;
 
 
-class TrafficForbidGraphicsScene : public GraphicsScene
+class TrafficForbidGraphicsScene : public RoadGraphicsScene
 {
 	Q_OBJECT
 
@@ -26,15 +26,9 @@ public:
 protected:
 	void init();
 	void addLegend();
-	void updateItems();
-	void doSomething();
+	void updateItemsAttr();
 
 private:
-	QList<GraphicsSideLineItem*> mSideLineItemList;
-	// 绘制属性
-	QList<QColor> mColorList;
-	QList<qreal> mWidthList;
-	QList<qreal> mZValueList;
 	// scene的类型，bike、car......
 	ForbidType mForbidType;
 	
