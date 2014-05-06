@@ -9,8 +9,14 @@ class ThickLineWidget : public QWidget
 
 public:
 	ThickLineWidget(QWidget *parent = 0);
-	ThickLineWidget(double width, QColor color, QColor outColor, QWidget* parent=0);
+	ThickLineWidget(double width, QColor color, QColor outColor, bool have=true, QWidget* parent=0);
 	~ThickLineWidget();
+
+public slots:
+	void changeInnerColor(QColor);
+	void changeBorderColor(QColor);
+	void changeSize(qreal);
+	void changeHaveBorder(int);
 
 protected:
 	void paintEvent(QPaintEvent * event);
@@ -19,6 +25,7 @@ private:
 	QColor mColor;
 	QColor mOutColor;
 	double mWidth; // Íâ²àÏß¿í, ÄÚ²à-2
+	bool mHaveBorder;
 
 };
 

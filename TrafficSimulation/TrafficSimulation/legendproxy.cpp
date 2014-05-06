@@ -1,14 +1,19 @@
 #include "legendproxy.h"
 #include <QGraphicsScene>
 #include <QPainter>
+#include "legend.h"
+#include "legendelement.h"
 
 LegendProxy::LegendProxy(QWidget *widget)
 	: QGraphicsProxyWidget(0, Qt::Window)
 	, mPosInitialized(false)
+	, mLegendWidget((Legend*)widget)
 {
 	setWidget(widget);
 	setZValue(1E10);
 	//setCacheMode(QGraphicsItem::ItemCoordinateCache);
+	setCacheMode(QGraphicsItem::NoCache);
+	//mElements = mLegendWidget->elements();
 }
 
 LegendProxy::~LegendProxy()
@@ -48,6 +53,50 @@ void LegendProxy::showEvent( QShowEvent *event )
 	}
 	QGraphicsProxyWidget::showEvent(event);
 	
+}
+
+
+void LegendProxy::updateAttr(QList<QColor> colorList, QList<qreal> widthList)
+{
+	mLegendWidget->updateAttr(colorList, widthList);
+}
+
+void LegendProxy::updateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QList<qreal> sizeList)
+{
+	mLegendWidget->updateAttr(colorList1, colorList2, sizeList);
+}
+
+void LegendProxy::setElements(QList<LegendElement> li)
+{
+	mElements = li;
+}
+
+void LegendProxy::updateLegend()
+{
+	//delete mLegendWidget;
+	mLegendWidget = new Legend(mElements);
+	setWidget(mLegendWidget);
+}
+
+void LegendProxy::newUpdateAttr(QList<QColor> colors, QList<qreal> widths)
+{
+	for (int i=0; i<mElements.size(); ++i)
+	{
+		mElements[i].setElementColor1(colors[i]);
+		mElements[i].setElementSize(widths[i]);
+	}
+	updateLegend();
+}
+
+void LegendProxy::newUpdateAttr(QList<QColor> colorList1, QList<QColor> colorList2, QList<qreal> sizeList)
+{
+	for (int i=0; i<mElements.size(); ++i)
+	{
+		mElements[i].setElementColor1(colorList1[i]);
+		mElements[i].setElementColor2(colorList2[i]);
+		mElements[i].setElementSize(sizeList[i]);
+	}
+	updateLegend();
 }
 
 

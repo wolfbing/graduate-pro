@@ -22,7 +22,7 @@ public:
 	// graph type
 	enum GraphType
 	{
-		RoadTypeGraph, TrafficTypeGraph,
+		RoadTypeGraph, TrafficTypeGraph, BusNumGraph, RoadLevelGraph,
 		BikeForbidGraph, CarForbidGraph, MotorForbidGraph,  // 禁行类型图
 		BusForbidGraph, TaxiForbidGraph, TruckForbidGraph,  // 禁行类型图
 		CarLimitGraph, TaxiLimitGraph, TruckLimitGraph, MotorLimitGraph,  // 限号通行类型图
@@ -37,6 +37,8 @@ public:
 	GraphicsSideLineItem & setGraphType(GraphType);
 
 	void advance();
+	Edge* edgeData() const;
+	void updateAttr(QColor, qreal);
 
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */);

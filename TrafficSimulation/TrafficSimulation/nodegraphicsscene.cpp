@@ -8,15 +8,12 @@
 #include "legendproxy.h"
 
 NodeGraphicsScene::NodeGraphicsScene(QObject *parent)
-	: GraphicsScene(parent)
+	: CommonNodeGraphicsScene(parent)
 {		
 
 	init();
-
 	addLegend();
 	
-	
-
 }
 
 NodeGraphicsScene::~NodeGraphicsScene()
@@ -27,14 +24,14 @@ NodeGraphicsScene::~NodeGraphicsScene()
 void NodeGraphicsScene::updateItems()
 {
 	GraphicsScene::updateItems();
-	QListIterator<GraphicsNodeItem*> ite(mNodes);
+	QListIterator<GraphicsNodeItem*> ite(mNodeItemList);
 	GraphicsNodeItem* item;
 	while (ite.hasNext())
 	{
 		item = ite.next();
 		item->setPos(item->nodeData()->sceneCoor());
 	}
-	mEdgeNet->advance();
+	mEdgeNetItem->advance();
 	checkNoTextVisible();
 }
 
@@ -68,13 +65,13 @@ void NodeGraphicsScene::addItems()
 	{
 		tmpNodeData = nodeIte.next();
 		nodeItem = new GraphicsNodeItem;
-		nodeItem->setNodeData(tmpNodeData).setInnerColor(mNodeInnerColor).setBorderColor(mNodeBorderColor)
-			.setHaveBorder(mNodeHaveBorder).setRadius(mNodeRadius);
+		nodeItem->setNodeData(tmpNodeData).setInnerColor(mInnerColorList.at(0)).setBorderColor(mBorderColorList.at(0))
+			.setHaveBorder(mHaveBorderList.at(0)).setRadius(mSizeList.at(0));
 		nodeNoTextItem = new GraphicsNodeNoTextItem(nodeItem);
 		nodeNoTextItem->setNodeData(tmpNodeData);
 		connect(nodeItem, SIGNAL(sendTmpInfoToStatus(QString)), this, SIGNAL(sendMsgToStatus(QString)) );
 		connect(nodeItem, SIGNAL(clearTmpInfoFromStatus()), this, SIGNAL(clearMsgFromStatus() ) );
-		mNodes << nodeItem;
+		mNodeItemList << nodeItem;
 		mNodeNoTextItemList << nodeNoTextItem;
 		addItem(nodeItem);
 		addItem(nodeNoTextItem);
@@ -82,16 +79,16 @@ void NodeGraphicsScene::addItems()
 	} ////  添加节点和编号完成
 	///// 添加edgenet
 	Edge * tmpEdgeData;
-	mEdgeNet = new GraphicsEdgeNetItem;
-	mEdgeNet->setHaveBorder(mEdgeNetHaveBorder).setBorderColor(mEdgeNetBorderColor).setInnerColor(mEdgeNetInnerColor)
-		.setWidth(mEdgeNetWidth);
+	mEdgeNetItem = new GraphicsEdgeNetItem;
+	mEdgeNetItem->setHaveBorder(mHaveBorderList.last()).setBorderColor(mBorderColorList.last()).setInnerColor(mInnerColorList.last())
+		.setWidth(mSizeList.last());
 	QListIterator<Edge*> edgeIte(mEdgeDataList);
 	Node * tmpNode1, *tmpNode2;
 	GraphicsNodeNoTextItem * tmpNodeNoTextItem1, *tmpNodeNoTextItem2;
 	while (edgeIte.hasNext())
 	{
 		tmpEdgeData = edgeIte.next();
-		mEdgeNet->addEdgeData(tmpEdgeData);
+		mEdgeNetItem->addEdgeData(tmpEdgeData);
 		tmpNode1 = tmpEdgeData->sourceNode();
 		tmpNode2 = tmpEdgeData->destNode();
 		tmpNodeNoTextItem1 = nodeNoTextHash.value(tmpNode1);
@@ -100,34 +97,49 @@ void NodeGraphicsScene::addItems()
 		tmpNodeNoTextItem2->updateNeighbour(tmpNodeNoTextItem1);
 
 	}
-	addItem(mEdgeNet);  ////////// 添加edgenet完成
+	addItem(mEdgeNetItem);  ////////// 添加edgenet完成
 
 }
 
 
 void NodeGraphicsScene::init()
 {
-	mNodeRadius = 4.0;
-	mNodeBorderColor = QColor(38,0,0);
-	mNodeInnerColor = QColor(178,73,77);
-	mNodeHaveBorder = true;
+	mSizeList << 4.0 << 4.0;
+	mInnerColorList <<  QColor(178,73,77) << QColor(253,206,102);
+	mBorderColorList << QColor(38,0,0) << QColor(203,168,87);
+	mHaveBorderList << true << true;
+	mLabelTextList << QStringLiteral("节点") << QStringLiteral("路段");
 
-	mEdgeNetHaveBorder = true;
-	mEdgeNetBorderColor = QColor(203,168,87);
-	mEdgeNetInnerColor = QColor(253,206,102);
-	mEdgeNetWidth = 4.0;
 }
 
 void NodeGraphicsScene::addLegend()
 {
 	// 添加图例
 	QList<LegendElement> legendList;
-	legendList << LegendElement(QStringLiteral("节点"), LegendElement::THICK_DOT, mNodeRadius, 
-		mNodeInnerColor, mNodeBorderColor );
-	legendList << LegendElement(QStringLiteral("路段"), LegendElement::THICK_LINE, mEdgeNetWidth,
-		mEdgeNetInnerColor, mEdgeNetBorderColor );
-	Legend * legend = new Legend(legendList);
-	LegendProxy* proxy = new LegendProxy(legend);
-	addItem(proxy);
+	legendList << LegendElement(mLabelTextList.at(0), LegendElement::THICK_DOT, mSizeList.at(0), 
+		mInnerColorList.at(0), mBorderColorList.at(0) );
+	legendList << LegendElement(mLabelTextList.at(1), LegendElement::THICK_LINE, mSizeList.at(1),
+		mInnerColorList.at(1), mBorderColorList.at(1) );
+	mLegend = new Legend(legendList);
+	mLegendProxy = new LegendProxy(mLegend);
+	addItem(mLegendProxy);
+}
+
+void NodeGraphicsScene::updateItemsAttr()
+{
+	QListIterator<GraphicsNodeItem*> nodeIte(mNodeItemList);
+	Node * tmpNodeData;
+	GraphicsNodeItem* nodeItem;
+	int index = 0;
+	while (nodeIte.hasNext())
+	{
+		nodeItem = nodeIte.next();
+		tmpNodeData = nodeItem->nodeData();
+		nodeItem->updateAttr(mInnerColorList.at(index), mBorderColorList.at(index),
+			mSizeList.at(index), mHaveBorderList.at(index));
+	}
+	mEdgeNetItem->updateAttr(mInnerColorList.last(), mBorderColorList.last(), mSizeList.last(), mHaveBorderList.last());
+	mLegend->updateAttr(mInnerColorList, mBorderColorList, mSizeList);
+	//mLegendProxy->newUpdateAttr(mInnerColorList, mBorderColorList, mSizeList);
 }
 

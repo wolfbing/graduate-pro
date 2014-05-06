@@ -11,7 +11,7 @@ LineWidget::LineWidget(QWidget *parent) :
     mColor = QColor(255,0,0);
 }
 
-LineWidget *LineWidget::setWidth(int width)
+LineWidget *LineWidget::setWidth(qreal width)
 {
     mWidth = width;
     return this;
@@ -38,4 +38,16 @@ void LineWidget::paintEvent(QPaintEvent *event)
 QSize LineWidget::sizeHint() const
 {
     return QSize(100,20);
+}
+
+void LineWidget::changeColor(QColor color)
+{
+	mColor = color;
+	update();
+}
+
+void LineWidget::changeWidth(qreal width)
+{
+	mWidth = width;
+	update();
 }

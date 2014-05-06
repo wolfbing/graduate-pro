@@ -7,7 +7,7 @@
 #include "legendproxy.h"
 
 TrafficRoadVolumeGraphicsScene::TrafficRoadVolumeGraphicsScene(QObject *parent)
-	: GraphicsScene(parent)
+	: RoadGraphicsScene(parent)
 {
 	init();
 	addLegend();
@@ -24,6 +24,7 @@ void TrafficRoadVolumeGraphicsScene::init()
 		<<  QColor(230,204,58) << QColor(240,129,0) << QColor(223,35,40);
 	mWidthList << 3 << 3 << 3 << 3 << 3 << 3;
 	mZValueList << 1 << 2 << 3 << 4 << 5 << 6;
+	mLabelTextList << "<=100" << "100-200" << "200-500" << "500-1000" << "1000-2000" << ">=2000";
 
 }
 
@@ -37,8 +38,8 @@ void TrafficRoadVolumeGraphicsScene::addLegend()
 	elements << LegendElement("1000-2000", LegendElement::LINE, mWidthList.at(4), mColorList.at(4));
 	elements << LegendElement(">=2000", LegendElement::LINE, mWidthList.at(5), mColorList.at(5));
 	Legend* legend = new Legend(elements);
-	LegendProxy* proxy = new LegendProxy(legend);
-	addItem(proxy);
+	mLegendProxy = new LegendProxy(legend);
+	addItem(mLegendProxy);
 }
 
 void TrafficRoadVolumeGraphicsScene::addItems()
@@ -116,14 +117,57 @@ TrafficRoadVolumeGraphicsScene& TrafficRoadVolumeGraphicsScene::setVolumeType(Vo
 	return *this;
 }
 
-void TrafficRoadVolumeGraphicsScene::updateItems()
+void TrafficRoadVolumeGraphicsScene::updateItemsAttr()
 {
-	GraphicsScene::updateItems();
-	QListIterator<GraphicsSideLineItem*> ite(mSideLineItemList);
 	GraphicsSideLineItem* item;
-	while (ite.hasNext())
-	{
-		item = ite.next();
-		item->advance();
+	QListIterator<GraphicsSideLineItem*> itemIte(mSideLineItemList);
+	qreal volume;
+	int index;
+	Edge* tmpEdgeData;
+	while (itemIte.hasNext()){
+		item = itemIte.next();
+		tmpEdgeData = item->edgeData();
+		switch (mVolumeType)
+		{
+		case TrafficRoadVolumeGraphicsScene::MotorVolume:
+			volume = tmpEdgeData->trafficVolume()->motorVolume();
+			break;
+		case TrafficRoadVolumeGraphicsScene::NonMotorVolume:
+			volume = tmpEdgeData->trafficVolume()->nonMotorVolume();
+			break;
+		case TrafficRoadVolumeGraphicsScene::CarVolume:
+			volume = tmpEdgeData->trafficVolume()->carVolume();
+			break;
+		case TrafficRoadVolumeGraphicsScene::BusVolume:
+			volume = tmpEdgeData->trafficVolume()->busVolume();
+			break;
+		case TrafficRoadVolumeGraphicsScene::MotorbikeVolume:
+			volume = tmpEdgeData->trafficVolume()->motorbikeVolume();
+			break;
+		case TrafficRoadVolumeGraphicsScene::TaxiVolume:
+			volume = tmpEdgeData->trafficVolume()->taxiVolume();
+			break;
+		case TrafficRoadVolumeGraphicsScene::TruckVolume:
+			volume = tmpEdgeData->trafficVolume()->truckVolume();
+			break;
+		default:
+			break;
+		}
+		if(volume<=100)
+			index = 0;
+		else if(volume<=200)
+			index = 1;
+		else if(volume<=500)
+			index = 2;
+		else if(volume<=1000)
+			index = 3;
+		else if(volume<=2000)
+			index = 4;
+		else
+			index = 5;
+		item->updateAttr(mColorList.at(index), mWidthList.at(index));
 	}
+	mLegendProxy->updateAttr(mColorList, mWidthList);
 }
+
+

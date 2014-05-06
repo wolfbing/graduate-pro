@@ -7,7 +7,7 @@
 #include "legendproxy.h"
 
 RoadTypeGraphicsScene::RoadTypeGraphicsScene(QObject *parent)
-	: GraphicsScene(parent)
+	: RoadGraphicsScene(parent)
 {
 	init();
 	addLegend();
@@ -24,6 +24,11 @@ void RoadTypeGraphicsScene::init()
 		<< QColor(223,35,40) << QColor(0,122,204);
 	mWidthList << 3 << 3 << 3 << 3 << 3;
 	mZValueList << 5 << 4 << 3 << 2 << 1;
+	mLabelTextList << QStringLiteral("双向通行道路,\n有中央(物体)分隔")
+		<< QStringLiteral("双向通行道路,\n无中央(物体)分隔")
+		<< QStringLiteral("单向通行道路,\n可通行方向")
+		<< QStringLiteral("单向通行道路,\n不可通行方向")
+		<< QStringLiteral("单向通行道路,\n不可通行方向,\n但公交车辆可通行");
 }
 
 void RoadTypeGraphicsScene::addItems()
@@ -47,32 +52,33 @@ void RoadTypeGraphicsScene::addItems()
 	}
 }
 
-void RoadTypeGraphicsScene::updateItems()
-{
-	GraphicsScene::updateItems();
-	QListIterator<GraphicsSideLineItem*> edgeIte(mSideLineItemList);
-	GraphicsSideLineItem* item;
-	while (edgeIte.hasNext())
-	{
-		item = edgeIte.next();
-		item->advance();
-	}
-}
 
 void RoadTypeGraphicsScene::addLegend()
 {
 	QList<LegendElement> elements;
-	elements << LegendElement(QStringLiteral("双向通行道路,\n有中央(物体)分隔"), LegendElement::LINE, mWidthList.at(0), mColorList.at(0));
-	elements << LegendElement(QStringLiteral("双向通行道路,\n无中央(物体)分隔"), LegendElement::LINE, mWidthList.at(1), mColorList.at(1));
-	elements << LegendElement(QStringLiteral("单向通行道路,\n可通行方向"), LegendElement::LINE, mWidthList.at(2), mColorList.at(2));
-	elements << LegendElement(QStringLiteral("单向通行道路,\n不可通行方向"), LegendElement::LINE, mWidthList.at(3), mColorList.at(3));
-	elements << LegendElement(QStringLiteral("单向通行道路,\n不可通行方向,\n但公交车辆可通行"), LegendElement::LINE, mWidthList.at(4), mColorList.at(4));
+	elements << LegendElement(mLabelTextList.at(0), LegendElement::LINE, mWidthList.at(0), mColorList.at(0));
+	elements << LegendElement(mLabelTextList.at(1), LegendElement::LINE, mWidthList.at(1), mColorList.at(1));
+	elements << LegendElement(mLabelTextList.at(2), LegendElement::LINE, mWidthList.at(2), mColorList.at(2));
+	elements << LegendElement(mLabelTextList.at(3), LegendElement::LINE, mWidthList.at(3), mColorList.at(3));
+	elements << LegendElement(mLabelTextList.at(4), LegendElement::LINE, mWidthList.at(4), mColorList.at(4));
 	Legend* legend = new Legend(elements);
-	LegendProxy* proxy = new LegendProxy(legend);
-	addItem(proxy);
+	mLegendProxy = new LegendProxy(legend);
+	addItem(mLegendProxy);
 }
 
-void RoadTypeGraphicsScene::doSomething()
+void RoadTypeGraphicsScene::updateItemsAttr()
 {
-
+	QListIterator<GraphicsSideLineItem*> itemIte(mSideLineItemList);
+	Edge * edgeData;
+	GraphicsSideLineItem * item;
+	int index;
+	while (itemIte.hasNext())
+	{
+		item = itemIte.next();
+		edgeData = item->edgeData();
+		index = edgeData->roadType() - 1;
+		item->updateAttr(mColorList.at(index), mWidthList.at(index));
+	}
+	mLegendProxy->updateAttr(mColorList, mWidthList);
 }
+

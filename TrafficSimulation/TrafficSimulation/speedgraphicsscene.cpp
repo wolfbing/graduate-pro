@@ -9,7 +9,7 @@
 
 
 SpeedGraphicsScene::SpeedGraphicsScene(QObject *parent)
-	: GraphicsScene(parent)
+	: RoadGraphicsScene(parent)
 {
 	init();
 	addLegend();
@@ -26,6 +26,7 @@ void SpeedGraphicsScene::init()
 		<<  QColor(230,204,58) << QColor(240,129,0) << QColor(223,35,40);
 	mWidthList << 3 << 3 << 3 << 3 << 3 << 3;
 	mZValueList << 1 << 2 << 3 << 4 << 5 << 6;
+	mLabelTextList << "<=10" << "10-20" << "20-30" << "30-40" << "40-60" << ">=60";
 }
 
 void SpeedGraphicsScene::addItems()
@@ -65,25 +66,45 @@ void SpeedGraphicsScene::addItems()
 void SpeedGraphicsScene::addLegend()
 {
 	QList<LegendElement> elements;
-	elements << LegendElement("<=10", LegendElement::LINE, mWidthList.at(0), mColorList.at(0));
-	elements << LegendElement("10-20", LegendElement::LINE, mWidthList.at(1), mColorList.at(1));
-	elements << LegendElement("20-30", LegendElement::LINE, mWidthList.at(2), mColorList.at(2));
-	elements << LegendElement("30-40", LegendElement::LINE, mWidthList.at(3), mColorList.at(3));
-	elements << LegendElement("40-60", LegendElement::LINE, mWidthList.at(4), mColorList.at(4));
-	elements << LegendElement(">=60", LegendElement::LINE, mWidthList.at(5), mColorList.at(5));
+	elements << LegendElement(mLabelTextList.at(0), LegendElement::LINE, mWidthList.at(0), mColorList.at(0));
+	elements << LegendElement(mLabelTextList.at(1), LegendElement::LINE, mWidthList.at(1), mColorList.at(1));
+	elements << LegendElement(mLabelTextList.at(2), LegendElement::LINE, mWidthList.at(2), mColorList.at(2));
+	elements << LegendElement(mLabelTextList.at(3), LegendElement::LINE, mWidthList.at(3), mColorList.at(3));
+	elements << LegendElement(mLabelTextList.at(4), LegendElement::LINE, mWidthList.at(4), mColorList.at(4));
+	elements << LegendElement(mLabelTextList.at(5), LegendElement::LINE, mWidthList.at(5), mColorList.at(5));
 	Legend* legend = new Legend(elements);
-	LegendProxy* proxy = new LegendProxy(legend);
-	addItem(proxy);
+	mLegendProxy = new LegendProxy(legend);
+	addItem(mLegendProxy);
 }
 
-void SpeedGraphicsScene::updateItems()
+void SpeedGraphicsScene::updateItemsAttr()
 {
-	GraphicsScene::updateItems();
-	QListIterator<GraphicsSideLineItem*> ite(mSideLineItemList);
-	GraphicsSideLineItem* item;
-	while (ite.hasNext())
+	QListIterator<GraphicsSideLineItem*> itemIte(mSideLineItemList);
+	Edge* tmpEdgeData;
+	qreal speed;
+	GraphicsSideLineItem * item;
+	int index;
+	while (itemIte.hasNext())
 	{
-		item = ite.next();
-		item->advance();
+		item = itemIte.next();
+		tmpEdgeData = item->edgeData();
+		speed =tmpEdgeData->speed()->speed();
+		if(speed<=10)
+			index = 0;
+		else if(speed<=20)
+			index = 1;
+		else if(speed<=30)
+			index = 2;
+		else if(speed<=40)
+			index = 3;
+		else if(speed<=60)
+			index = 4;
+		else
+			index = 5;
+		item->setColor(mColorList.at(index)).setWidth(mWidthList.at(index));
 	}
+	mLegendProxy->updateAttr(mColorList, mWidthList);
+
 }
+
+

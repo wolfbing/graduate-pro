@@ -1,12 +1,12 @@
 #ifndef TRAFFICNUMLIMITGRAPHICSSCENE_H
 #define TRAFFICNUMLIMITGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "roadgraphicsscene.h"
 
 
 class GraphicsSideLineItem;
 
-class TrafficNumLimitGraphicsScene : public GraphicsScene
+class TrafficNumLimitGraphicsScene : public RoadGraphicsScene
 {
 	Q_OBJECT
 
@@ -26,14 +26,9 @@ public:
 protected:
 	void init();
 	void addLegend();
-	void updateItems();
+	void updateItemsAttr();
 
 private:
-	QList<GraphicsSideLineItem*> mSideLineItemList;
-	// 绘制属性
-	QList<QColor> mColorList;
-	QList<qreal> mWidthList;
-	QList<qreal> mZValueList;
 	// 现行车种
 	LimitType mLimitType;
 	

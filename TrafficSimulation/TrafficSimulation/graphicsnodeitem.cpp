@@ -212,4 +212,13 @@ GraphicsNodeItem & GraphicsNodeItem::setGraphType(NodeItemType type)
 	return *this;
 }
 
+void GraphicsNodeItem::updateAttr(QColor innerColor, QColor borderColor, qreal radius, bool haveBorder)
+{
+	mInnerColor = innerColor;
+	mBorderColor = borderColor;
+	mRadius = radius;
+	mHaveBorder = haveBorder;
+	update();
+}
+
 

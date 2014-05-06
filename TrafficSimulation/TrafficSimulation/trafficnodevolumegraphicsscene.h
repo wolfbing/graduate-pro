@@ -1,14 +1,14 @@
 #ifndef TRAFFICNODEVOLUMEGRAPHICSSCENE_H
 #define TRAFFICNODEVOLUMEGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "commonnodegraphicsscene.h"
 
 
 class GraphicsEdgeNetItem;
 class GraphicsNodeItem;
 
 
-class TrafficNodeVolumeGraphicsScene : public GraphicsScene
+class TrafficNodeVolumeGraphicsScene : public CommonNodeGraphicsScene
 {
 	Q_OBJECT
 
@@ -28,21 +28,9 @@ public:
 protected:
 	void init();
 	void addLegend();
-	void updateItems();
+	void updateItemsAttr();
 
 private:
-	QList<GraphicsNodeItem*> mNodeItemList;
-	GraphicsEdgeNetItem* mEdgeNetItem;
-	// ªÊ÷∆ Ù–‘
-	QList<QColor> mNodeInnerColorList;
-	QList<QColor> mNodeBorderColorList;
-	QList<qreal> mNodeRadiusList;
-	QList<bool> mNodeHaveBorderList;
-	QColor mEdgeNetInnerColor;
-	QColor mEdgeNetBorderColor;
-	qreal mEdgeNetWidth;
-	bool mEdgeNetHaveBorder;
-
 	// node type
 	VolumeType mVolumeType;
 	

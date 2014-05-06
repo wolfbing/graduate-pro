@@ -29,6 +29,7 @@ public:
 signals:
 	void sizeChange(int w, int h);
 	void print();
+	void configGraphics();
 
 public slots:
 	void updateStatus(QString);
@@ -38,6 +39,7 @@ public slots:
 	void selectGraphics();
 	void createDb();
 	void selectDb();
+	void config();
 
 protected:
 	void showEvent(QShowEvent *);
@@ -67,6 +69,7 @@ private:
 	QAction* mSelectSceneAction;
 	QAction* mCreateDbAction;
 	QAction* mSelectDbAction;
+	QAction* mConfigAction;
 
 	DbAdapter mDbAdapter;
     QList<Edge*> mEdgeDataList;

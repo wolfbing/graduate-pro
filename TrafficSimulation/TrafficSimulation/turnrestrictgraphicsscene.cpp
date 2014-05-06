@@ -7,7 +7,7 @@
 
 
 TurnRestrictGraphicsScene::TurnRestrictGraphicsScene(QObject *parent)
-	: GraphicsScene(parent)
+	: CommonNodeGraphicsScene(parent)
 {
 	init();
 	addLegend();
@@ -29,9 +29,9 @@ void TurnRestrictGraphicsScene::addItems()
 		tmpNodeData = nodeIte.next();
 		index = tmpNodeData->haveTurnRestrict() ? 1 : 0;
 		tmpNodeItem = new GraphicsNodeItem;
-		tmpNodeItem->setNodeData(tmpNodeData).setHaveBorder(mNodeHaveBorderList.at(index))
-			.setRadius(mNodeRadiusList.at(index)).setInnerColor(mNodeInnerColorList.at(index))
-			.setBorderColor(mNodeBorderColorList.at(index)).setNodeItemType(GraphicsNodeItem::Restriction);
+		tmpNodeItem->setNodeData(tmpNodeData).setHaveBorder(mHaveBorderList.at(index))
+			.setRadius(mSizeList.at(index)).setInnerColor(mInnerColorList.at(index))
+			.setBorderColor(mBorderColorList.at(index)).setNodeItemType(GraphicsNodeItem::Restriction);
 		addItem(tmpNodeItem);
 		connect(tmpNodeItem, SIGNAL(sendTmpInfoToStatus(QString)), this, SIGNAL(sendMsgToStatus(QString)) );
 		connect(tmpNodeItem, SIGNAL(clearTmpInfoFromStatus()), this, SIGNAL(clearMsgFromStatus() ) );
@@ -40,8 +40,8 @@ void TurnRestrictGraphicsScene::addItems()
 	QListIterator<Edge*> edgeDataIte(mEdgeDataList);
 	Edge * tmpEdgeData;
 	mEdgeNetItem = new GraphicsEdgeNetItem;
-	mEdgeNetItem->setHaveBorder(mEdgeNetHaveBorder).setInnerColor(mEdgeNetInnerColor)
-		.setBorderColor(mEdgeNetBorderColor).setWidth(mEdgeNetWidth);
+	mEdgeNetItem->setHaveBorder(mHaveBorderList.last()).setInnerColor(mInnerColorList.last())
+		.setBorderColor(mBorderColorList.last()).setWidth(mSizeList.last());
 	while (edgeDataIte.hasNext())
 	{
 		tmpEdgeData = edgeDataIte.next();
@@ -51,50 +51,50 @@ void TurnRestrictGraphicsScene::addItems()
 
 }
 
-void TurnRestrictGraphicsScene::updateItems()
-{
-	GraphicsScene::updateItems();
-	QListIterator<GraphicsNodeItem*> nodeItemIte(mNodeItemList);
-	GraphicsNodeItem* tmpNodeItem;
-	while (nodeItemIte.hasNext())
-	{
-		tmpNodeItem = nodeItemIte.next();
-		tmpNodeItem->setPos(tmpNodeItem->nodeData()->sceneCoor());
-
-	}
-	mEdgeNetItem->advance();
-}
-
 void TurnRestrictGraphicsScene::addLegend()
 {
 	QList<LegendElement> elements;
-	elements << LegendElement(QStringLiteral("无转向限制交叉"), LegendElement::THICK_DOT, mNodeRadiusList.at(0),
-		mNodeInnerColorList.at(0), mNodeBorderColorList.at(0));
-	elements << LegendElement(QStringLiteral("转向限制交叉"), LegendElement::THICK_DOT, mNodeRadiusList.at(1),
-		mNodeInnerColorList.at(1), mNodeBorderColorList.at(1));
-	elements << LegendElement(QStringLiteral("路段"), LegendElement::THICK_LINE, mEdgeNetWidth,
-		mEdgeNetInnerColor, mEdgeNetBorderColor);
-	Legend * legend = new Legend(elements);
-	LegendProxy * proxy = new LegendProxy;
-	proxy->setWidget(legend);
-	addItem(proxy);
+	elements << LegendElement(mLabelTextList.at(0), LegendElement::THICK_DOT, mSizeList.at(0),
+		mInnerColorList.at(0), mBorderColorList.at(0));
+	elements << LegendElement(mLabelTextList.at(1), LegendElement::THICK_DOT, mSizeList.at(1),
+		mInnerColorList.at(1), mBorderColorList.at(1));
+	elements << LegendElement(mLabelTextList.at(2), LegendElement::THICK_LINE, mSizeList.at(2),
+		mInnerColorList.at(2), mBorderColorList.at(2));
+	mLegend = new Legend(elements);
+	LegendProxy * mLegendProxy = new LegendProxy;
+	mLegendProxy->setWidget(mLegend);
+	addItem(mLegendProxy);
 
 }
 
 void TurnRestrictGraphicsScene::init()
 {
-	mNodeBorderColorList << QColor() << QColor();
-	mNodeInnerColorList << QColor(0,255,0) << QColor(255,0,0);
-	mNodeRadiusList << 4 << 4;
-	mNodeHaveBorderList << true << true;
-	mEdgeNetBorderColor =  QColor(203,168,87);
-	mEdgeNetHaveBorder = true;
-	mEdgeNetWidth = 4.0;
-	mEdgeNetInnerColor = QColor(253,206,102);
+	mBorderColorList << QColor() << QColor() << QColor(203,168,87);
+	mInnerColorList << QColor(0,255,0) << QColor(255,0,0) << QColor(253,206,102);
+	mSizeList << 4 << 4 << 4;
+	mHaveBorderList << true << true << true;
+	mLabelTextList << QStringLiteral("无转向限制交叉") << QStringLiteral("转向限制交叉") <<
+		QStringLiteral("路段");
 
 }
 
-void TurnRestrictGraphicsScene::doSomething()
+void TurnRestrictGraphicsScene::updateItemsAttr()
 {
-
+	QListIterator<GraphicsNodeItem*> nodeItemIte(mNodeItemList);
+	GraphicsNodeItem * tmpNodeItem;
+	Node* tmpNodeData;
+	int index;
+	while (nodeItemIte.hasNext())
+	{
+		tmpNodeItem = nodeItemIte.next();
+		tmpNodeData = tmpNodeItem->nodeData();
+		index = tmpNodeData->haveTurnRestrict() ? 1 : 0;
+		tmpNodeItem->updateAttr(mInnerColorList.at(index), mBorderColorList.at(index),
+			mSizeList.at(index), mHaveBorderList.at(index));
+	}
+	mEdgeNetItem->updateAttr(mInnerColorList.last(), mBorderColorList.last(),
+		mSizeList.last(), mHaveBorderList.last());
+	mLegend->updateAttr(mInnerColorList, mBorderColorList, mSizeList);
 }
+
+

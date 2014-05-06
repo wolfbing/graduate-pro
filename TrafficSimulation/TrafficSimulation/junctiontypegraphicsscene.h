@@ -1,12 +1,12 @@
 #ifndef JUNCTIONTYPEGRAPHICSSCENE_H
 #define JUNCTIONTYPEGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "commonnodegraphicsscene.h"
 
 class GraphicsEdgeNetItem;
 class GraphicsNodeItem;
 
-class JunctionTypeGraphicsScene : public GraphicsScene
+class JunctionTypeGraphicsScene : public CommonNodeGraphicsScene
 {
 	Q_OBJECT
 
@@ -16,26 +16,15 @@ public:
 
 	void addItems();
 
+protected:
+	void updateItemsAttr();
+
 private:
 	void init();
-	void updateItems();
 	void addLegend();
-	void doSomething();
+
 
 private:
-	GraphicsEdgeNetItem * mEdgeNetItem;
-	QList<GraphicsNodeItem*> mNodeItemList;
-
-	// ªÊÕº Ù–‘
-	QList<QColor> mNodeInnerColorList;
-	QList<QColor> mNodeBorderColorList;
-	QList<qreal> mNodeRadiusList;
-	QList<bool> mNodeHaveBorderList;
-
-	QColor mEdgeNetInnerColor;
-	QColor mEdgeNetBorderColor;
-	bool mEdgeNetHaveBorder;
-	qreal mEdgeNetWidth;
 	
 };
 

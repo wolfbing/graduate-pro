@@ -107,6 +107,12 @@ void GraphicsSideLineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		+ "-" + QString::number(mEdgeData->destNode()->no()) + ";  ";
 	switch (mGraphType)
 	{
+	case BusNumGraph:
+		msg += QStringLiteral("公交线路数量: ") + QString::number(mEdgeData->busNum());
+		break;
+	case RoadLevelGraph:
+		msg += QStringLiteral("道路等级: ") + QString::number(mEdgeData->roadLevel());
+		break;
 	case GraphicsSideLineItem::RoadTypeGraph:
 		msg += QStringLiteral("道路类型: ") + QString::number(mEdgeData->roadType());
 		break;
@@ -180,4 +186,16 @@ GraphicsSideLineItem & GraphicsSideLineItem::setGraphType(GraphType type)
 {
 	mGraphType = type;
 	return *this;
+}
+
+Edge* GraphicsSideLineItem::edgeData() const
+{
+	return mEdgeData;
+}
+
+void GraphicsSideLineItem::updateAttr(QColor color, qreal width)
+{
+	mColor = color;
+	mWidth = width;
+	update();
 }

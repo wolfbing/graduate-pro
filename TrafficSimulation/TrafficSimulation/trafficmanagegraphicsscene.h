@@ -1,11 +1,11 @@
 #ifndef TRAFFICMANAGEGRAPHICSSCENE_H
 #define TRAFFICMANAGEGRAPHICSSCENE_H
 
-#include "graphicsscene.h"
+#include "roadgraphicsscene.h"
 
 class GraphicsSideLineItem;
 
-class TrafficManageGraphicsScene : public GraphicsScene
+class TrafficManageGraphicsScene : public RoadGraphicsScene
 {
 	Q_OBJECT
 
@@ -19,16 +19,9 @@ public:
 protected:
 	void init();
 	void addLegend();
-	void doSomething();
-	void updateItems();
+	void updateItemsAttr();
 
 private:
-	QList<GraphicsSideLineItem*> mSideLineItemList;
-
-	// ªÊ÷∆ Ù–‘
-	QList<QColor> mColorList;
-	QList<qreal> mWidthList;
-	QList<qreal> mZValueList;
 	
 };
 

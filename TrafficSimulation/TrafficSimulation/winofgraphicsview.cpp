@@ -30,6 +30,9 @@
 #include "Speed.h"
 #include "speedgraphicsscene.h"
 
+//////   tmp include
+#include "roadgraphicsconfigdialog.h"
+
 
 WinOfGraphicsView::WinOfGraphicsView(QWidget *parent)
 	: QMainWindow(parent)
@@ -104,7 +107,8 @@ void WinOfGraphicsView::initActions()
 	connect(mCreateDbAction, SIGNAL(triggered()), this, SLOT(createDb()));
 	mSelectDbAction = new QAction("Select db",this);
 	connect(mSelectDbAction, SIGNAL(triggered()), this, SLOT(selectDb()));
-	
+	mConfigAction = new QAction("Config", this);
+	connect(mConfigAction, SIGNAL(triggered()), this, SLOT(config()));
 }
 
 void WinOfGraphicsView::initToolBar()
@@ -114,6 +118,7 @@ void WinOfGraphicsView::initToolBar()
 	mToolBar->addAction(mPrintAction);
 	mToolBar->addAction(mCreateDbAction);
 	mToolBar->addAction(mSelectDbAction);
+	mToolBar->addAction(mConfigAction);
 }
 
 void WinOfGraphicsView::loadDataFromDb()
@@ -281,6 +286,7 @@ void WinOfGraphicsView::loadDataFromDb()
 
 void WinOfGraphicsView::changeScene( int index1, int index2 )
 {
+	GraphicsScene* oriScene = mScene;
 	switch (index1)
 	{
 	case 0:
@@ -319,6 +325,7 @@ void WinOfGraphicsView::changeScene( int index1, int index2 )
 		case 3:
 			mScene = new TrafficManageGraphicsScene;
 			mScene->setTitle(QStringLiteral("道路交通管理"));
+			break;
 		case 4:
 			mScene = new TrafficForbidGraphicsScene;
 			((TrafficForbidGraphicsScene*) mScene)->setForbidType(TrafficForbidGraphicsScene::BikeForbid);
@@ -484,13 +491,15 @@ void WinOfGraphicsView::changeScene( int index1, int index2 )
 	default:
 		break;
 	}
-	
+	connect(mConfigAction, SIGNAL(triggered()), mScene, SLOT(config()));
 	mScene->setEdgeDataList(mEdgeDataList).setNodeDataList(mNodeDataList).addItems();
 	connect(mScene, SIGNAL(sendMsgToStatus(QString)), this, SLOT(updateStatus(QString)) );
 	connect(mScene, SIGNAL(clearMsgFromStatus()), this, SLOT(clearTmpMsgFromStatus())  );
 	updatePermanentStatus(QStringLiteral("节点数目：")+QString::number(mScene->nodeNum()),
 		QStringLiteral("路段数目：")+QString::number(mScene->edgeNum()) );
+	delete oriScene;
 	mView->setScene(mScene);
+	
 }
 
 void WinOfGraphicsView::showEvent( QShowEvent * evt )
@@ -541,6 +550,20 @@ void WinOfGraphicsView::selectDb()
 		loadDataFromDb();
 	}
 	
+}
+
+void WinOfGraphicsView::config()
+{
+	//RoadGraphicsConfigDialog* dialog = new RoadGraphicsConfigDialog(this);
+	//QList<QString> textList;
+	//textList << "item1" << "item2";
+	//QList<QColor> colorList;
+	//colorList << QColor(255,0,0) << QColor(0,0,255);
+	//QList<qreal> widthList;
+	//widthList << 3 << 3;
+	//dialog->setColorList(colorList).setWidthList(widthList).setLabelTextList(textList).draw();
+	//dialog->show();
+	emit configGraphics();
 }
 
 

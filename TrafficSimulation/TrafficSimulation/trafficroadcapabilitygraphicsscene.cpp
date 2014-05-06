@@ -8,7 +8,7 @@
 
 
 TrafficRoadCapabilityGraphicsScene::TrafficRoadCapabilityGraphicsScene(QObject *parent)
-	: GraphicsScene(parent)
+	: RoadGraphicsScene(parent)
 {
 	init();
 	addLegend();
@@ -79,30 +79,62 @@ void TrafficRoadCapabilityGraphicsScene::init()
 		<<  QColor(230,204,58) << QColor(240,129,0) << QColor(223,35,40);
 	mWidthList << 3 << 3 << 3 << 3 << 3 << 3;
 	mZValueList << 1 << 2 << 3 << 4 << 5 << 6;
+	mLabelTextList << "<=0.40" << "0.40-0.60" << "0.60-0.75" << "0.75-0.90"
+		<< "0.90-1.00" << ">=1.00";
 }
 
 void TrafficRoadCapabilityGraphicsScene::addLegend()
 {
 	QList<LegendElement> elements;
-	elements << LegendElement("<=0.40", LegendElement::LINE, mWidthList.at(0), mColorList.at(0));
-	elements << LegendElement("0.40-0.60", LegendElement::LINE, mWidthList.at(1), mColorList.at(1));
-	elements << LegendElement("0.60-0.75", LegendElement::LINE, mWidthList.at(2), mColorList.at(2));
-	elements << LegendElement("0.75-0.90", LegendElement::LINE, mWidthList.at(3), mColorList.at(3));
-	elements << LegendElement("0.90-1.00", LegendElement::LINE, mWidthList.at(4), mColorList.at(4));
-	elements << LegendElement(">=1.00", LegendElement::LINE, mWidthList.at(5), mColorList.at(5));
+	elements << LegendElement(mLabelTextList.at(0), LegendElement::LINE, mWidthList.at(0), mColorList.at(0));
+	elements << LegendElement(mLabelTextList.at(1), LegendElement::LINE, mWidthList.at(1), mColorList.at(1));
+	elements << LegendElement(mLabelTextList.at(2), LegendElement::LINE, mWidthList.at(2), mColorList.at(2));
+	elements << LegendElement(mLabelTextList.at(3), LegendElement::LINE, mWidthList.at(3), mColorList.at(3));
+	elements << LegendElement(mLabelTextList.at(4), LegendElement::LINE, mWidthList.at(4), mColorList.at(4));
+	elements << LegendElement(mLabelTextList.at(5), LegendElement::LINE, mWidthList.at(5), mColorList.at(5));
 	Legend* legend = new Legend(elements);
-	LegendProxy* proxy = new LegendProxy(legend);
-	addItem(proxy);
+	mLegendProxy = new LegendProxy(legend);
+	addItem(mLegendProxy);
 }
 
-void TrafficRoadCapabilityGraphicsScene::updateItems()
+void TrafficRoadCapabilityGraphicsScene::updateItemsAttr()
 {
-	GraphicsScene::updateItems();
-	QListIterator<GraphicsSideLineItem*> ite(mSideLineItemList);
 	GraphicsSideLineItem* item;
-	while (ite.hasNext())
+	QListIterator<GraphicsSideLineItem*> itemIte(mSideLineItemList);
+	qreal volume;
+	int index;
+	Edge* tmpEdgeData;
+	while (itemIte.hasNext())
 	{
-		item = ite.next();
-		item->advance();
+		item = itemIte.next();
+		tmpEdgeData = item->edgeData();
+		switch (mCapabilityType)
+		{
+		case TrafficRoadCapabilityGraphicsScene::MotorCapability:
+			volume = tmpEdgeData->trafficCapability()->motorCapability();
+			break;
+		case TrafficRoadCapabilityGraphicsScene::NonMotorCapability:
+			volume = tmpEdgeData->trafficCapability()->nonMotorCapability();
+			break;
+		default:
+			break;
+		}
+		if(volume<=0.4)
+			index = 0;
+		else if(volume<=0.6)
+			index = 1;
+		else if(volume<=0.75)
+			index = 2;
+		else if(volume<=0.90)
+			index = 3;
+		else if(volume<=1)
+			index = 4;
+		else
+			index = 5;
+		item->updateAttr(mColorList.at(index), mWidthList.at(index));
+		
 	}
+	mLegendProxy->updateAttr(mColorList, mWidthList);
 }
+
+

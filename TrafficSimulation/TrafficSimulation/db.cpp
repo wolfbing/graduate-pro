@@ -232,6 +232,11 @@ DB::~DB()
 void DB::createTablesAndFetchData()
 {
 	QSqlDatabase db = QSqlDatabase::addDatabase(sDbType, "create_db");
+	QDir dbDir("./");
+	if (!dbDir.exists("./db/"))
+	{
+		dbDir.mkdir("./db/");
+	}
 	db.setDatabaseName("./db/"+ mCreateDbName);
 	db.open();
     QSqlQuery query = QSqlQuery(db);

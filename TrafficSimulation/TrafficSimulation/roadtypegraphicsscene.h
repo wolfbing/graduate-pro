@@ -2,12 +2,12 @@
 #define ROADTYPEGRAPHICSSCENE_H
 
 #include <QGraphicsScene>
-#include "graphicsscene.h"
+#include "roadgraphicsscene.h"
 
 class GraphicsSideLineItem;
 class GraphicsEdgeItem;
 
-class RoadTypeGraphicsScene : public GraphicsScene
+class RoadTypeGraphicsScene : public RoadGraphicsScene
 {
 	Q_OBJECT
 
@@ -19,17 +19,10 @@ public:
 
 protected:
 	void init();
-	void updateItems();
 	void addLegend();
-	void doSomething();
+	void updateItemsAttr();
 
 private:
-	QList<GraphicsSideLineItem*> mSideLineItemList;
-
-	// ªÊ÷∆ Ù–‘
-	QList<QColor> mColorList;
-	QList<qreal> mWidthList;
-	QList<qreal> mZValueList;
 
 	
 };
