@@ -45,12 +45,12 @@ void RoadLevelGraphicsScene::addLegend()
 {
 	QList<LegendElement> elements;
 	elements << LegendElement(mLabelTextList.at(0),LegendElement::LINE,mWidthList.at(0),mColorList.at(0))
-		<< LegendElement(mLabelTextList.at(0),LegendElement::LINE, mWidthList.at(1),mColorList.at(1))
-		<< LegendElement(mLabelTextList.at(0),LegendElement::LINE, mWidthList.at(2),mColorList.at(2))
-		<< LegendElement(mLabelTextList.at(0),LegendElement::LINE, mWidthList.at(3),mColorList.at(3))
-		<< LegendElement(mLabelTextList.at(0),LegendElement::LINE, mWidthList.at(4),mColorList.at(4))
-		<< LegendElement(mLabelTextList.at(0),LegendElement::LINE, mWidthList.at(5),mColorList.at(5))
-		<< LegendElement(mLabelTextList.at(0),LegendElement::LINE, mWidthList.at(6),mColorList.at(6));
+		<< LegendElement(mLabelTextList.at(1),LegendElement::LINE, mWidthList.at(1),mColorList.at(1))
+		<< LegendElement(mLabelTextList.at(2),LegendElement::LINE, mWidthList.at(2),mColorList.at(2))
+		<< LegendElement(mLabelTextList.at(3),LegendElement::LINE, mWidthList.at(3),mColorList.at(3))
+		<< LegendElement(mLabelTextList.at(4),LegendElement::LINE, mWidthList.at(4),mColorList.at(4))
+		<< LegendElement(mLabelTextList.at(5),LegendElement::LINE, mWidthList.at(5),mColorList.at(5))
+		<< LegendElement(mLabelTextList.at(6),LegendElement::LINE, mWidthList.at(6),mColorList.at(6));
 	mLegend = new Legend(elements);
 	mLegendProxy = new LegendProxy;
 	mLegendProxy->setWidget(mLegend);
@@ -71,6 +71,7 @@ void RoadLevelGraphicsScene::addItems()
 		int level = tmpEdge->roadLevel();
 		item->setWidth(mWidthList.at(level)).setColor(mColorList.at(level))
 			.setZValue(mZValueList.at(level));
+		item->setGraphType(GraphicsSideLineItem::RoadLevelGraph);
 		mSideLineItemList << item;
 		addItem(item);
 		connect(item, SIGNAL(sendTmpInfoToStatus(QString)), this, SIGNAL(sendMsgToStatus(QString)) );
