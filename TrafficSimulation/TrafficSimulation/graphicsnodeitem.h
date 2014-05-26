@@ -19,7 +19,7 @@ public:
 		No,Junction,Restriction,
 		MotorVolumeGraph, NonMotorVolumeGraph, CarVolumeGraph, BusVolumeGraph,  // 车载量图
 		MotorbikeVolumeGraph, TaxiVolumeGraph, TruckVolumeGraph,     // 车载量图
-		MotorCapabilityGraph, NonMotorCapabilityGraph,  // 承载量
+		MotorCapabilityGraph, NonMotorCapabilityGraph,  // 负荷
 	};
 
 	// 重载

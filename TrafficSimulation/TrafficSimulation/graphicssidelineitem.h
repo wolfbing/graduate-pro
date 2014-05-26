@@ -27,7 +27,9 @@ public:
 		BusForbidGraph, TaxiForbidGraph, TruckForbidGraph,  // 禁行类型图
 		CarLimitGraph, TaxiLimitGraph, TruckLimitGraph, MotorLimitGraph,  // 限号通行类型图
 		MotorVolumeGraph, NonMotorVolumeGraph, CarVolumeGraph, BusVolumeGraph,  // 车载量图
-		MotorbikeVolumeGraph, TaxiVolumeGraph, TruckVolumeGraph     // 车载量图
+		MotorbikeVolumeGraph, TaxiVolumeGraph, TruckVolumeGraph,     // 车载量图
+		MotorCapabilityGraph, NonMotorCapabilityGraph, // 负荷量
+		SpeedGraph,  // 平均速度
 	};
 
 	// set

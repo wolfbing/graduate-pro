@@ -4,6 +4,8 @@
 #include "Edge.h"
 #include "RoadPermission.h"
 #include "TrafficVolume.h"
+#include "Capability.h"
+#include "Speed.h"
 
 GraphicsSideLineItem::GraphicsSideLineItem(QGraphicsItem *parent)
 	: QGraphicsItem(parent)
@@ -169,6 +171,15 @@ void GraphicsSideLineItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		break;
 	case TruckVolumeGraph:
 		msg += QStringLiteral("货车交通量: ") + QString::number(mEdgeData->trafficVolume()->truckVolume());
+		break;
+	case MotorCapabilityGraph:
+		msg += QStringLiteral("负荷量: ") + QString::number(mEdgeData->trafficCapability()->motorCapability());
+		break;
+	case NonMotorCapabilityGraph:
+		msg += QStringLiteral("负荷量: ") + QString::number(mEdgeData->trafficCapability()->nonMotorCapability());
+		break;
+	case SpeedGraph:
+		msg += QStringLiteral("平均速度: ") + QString::number(mEdgeData->speed()->speed());
 		break;
 	default:
 		break;

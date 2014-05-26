@@ -141,31 +141,31 @@ void GraphicsNodeItem::hoverEnterEvent( QGraphicsSceneHoverEvent *event )
 		str += QStringLiteral(";  转向限制: ") + QString::number(mNodeData->haveTurnRestrict() ? 1:0);
 		break;
 	case GraphicsNodeItem::MotorVolumeGraph:
-		str += QStringLiteral("机动车交通量") + QString::number(mNodeData->trafficVolume()->motorVolume());
+		str += QStringLiteral("机动车交通量: ") + QString::number(mNodeData->trafficVolume()->motorVolume());
 		break;
 	case GraphicsNodeItem::NonMotorVolumeGraph:
-		str += QStringLiteral("非机动车交通量") + QString::number(mNodeData->trafficVolume()->nonMotorVolume());
+		str += QStringLiteral("非机动车交通量: ") + QString::number(mNodeData->trafficVolume()->nonMotorVolume());
 		break;
 	case GraphicsNodeItem::CarVolumeGraph:
-		str += QStringLiteral("客车交通量") + QString::number(mNodeData->trafficVolume()->carVolume());
+		str += QStringLiteral("客车交通量: ") + QString::number(mNodeData->trafficVolume()->carVolume());
 		break;
 	case GraphicsNodeItem::BusVolumeGraph:
-		str += QStringLiteral("公交车交通量") + QString::number(mNodeData->trafficVolume()->busVolume());
+		str += QStringLiteral("公交车交通量: ") + QString::number(mNodeData->trafficVolume()->busVolume());
 		break;
 	case GraphicsNodeItem::MotorbikeVolumeGraph:
-		str += QStringLiteral("摩托车交通量") + QString::number(mNodeData->trafficVolume()->motorbikeVolume());
+		str += QStringLiteral("摩托车交通量: ") + QString::number(mNodeData->trafficVolume()->motorbikeVolume());
 		break;
 	case GraphicsNodeItem::TaxiVolumeGraph:
-		str += QStringLiteral("出租车交通量") + QString::number(mNodeData->trafficVolume()->taxiVolume());
+		str += QStringLiteral("出租车交通量: ") + QString::number(mNodeData->trafficVolume()->taxiVolume());
 		break;
 	case GraphicsNodeItem::TruckVolumeGraph:
-		str += QStringLiteral("货车交通量") + QString::number(mNodeData->trafficVolume()->truckVolume());
+		str += QStringLiteral("货车交通量: ") + QString::number(mNodeData->trafficVolume()->truckVolume());
 		break;
 	case MotorCapabilityGraph:
-		str += QStringLiteral("") + QString::number(mNodeData->trafficCapability()->motorCapability());
+		str += QStringLiteral("非机动车负荷量: ") + QString::number(mNodeData->trafficCapability()->motorCapability());
 		break;
 	case NonMotorCapabilityGraph:
-		str += QStringLiteral("") + QString::number(mNodeData->trafficCapability()->nonMotorCapability());
+		str += QStringLiteral("非机动车负荷量: ") + QString::number(mNodeData->trafficCapability()->nonMotorCapability());
 		break;
 	default:
 		break;

@@ -53,7 +53,7 @@ void SpeedGraphicsScene::addItems()
 			index = 4;
 		else
 			index = 5;
-
+		item->setGraphType(GraphicsSideLineItem::SpeedGraph);
 		item->setEdgeData(tmpEdgeData).setColor(mColorList.at(index)).setWidth(mWidthList.at(index))
 			.setZValue(mZValueList.at(index));
 		connect(item, SIGNAL(sendTmpInfoToStatus(QString)), this, SIGNAL(sendMsgToStatus(QString)) );
